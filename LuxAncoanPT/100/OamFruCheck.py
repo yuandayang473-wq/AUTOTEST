@@ -1,7 +1,7 @@
 # !/usr/bin/python3
 # -*- encoding: utf-8 -*-
 '''
-@Author  :   Jinwen.chen
+@Author  :   yuandayang
 @Contact :   Jinwen.chen@luxshare-ict.com
 @Software:   TestCase
 @File    :   OamFruCheck.py
@@ -70,7 +70,7 @@ class OamFruCheck(TempItem):
 
                 parser = self.execute_run(f"python {fru_path}ppudbg_load_fru.py --function=read --device={device_id}")
                 sn2 = parser.get_value(r"serial[ =]+(KS.*)")
-                self.assertEqual(f"ppu device {device_id}", sn1, sn2)
+                self.assertEqual(ErrorCode.FFFFFFFF, f"ppu device {device_id}", sn1, sn2)
 
         
 

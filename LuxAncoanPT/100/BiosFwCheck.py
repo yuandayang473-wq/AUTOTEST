@@ -1,7 +1,7 @@
 # !/usr/bin/python3
 # -*- encoding: utf-8 -*-
 '''
-@Author  :   陈进文
+@Author  :   yuandayang
 @Contact :   jinwen.chen@luxshare-ict.com
 @Software:   TestCase
 @File    :   BiosFwCheck.py

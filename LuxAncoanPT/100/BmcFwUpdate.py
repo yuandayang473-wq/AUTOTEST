@@ -1,7 +1,7 @@
 # !/usr/bin/python3
 # -*- encoding: utf-8 -*-
 '''
-@Author  :   Lujunchdng
+@Author  :   yuandayang
 @Contact :   Juncheng.Lu@luxshare-ict.com
 @Software:   TestCase
 @File    :   BmcFwUpdate.py
