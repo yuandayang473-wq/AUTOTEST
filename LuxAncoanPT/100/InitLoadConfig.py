@@ -37,6 +37,7 @@ from Lib.Request import MesSocket
 from Lib.Result import Fail
 from Lib.Error import Error
 from Utils.Constant import ErrorCode
+from Utils.Init import PpuInitLoadConfig
 
 
 class InitLoadConfig(TempItem):
@@ -50,6 +51,7 @@ class InitLoadConfig(TempItem):
         cfg = JsonLoadConfig(cfg_path_name="", cfg_name="jobcontext.json").get_config()
         sn = cfg["unitData"]["name"].strip()
         url = cfg["flowdata"]["tcs_data_url"].strip()
+        http_server_url = cfg["flowdata"]["http_server_url"].strip()
         mes = MesSocket(url)
         rk, status = mes.save_mes_info(sn)
         if status != 200:
@@ -59,40 +61,16 @@ class InitLoadConfig(TempItem):
             "info": {
                 "sn": sn,
                 "url": url,
-                "rk": rk
+                "rk": rk,
+                "http_server_url": http_server_url
             }
         }
         JsonLoadConfig(cfg_path_name="", cfg_name="mes_info.json").set_config(data, is_new_file=True)
 
-        # PpuInitLoadConfig().load_config(self.get_logger())
-        # self.init_settings()
+        PpuInitLoadConfig().load_config(self.get_logger())
+        self.init_settings()
 
     def init_settings(self):
-        user = {
-            "ip_address": "localhost",
-            "password": "123456",
-            "username": "root"
-        }
-
-        self.config = [
-            {"file": "BmcDevice.yaml", "name": "TAIL_TAOBAO_BMC", "key": "BMC_02"},
-        ]
-        # with self.ssh_connect(uut=user):
-        #     for host in [self.config["TAIL_TAOBAO_BMC"]]:
-        #         ip = host["ip_address"]
-        #         user = host["username"]
-        #         password = host["password"]
-        #         self.execute_run(f"cat /root/.ssh/known_hosts | grep -i '{ip}'", save_exit_code=True)
-        #         if self.ssh.get_exit_code() == 0:
-        #             self.execute_run(f"sed -i '/{ip}/d' /root/.ssh/known_hosts", i_exit_code=True)
-        #
-        #         self.sleep(3)
-        #         self.invoke_run(f"ssh {user}@{ip}", end_with="yes/no")
-        #         self.invoke_run("yes", end_with="password")
-        #         self.invoke_run(f"{password}", end_with="# |~ |$")
-        #         self.invoke_run("exit", end_invoke=True)
-        #         self.sleep(3)
-        #
         import paramiko
         for host in [self.config["TAIL_TAOBAO_BMC"]]:
             ip = host["ip_address"]
