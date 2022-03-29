@@ -14,6 +14,7 @@ import contextlib
 import time
 import logging
 import os
+import shutil
 
 
 from Lib.Constant import Log
@@ -71,9 +72,7 @@ class Case:
         self.root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.platform = ControlPlatform(self)
 
-        # 存在客户Log
-        if not self.CUSTOM_LOG_PATH:
-            self.CUSTOM_LOG_PATH = os.path.join(self.root_path, "customlog")
+        self.CUSTOM_LOG_PATH = os.path.join(self.root_path, "customlog")
 
         if os.path.isdir(self.CUSTOM_LOG_PATH):
             shutil.rmtree(self.CUSTOM_LOG_PATH, ignore_errors=True)
