@@ -1,11 +1,20 @@
+#! /usr/bin/python3
+# coding=utf-8
+"""
+@Author  :   陈进文
+@Contact :   jinwen.chen@luxshare-ict.com
+@Software:   V2
+@File    :   BmcUtility.py
+@Time    :   2022/8/22
+@Version :   1.0
+@License :   Copyright ©LuxShare  2022 . All Rights Reserved.
+@Desc    :   bmc common function
+"""
+
 import time
 import datetime
 import os
 import contextlib
-# import platform, socket, re, uuid, json, psutil
-import logging
-
-from Utils.Login import SshConnect
 
 
 def current_datetime(time_format='%Y-%m-%d %H:%M:%S'):
@@ -60,28 +69,6 @@ def read_file(file):
     return data
 
 
-def os_env(server_cnf, local_cnf, log):
-    # 测试否是在os 环境下
-    server_ip = server_cnf.get("os_ip")
-    with SshConnect(
-            ip=local_cnf["os_ip"],
-            user=local_cnf["os_user"],
-            password=local_cnf["os_pwd"],
-            logger=log,
-            login_retry=1,
-    ) as ssh:
-        parser = ssh.run(
-            "ping -c 1 {ip}".format(ip=server_ip), retry_expt=1, i_exit_code=True
-        ).str_parser()
-        log.info(
-            "SSH Execute command ok, Output below: \n%s" % parser.get_origin_data()
-        )
-        val = parser.get_value(r"(100% packet loss)")
-        if val == "Null":
-            return True
-        return False
-
-
 def make_dir(dir):
     # make empty dir
     if os.path.exists(dir):
@@ -103,69 +90,6 @@ class Timer:
         Timer.second = end_time - start_time
 
 
-def creat_logger_files(case, cycle):
-    l_name = list(os.path.split(case.logger.log_name))
-    time_tag = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
-    l_name[-1] = f"{case.__class__.__name__}_{cycle}-{time_tag}.log"
-
-    fh = logging.FileHandler(os.path.join(*l_name))  # for file out
-    fh.setFormatter(case.parent.logger_factory.fmt)
-
-    p_logger = case.parent.get_logger()
-    p_logger.removeHandler(case.parent.logger_factory.fh)
-
-    for handler in case.logger.handlers[:]:  # make a copy of the list
-        case.logger.removeHandler(handler)
-
-    case.logger.addHandler(fh)
-
-
-# def getSystemInfo():
-#     try:
-#         info = {}
-#         info["OS"] = platform.system()
-#         info["Kernel"] = platform.release()
-#         info["architecture"] = platform.machine()
-#         info["hostname"] = socket.gethostname()
-#         info["ip-address"] = socket.gethostbyname(socket.gethostname())
-#         info["mac-address"] = ":".join(re.findall("..", "%012x" % uuid.getnode()))
-#         info["processor"] = platform.processor()
-#         info["ram"] = str(round(psutil.virtual_memory().total / (1024.0 ** 3))) + " GB"
-#         return json.dumps(
-#             info,
-#             indent=4,
-#             separators=(
-#                 ",",
-#                 ": ",
-#             ),
-#         )
-#     except Exception as e:
-#         logging.exception(e)
-
-
-def create_logger(name):
-    logger = logging.getLogger(name)
-    # 创建一个handler，用于写入日志文件
-    filename = f'{name}.log'
-    fh = logging.FileHandler(filename, mode='w+', encoding='utf-8')
-    # 再创建一个handler用于输出到控制台
-    ch = logging.StreamHandler()
-    # 定义输出格式(可以定义多个输出格式例formatter1，formatter2)
-    formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s", "%Y-%m-%d %H:%M:%S")
-    # 定义日志输出层级
-    logger.setLevel(logging.DEBUG)
-    # 定义控制台输出层级
-    # logger.setLevel(logging.DEBUG)
-    # 为文件操作符绑定格式（可以绑定多种格式例fh.setFormatter(formatter2)）
-    fh.setFormatter(formatter)
-    # 为控制台操作符绑定格式（可以绑定多种格式例ch.setFormatter(formatter2)）
-    ch.setFormatter(formatter)
-    # 给logger对象绑定文件操作符
-    logger.addHandler(fh)
-    # 给logger对象绑定文件操作符
-    return logger
-
-
 def power(x):
     """
     x = 2 ** n, 求n 的值
@@ -178,3 +102,93 @@ def power(x):
         x //= 2
         count += 1
     return count
+
+
+def _data(data, s_column, e_column=None, separator="|", exclude=[], keyword={}, stop=False, ignore_space=True):
+    """
+    :param data: sensor/sdr list response data
+    :param s_column: start column
+    :param e_column: end column
+    :return:
+    """
+
+    def get_data(r_d, c, ks):
+        d = []
+        temp = []
+        flag = True
+        for i in c:
+            v = r_d[i].strip()
+            match = ks.get(i, None)
+            if match:
+                if match.lower() in v.lower():
+                    temp.append(v)
+                else:
+                    flag = False
+            else:
+                temp.append(v)
+        if flag:
+            d = temp
+        return d
+
+    lines = data.split("\n")
+    count = 0
+    column_data = []
+    # for line in lines:
+    for i in range(len(lines)):
+        if i in exclude:
+            continue
+        line = lines[i]
+        row_data = line.split(separator)
+
+        # 过滤列表中的 ""
+        if ignore_space:
+            r_d = []
+            for c in row_data:
+                if c:
+                    r_d.append(c)
+            row_data = r_d
+
+        if e_column is not None:
+            if s_column[-1] < e_column < len(row_data):
+                if len(s_column) > 1:
+                    s_column.extend([i for i in range(s_column[-1], e_column + 1)])
+                else:
+                    s_column = [i for i in range(s_column[-1], e_column + 1)]
+
+        res = get_data(row_data, s_column, keyword)
+        if res:
+            column_data.append(res)
+            if stop:
+                break
+        count += 1
+
+    return column_data, count
+
+
+def a_column(data, column_index, separator="|", exclude=[], keyword={}, stop=False, ignore_space=True):
+    column_data, count = _data(data, [column_index], separator=separator, exclude=exclude, keyword=keyword, stop=stop,
+                               ignore_space=ignore_space)
+    return [c[0] for c in column_data]
+
+
+def multi_column(data, column_index, separator="|", exclude=[], keyword={}, stop=False, ignore_space=True):
+    column_data, count = _data(data, column_index, separator=separator, exclude=exclude, keyword=keyword, stop=stop,
+                               ignore_space=ignore_space)
+    return column_data
+
+
+def continuous_column(data, s_column, e_column, separator="|", exclude=[], keyword={}, stop=False, ignore_space=True):
+    """
+    :param data: sensor/sdr list response data
+    :param s_column: format s_column=0,s_column=[0],s_column=[0,3]
+    :param e_column:format e_column> s s_column, must be int
+    :return:
+    """
+    s_column = [s_column] if isinstance(s_column, int) else s_column
+    column_data, count = _data(data, s_column, e_column, separator=separator, exclude=exclude, keyword=keyword,
+                               stop=stop, ignore_space=ignore_space)
+    return column_data
+
+
+if __name__ == "__main__":
+    pass

@@ -100,7 +100,7 @@ class CaseLogger:
         else:
             fmt = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
 
-        fh = logging.FileHandler(log_name, encoding="UTF-8")  # for file out
+        fh = logging.FileHandler(log_name, encoding="UTF-8", mode="w")  # for file out
         fh.setFormatter(fmt)
         self.logger.addHandler(fh)
         sh = logging.StreamHandler()  # for print out
@@ -162,9 +162,9 @@ class RootLogger(object):
 
     def case_logger(self, case, prefix_format=None, log_flag="debug"):
         case_logger = self.ROOT_LOGGER.getChild(case)
-        time_tag = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
-        log_name = os.path.join(self.ROOT_LOGGER.name, "%s.log" % (case + '-' + time_tag))
-        # log_name = f"{self.LOG_ROOT_PATH}{case}_{time_tag}"
+        # time_tag = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
+        # log_name = os.path.join(self.ROOT_LOGGER.name, "%s.log" % (case + '-' + time_tag))
+        log_name = os.path.join(self.ROOT_LOGGER.name, f"{case}.log")
         return CaseLogger(case_logger, log_name, prefix_format, log_flag)
 
     def generate_log_folder(self, folder, sub_folder):

@@ -15,9 +15,8 @@
 import contextlib
 
 from .Case import Item
-from .Error import OverrideError, SSHSessionError, TimeoutError
+from .Error import OverrideError, SSHSessionError
 from Utils.Login import SshConnect, BmcConnect
-from Cmd.Cmd import get_bios_boot_stage, Chassis, build_cmd
 from Utils.DataBuffer import StrParser
 
 
@@ -135,29 +134,5 @@ class TempItem(Item):
         return f"[编号: {self.parent.globals['log_prefix']}]--{msg}"
 
 
-class BiosTmepItem(TempItem):
 
-    def setup(self):
-        with self.action("check entry os"):
-            with self.ssh_outband_connect():
-                parser = self.outband_run(Chassis.power_status)
-                value = parser.get_value(r"Chassis Power is (on|off)")
-                if value == "on":
-                    self.outband_run(Chassis.power_reset)
-                else:
-                    self.outband_run(Chassis.power_on)
-
-                self.check_bios_boot_stage(ipmi_I=True)
-
-    def check_bios_boot_stage(self, count=20, ipmi_I=False):
-        cur_count = 0
-        while cur_count <= count:
-            parser = self.execute_run(build_cmd(get_bios_boot_stage, "0x00 0x4c 0xa5"), parser_type="raw_parser",
-                                      desc="get bios boot stage", ipmi_I=ipmi_I)
-            val = parser.get_unit8(0)
-            if val == 200:
-                break
-            self.sleep(20)
-        else:
-            raise TimeoutError("not check bios boot stage")
 

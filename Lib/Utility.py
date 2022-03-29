@@ -11,75 +11,7 @@
 @Desc    :   None
 """
 
-import os
 import time
-from optparse import OptionParser
-from selenium import webdriver
-
-from .Config import YamlLoadConfig
-from .Error import FormatError
-
-
-def get_file_name(file_path):
-    """[summary]
-
-    Args:
-        file_path ([str]): [file name abcpath]
-
-    Raises:
-        TypeError: [not string]
-        FormatError: [endswith not .py]
-
-    Returns:
-        [str]: [generate a name]
-    """
-    # check file name is str
-    if not isinstance(file_path, str):
-        raise TypeError("file name is string")
-    # check file name format
-    if not file_path.endswith(".py"):
-        raise FormatError("file name must be .py")
-    file_name = os.path.basename(file_path)
-    new_name = file_name.replace(".py", "")
-    return new_name
-
-
-def set_options(extend_para=[]):
-    optparser = OptionParser()
-    if extend_para:
-        for p_file, p_dict in extend_para:
-            c = YamlLoadConfig(cfg_name=p_file)
-            i_p = p_dict.get("include", [])
-            e_p = p_dict.get("exclude", [])
-            default_p = p_dict.get("default", {})
-
-            if not i_p:
-                params = c.get_config()
-                i_p = params.keys()
-
-            p_list = set(i_p) - set(e_p)
-
-            for section in p_list:
-                para = c.data(section)
-                if section in default_p:
-                    para["default"] = default_p[section]
-                optparser.add_option('--' + str(section), **para)
-    else:
-        cnf = YamlLoadConfig(cfg_name="Param.yaml")
-        common_para = cnf.get_config()
-        for section, value in common_para.items():
-            optparser.add_option('--' + str(section), **value)
-    options, args = optparser.parse_args()
-    return options, optparser
-
-
-def gen_firefox_profile(downloadDir):
-    fp = webdriver.FirefoxProfile()
-    fp.set_preference("browser.download.folderList", 2)
-    fp.set_preference("browser.download.manager.showWhenStarting", False)
-    fp.set_preference("browser.download.dir", downloadDir)
-    fp.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/zip")
-    return fp
 
 
 class SleepTime:
