@@ -38,7 +38,7 @@ class LoadConfig(object):
             self.cnf = self._load_config(self.get_path())
         return self.cnf
 
-    def set_config(self, data, is_new_file=False):
+    def dump_config(self, data, is_new_file=False):
         file = os.path.join(self.cfg_path_name, self.cfg_name) if is_new_file else self.get_path()
         self._dump_config(file, data)
 
@@ -92,12 +92,15 @@ class JsonLoadConfig(LoadConfig):
             cnf = json.loads(f.read())
             return cnf
 
-    def data(self, type_name):
-        pass
-
-    def dump_config(self, data):
-        with open(self.get_path(), "w", encoding="utf-8") as f:
-            f.write(json.dumps(data))
+    def data(self, key):
+        data = self.get_config()
+        keys = key.split(".")
+        if len(keys) > 1:
+            for key in keys:
+                data = data[key]
+        else:
+            data = data[key]
+        return data
 
     def _dump_config(self, config_path, data):
         with open(config_path, "w", encoding="utf-8") as f:

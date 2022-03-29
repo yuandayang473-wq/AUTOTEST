@@ -142,7 +142,6 @@ class CaseLogger:
 
 class RootLogger(object):
     LOG_ROOT_PATH = None
-    CUSTOM_LOG_PATH = None
     ROOT_LOGGER = None
     _instance = None
 
@@ -191,14 +190,6 @@ class RootLogger(object):
         if os.path.isdir(self.LOG_ROOT_PATH):
             shutil.rmtree(self.LOG_ROOT_PATH, ignore_errors=True)
         os.makedirs(self.LOG_ROOT_PATH)
-
-        # 存在客户Log
-        if not self.CUSTOM_LOG_PATH:
-            self.CUSTOM_LOG_PATH = os.path.join(log_parent, "customlog")
-
-        if os.path.isdir(self.CUSTOM_LOG_PATH):
-            shutil.rmtree(self.CUSTOM_LOG_PATH, ignore_errors=True)
-        os.makedirs(self.CUSTOM_LOG_PATH)
 
         return folder
 

@@ -82,5 +82,16 @@ class Step:
         pass
 
 
+def get_file_content(file):
+    data = ""
+    with open(file, "r", encoding="utf-8", errors='ignore') as f:
+        while True:
+            d = f.read(1024)
+            if not d:
+                break
+            data += d
+    return data
+
+
 if __name__ == '__main__':
     pass

@@ -15,6 +15,7 @@ import time
 import logging
 import os
 
+
 from Lib.Constant import Log
 from .Result import Pass, Fail, Result
 from .Error import Error, ErrItemFail, MyAssertError
@@ -22,6 +23,7 @@ from .Config import YamlLoadConfig, JsonLoadConfig
 from .Utility import SleepTime, Step
 from .Logging import LoggerFactory, CaseLogger
 from .Login import OsRunCmd
+from .lux_control_platform import ControlPlatform
 
 _MAX_LENGTH = 100
 _LIEN_FEED_LENGTH = 60
@@ -53,28 +55,29 @@ class Case:
 
         # The case name.
         self.__name = None
-
         self.__config = {}
-
         self.__logger = None
-
         # The start time of the case.
         self.__start_time = None
-
         # The end time of the case.
         self.__end_time = None
-
         self.__id = None
-
         self.__expect = None
-
         self.__sleep = SleepTime()
         self._step = Step()
-
         self.isSkip = False
         self.result = Pass(self)
         self.os_run = None
         self.root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.platform = ControlPlatform(self)
+
+        # 存在客户Log
+        if not self.CUSTOM_LOG_PATH:
+            self.CUSTOM_LOG_PATH = os.path.join(self.root_path, "customlog")
+
+        if os.path.isdir(self.CUSTOM_LOG_PATH):
+            shutil.rmtree(self.CUSTOM_LOG_PATH, ignore_errors=True)
+        os.makedirs(self.CUSTOM_LOG_PATH)
 
     @property
     def ID(self):
@@ -145,21 +148,35 @@ class Case:
         ]
         """
         for conf in confs:
-            if isinstance(conf["key"], dict):
-                data = conf["key"]
+            if "folder" in conf:
+                c = YamlLoadConfig(cfg_path_name=conf["folder"], cfg_name=conf["file"])
             else:
-                if "folder" in conf and conf:
-                    c = YamlLoadConfig(cfg_path_name=conf["folder"], cfg_name=conf["file"])
-                else:
-                    c = YamlLoadConfig(cfg_name=conf["file"])
+                c = YamlLoadConfig(cfg_name=conf["file"])
 
-                if "key" in conf:
-                    data = c.data(conf["key"])
-
+            if "key" in conf:
+                if isinstance(conf["key"], dict):
+                    data = conf["key"]
                 else:
-                    data = c.get_config()
+                    keys = conf["key"].split("/")
+                    data = c.data(keys[0])
+                    if len(keys) > 1:
+                        for key in keys[1:]:
+                            data = data[key]
+                        else:
+                            self._gen_tool_abspath(keys, data)
+                    else:
+                        data = c.data(conf["key"])
+            else:
+                data = c.get_config()
 
             self.__config[conf["name"]] = data
+
+    def _gen_tool_abspath(self, keys, data):
+        for k, v in data.items():
+            if isinstance(v, str):
+                data[k] = os.path.join(self.root_path, "/".join(keys), v)
+            else:
+                self._gen_tool_abspath(keys, data[k])
 
     def get_logger(self) -> CaseLogger:
         """Get the logger.
@@ -595,6 +612,9 @@ class Item(Case):
         yield
         self.isSkip = False
 
+    def upload_log(self):
+        pass
+
 
 class Suite:
     """A Suite instance executes several test cases."""
@@ -751,4 +771,4 @@ class Suite:
 
             temp_ret["errlist"] = errlist
 
-        JsonLoadConfig(cfg_path_name="", cfg_name="result.json").set_config(temp_ret, is_new_file=True)
+        JsonLoadConfig(cfg_path_name="", cfg_name="result.json").dump_config(temp_ret, is_new_file=True)

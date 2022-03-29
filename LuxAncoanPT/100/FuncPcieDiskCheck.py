@@ -33,7 +33,7 @@ load_package(os.path.abspath(__file__))
 from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Utils.DataBuffer import StrParser
+from Lib.DataBuffer import StrParser
 from Utils.Constant import ErrorCode
 from Utils.Init import load_mes_info
 
