@@ -59,9 +59,7 @@ class BmcFwUpdate(TempItem):
         path = self.config["InitPath"]
         with self.ssh_connect(uut=self.config["UUT"]):
             
-            parser = self.execute_run("ls -l /opt/Alioam/")
-            if 'x' not in parser.get_origin_data():
-                self.execute_run("chmod -R 777 /opt/Alioam/")
+            self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/tools/ancoan/")
             
             # 检查机尾bmc fw版本
             parser = self.execute_run(f"ipmitool -I lanplus -H {tail_bmc_ip} -U admin -P admin mc info | grep -i 'Firmware Revision'")
@@ -120,7 +118,7 @@ class BmcFwUpdate(TempItem):
         self.sleep(60)
         user = {
             "ip_address": "localhost",
-            "password": "1",
+            "password": "123456",
             "username": "root"
         }
         host = self.config["HEADER_TAIL"]

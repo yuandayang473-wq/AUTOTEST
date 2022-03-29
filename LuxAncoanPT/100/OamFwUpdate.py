@@ -57,11 +57,12 @@ class OamFwUpdate(TempItem):
             for dev in range(8):
                 parser = self.execute_run(f"ppudbg --device {dev} | grep -i 'Firmware Version' | cut -d' ' -f3")
                 if parser.get_origin_data().strip() != target_oam_ver:
-                    parser = self.execute_run(f"ppudbg --mfu {path['oam_fw']} both 1 --device {dev}")
-                    if not re.search(r'Update\s*done!', parser.get_origin_data(), re.I):
+                    parser = self.execute_run(f"rpm -ivh  {path['oam_fw']} --force --nodeps")
+                    if not re.search(r'upgrade successfully ', parser.get_origin_data(), re.I):
                         self.logger.info("Oam fw flash bure fail")
                         self.fail(ErrorCode.FFFFFFFF, "Oam fw flash bure fail")
-        
+                    break
+
 
 
 if __name__ == '__main__':

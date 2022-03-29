@@ -51,22 +51,22 @@ class HeaderRetimerFwcheck(TempItem):
         ]
 
     def exe(self):
-        tail_bmc_ip = self.config["BMC_TAIL"]["ip_address"]
-        header_bmc_ip = self.config["BMC_HEADER"]["ip_address"]
         FwVsersion = self.config["FwVsersion"]
         
         with self.ssh_connect(uut=self.config["BMC_HEADER"]):
-            parser = self.execute_run("ls /var/retimer/ | xargs")
-            ven = parser.get_origin_data().split(" ")[0]
-            self.logger.info(ven)
-            from_ = 'header_m' if 'm' in ven else 'header_a'
-            parser = self.execute_run('''ipmitool alioem version | grep -i retimer | awk '{print $1"="$NF}' | xargs ''')
-            current_versions = parser.get_origin_data().split()
-            for i in current_versions:
-                self.logger.info(f"{i}")
-                self.assertEqual(ErrorCode.FWTCH00F, "check head retimer fw version", i.split('=')[1].strip().lower(), FwVsersion['retimer_ver'][from_].strip().lower())
-                
-        
+            for num in range(1, 9):
+                parser = self.execute_run(f"ipmitool raw 0x3e 0x07 0x00 0x4c 0xa5 0x07 0x03 {num} 9",
+                                          parser_type="raw_parser")
+                flag = parser.raw_str(0)
+
+                from_ = "header_m" if flag.lower() == "0b" else "header_a"
+
+                current_ver = str(binascii.a2b_hex(parser.get_origin_data().replace(' ', '')))[6:-1]
+                # self.logger.info(current_ver)
+
+                self.assertEqual(ErrorCode.FWTCH00F, "check head retimer fw version", current_ver.lower(),
+                                 FwVsersion['retimer_ver'][from_].strip().lower())
+
 
 
 if __name__ == '__main__':
