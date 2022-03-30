@@ -116,7 +116,7 @@ class StrParser(Parser):
 
     def __init__(self, data=None) -> None:
         if isinstance(data, bytes):
-            self.data = str(data, encoding="utf-8")
+            self.data = str(data, encoding="utf-8", errors="ignore")
         if isinstance(data, str):
             self.data = data
 

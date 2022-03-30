@@ -68,7 +68,7 @@ class Case:
         self._step = Step()
         self.isSkip = False
         self.result = Pass(self)
-        self.os_run = None
+        self.os_run = OsRunCmd()
         self.root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.platform = ControlPlatform(self)
 
@@ -740,7 +740,7 @@ class Suite:
         case_logger = self.root_logger.case_logger(Log.name, None, Log.debug)
         instance.set_logger(case_logger)
         instance.ID = test_id
-        instance.os_run = OsRunCmd(case_logger)
+        instance.os_run.set_logger(case_logger)
         ret = instance.run()
         ret.ID = instance.ID
         # 记录结束时间

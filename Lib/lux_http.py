@@ -1,16 +1,20 @@
 import os
 import requests
-from urllib import request, error
-import sys
-import shutil
+from urllib import request
 
 
 class Requests:
 
     @staticmethod
     def get(url):
-        response = requests.get(url)
-        return response.json()
+        data = None
+        try:
+            response = requests.get(url)
+            data = response.json()
+        except Exception as e:
+            pass
+
+        return data
 
 
 class RequestFile:

@@ -1,45 +1,47 @@
 # 注意缩进
 FW-VERSION:
   # bios fw version
-  bios_ver: '3.0.ES.AL.P.066.04'
-  bios_ver_for_at: '3.0.ES.AL.P.066.04'
+  bios_ver: '3.0.ES.AL.P.070.10'
+  bios_ver_for_at: '3.0.ES.AL.P.070.10'
   # 机头bmc fw version
-  header_bmc_ver: '7.27.12'
-  header_bmc_ver_for_at: '7.27.12'
+  header_bmc_ver: '7.29.14'
+  header_bmc_ver_for_at: '7.29.14'
+  header_nvmebp: "16"
   # 机尾bmc fw version
-  tail_bmc_ver: '7.18.99'
-  tail_bmc_ver_at: '7.18.15'
+  tail_bmc_ver: '7.21.15'
+  tail_bmc_ver_at: '7.21.15'
   # 机头cpld fw version
   cpuboard_ver: '3.12'
   cmuboard_ver: '3.11'
   # mcx nic fw version
   mcx6_ver: '22.35.1012'
   # oam fw version
-  oam_ver: '1.4.46-497ca'
+  oam_ver: '1.5.8-b023cf'
   # HIB fw version
-  hib_ver: '0x08'
-  ubb1: '0x0a'
+  hib_ver: '0x0b'
+  ubb1: '0x0c'
   ubb2: '0x04'
-  fanbp80: '0x17'
+  fanbp80: '0x19'
   fanbp40: '0x03'
-  nvmebp1: '0x16'
-  nvmebp2: '0x16'
+  nvmebp1: '0x17'
+  nvmebp2: '0x17'
   nvme_ver: 'JCV102S1'
   target_retimer_ver: '123456'
   # pcie switch fw version 4:4上行 8：8上行
   switch_ver:
-    4: "02.18.02.02"
-    8: "02.18.02.03"
+    4: "2.18.2.8"
+    8: "2.18.2.9"
   psu:
     header_psu: "00.10.11"
     tail_psu: "00.05.06"
-  
+  oampower_ver: "0x4"
+  eicfw_ver: "V1.1.4_306"
   # retimer
   retimer_ver:
     header_a: "2.2.36"
     header_m: "06_6A_A4_00"
-    tail_a: "2.2.1"
-    tail_m: "06_6A_A0_01"
+    tail_a: "2.7.17"
+    tail_m: "06_6A_A0_03"
 
 DEVICE_COUNT:
   nic_count: '1'
