@@ -57,6 +57,7 @@ class SwFwCheck(TempItem):
         count = 1
 
         with self.ssh_connect(uut=self.config["UUT"]):
+            self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/")
             self.invoke_run(f"{self.config['path']['pciesw_tool']}", end_with="connect with :")
 
             for i in range(1, 4):

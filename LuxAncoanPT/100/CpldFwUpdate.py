@@ -34,7 +34,7 @@ load_package(os.path.abspath(__file__))
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
-from Utils.Login import ApcConnect
+from Lib.Login import ApcConnect
 from Utils.Init import load_mes_info
 
 
