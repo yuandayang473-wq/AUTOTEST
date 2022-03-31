@@ -35,7 +35,7 @@ from Lib.Template import TempItem
 from Lib.Runner import runner
 
 
-class EicFwUpdate(TempItem):
+class EicFwCheck(TempItem):
 
     def __init__(self):
         super().__init__()
@@ -70,14 +70,10 @@ class EicFwUpdate(TempItem):
             for ver in rst:
                 ver = ver.split(":")[1].strip()
                 if ver != eic_ver:
-                    self.execute_run(f"cd  {path.get('test_path')}{path.get('eictool')}/02-DevelopKit/01-Package/platform/ && ./platform_test.sh mt 7 -a work -f files/{path.get('eicupdatefile')} ")
-                    break
-            self.execute_run(f"cd  {path.get('test_path')}{path.get('eictool')}/02-DevelopKit/01-Package/platform/ && ./platform_test.sh mt 7 -a work -r ")
-            
-           
+                    return Fail(self)
         return Pass(self)
 
 
 if __name__ == '__main__':
-    runner.single_runner(EicFwUpdate)
+    runner.single_runner(EicFwCheck)
 
