@@ -36,8 +36,8 @@ from Lib.Config import JsonLoadConfig
 from Lib.Request import MesSocket
 from Lib.Result import Fail
 from Lib.Error import Error
-from Utils.Constant import ErrorCode
 from Utils.Init import PpuInitLoadConfig
+from Utils.Constant import ErrorCode
 
 
 class InitLoadConfig(TempItem):
@@ -46,13 +46,16 @@ class InitLoadConfig(TempItem):
         super().__init__()
         self.name = "init ppu"
         self.expect = "load project info"
+        self.tip = "\033[32m{}\033[0m"
 
     def exe(self):
-
         cfg = JsonLoadConfig(cfg_path_name="", cfg_name="jobcontext.json").get_config()
         sn = cfg["unitData"]["name"].strip()
         url = cfg["flowdata"]["tcs_data_url"].strip()
         http_server_url = cfg["flowdata"]["http_server_url"].strip()
+
+        self.check_sn(sn)
+
         mes = MesSocket(url, sn)
         rk, status = mes.save_mes_info(sn)
         if status != 200:

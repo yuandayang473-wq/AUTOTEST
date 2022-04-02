@@ -175,7 +175,9 @@ class Case:
             if isinstance(v, str):
                 data[k] = os.path.join(self.root_path, "/".join(keys), v)
             else:
+                keys.append(k)
                 self._gen_tool_abspath(keys, data[k])
+                keys.pop(keys.index(k))
 
     def get_logger(self) -> CaseLogger:
         """Get the logger.

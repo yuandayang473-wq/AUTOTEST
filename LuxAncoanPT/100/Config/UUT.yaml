@@ -904,11 +904,47 @@ tools:
     ancoan:
         fw:
             nvme_tool: "nvme"
-            sw_fw:
-                4: "tailsw/ssw_fw_4host_v22.signed"
-                8: "tailsw/ssw_fw_8host_v23.signed"
+            tailsw:
+                4host:
+                    fw: "ssw_fw_4host_v22.signed"
+                8host:
+                    fw: "ssw_fw_8host_v23.signed"
             bios:
                 bios_Script: "Flash_FirmWare_xw2_bios.sh"
+            ubb1:
+                tool: "Flash_FirmWare_xw2_cpld.sh"
+                fw: "*.bin"
+            ubb2:
+                tool: "Flash_FirmWare_xw2_cpld.sh"
+                fw: "*.bin"
+            fanboard:
+                tool: "Flash_FirmWare_xw2_cpld.sh"
+                40FCB:
+                    fw: "*.bin"
+                80FCB:
+                    fw: "*.bin"
+            nvmebp:
+                tool: "Flash_FirmWare_xw2_cpld.sh"
+                BP1:
+                    fw: "cpld_signed_SR6295A_BP1_V17_793_HITLESS.bin"
+                BP2:
+                    fw: "cpld_signed_SR6295A_BP2_V17_793_HITLESS.bin"
+
+            headnvmebp:
+                tool: "Flash_FirmWare_xw2_cpld.sh"
+                fw: "cpld_signed_qingtian_YZBB-02976-101_CPLD_V16.bin"
+
+            hib:
+                tool: "Flash_FirmWare_xw2_cpld.sh"
+                fw: "*.bin"
+
+            headercpld:
+                tool: "Flash_FirmWare_xw2_cpld.sh"
+                CPUboard:
+                    fw: "*.bin"
+                CMU:
+                    fw: "*.bin"
+
         rpm:
             aliaom_driver: "alippu-driver-5.10.134-007.ali5000.al8.x86_64.rpm"
             alippu_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-oam-0.13.0.rpm"

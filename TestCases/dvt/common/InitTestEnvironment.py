@@ -73,8 +73,6 @@ class InitTestEnvironment(TempItem):
             # # 存在，删除文件夹内容
             # self.execute_run(f"rm -rf {path.get('fw_path')}*")
 
-            
-
         with self.ssh_connect(uut=self.config["UUT"]):
             # self.execute_run(
             #     f'''[[ `df | grep -iE "//192.2.19.51/share.*/mnt"` != '' ]] || mount -t cifs -o vers=2.0,username=Administrator,password=\`1q,sec=ntlmssp,cache=none,nobrl {path.get('source_path')} /mnt ''',

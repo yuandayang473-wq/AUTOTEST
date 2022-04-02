@@ -48,9 +48,11 @@ class ControlPlatform:
             self._gen_platform_api()
 
         str_data = JsonLoadConfig(cfg_path_name="", cfg_name="jobcontext.json").data(f"unitData.propertyMap.{key}")
-        b64_data = bytes(str_data, encoding="utf-8")
-        data = base64.b64decode(b64_data)
-        return json.loads(data)
+        if str_data:
+            b64_data = bytes(str_data, encoding="utf-8")
+            data = base64.b64decode(b64_data)
+            return json.loads(data)
+        return str_data
 
     def getFileContent(self, name, path="."):
         return get_file_content(os.path.join(path, name))
