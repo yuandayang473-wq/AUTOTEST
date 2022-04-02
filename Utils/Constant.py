@@ -1,4 +1,4 @@
-class TypeCode:
+class ErrorCode:
     SUCCESS = "0000"
     FAIL = "0001"
     FWTUP001 = "FWTUP001"  # BIOS Upgrade fail
