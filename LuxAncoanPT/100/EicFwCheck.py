@@ -13,7 +13,8 @@ import re
 import os
 import sys
 
-load_list = ["PPU"]
+
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -33,45 +34,64 @@ load_package(os.path.abspath(__file__))
 from Lib.Result import Pass, Fail
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Init import load_mes_info
 
 
 class EicFwCheck(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "Eic link test"
         self.expect = "This is Eic link test for normal case."
 
         self.config = [
-            {"file": "Device.yaml", "name": "UUT", "key":self.locals["UUT"]},
-            {"file": "UUT.yaml", "name": "InitPath", "key": "InitPath"},
-            {"file": "UUT.yaml", "name": "Iperf", "key": "Iperf"},{"file": "BmcDevice.yaml", "name": "JBMC", "key":self.locals["TAIL_TAOBAO_BMC"]},
-            {"file": "UUT.yaml", "name": "cfg", "key": self.parent.globals["RK"]},
-            {"file": "FwVersion.yaml", "name": "FwVsersion", "key": "FW-VERSION"},
+            {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
+            {"folder": "LuxAncoanPT/100/Config","file": "UUT.yaml", "name": "Eic", "key": "tools/ancoan/Eic"},
+            {"folder": "LuxAncoanPT/100/Config","file": "UUT.yaml", "name": "Eic_info", "key": "tools.ancoan.Eic"},
+            {"file": "BmcDevice.yaml", "name": "JBMC", "key": "BMC_02"},
+            {"folder": "LuxAncoanPT/100/Config","file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
+            {"folder": "LuxAncoanPT/100/Config","file": "FwVersion.yaml", "name": "FwVsersion", "key": "FW-VERSION"},
         ]
 
+    def init_eic_env(self):
+        name = self.config["Eic_info"]["name"]
+
+        self.os_run.run(f"ls {name}", i_exit_code=True, save_exit_code=True)
+
+        if self.os_run.get_exit_code() != 0:
+            http_server_url = self.mes_info["info"]["http_server_url"]
+            _eic = os.path.join(http_server_url, "LuxScript/tools/ancoan/Eic/")
+            path = os.path.dirname(self.root_path)
+            self.os_run.run(f"cd {path};wget -t 5 -T 60 -r -np -nH -R index.html {_eic}")
+
+            # 解压
+            eic_cfg = self.config["Eic"]
+            self.os_run.run(f"tar -zxvf {eic_cfg['tar']}")
+
+
     def exe(self):
-        server_num = self.locals["PUT"].split("T")[-1]
-        path = self.config["InitPath"]
         server = self.config["cfg"]["JBOG"]
         pcie_nic_config = server["fpga_count"]
         eic_ver = self.config["FwVsersion"]["eicfw_ver"]
         if pcie_nic_config == "NA":
             return Pass(self)
-        with self.ssh_connect(uut=self.config["UUT"]):
-            self.execute_run(f"cp -rf {path.get('mount_path')}{path.get('eictool')} {path.get('test_path')}")
-            self.execute_run(f"cd  {path.get('test_path')}{path.get('eictool')}/02-DevelopKit/01-Package/platform/driver && make clean && make modulesymfile=Module.symvers", i_exit_code=True)
-            self.execute_run(f"cd  {path.get('test_path')}{path.get('eictool')}/02-DevelopKit/01-Package/platform/ && ./platform_test.sh mt 7 -a work -r ")
-            output = self.execute_run(f"cd  {path.get('test_path')}{path.get('eictool')}/02-DevelopKit/01-Package/platform && ./platform_test.sh mt 0").data
-            rst = re.findall(r'fpga version.*', output, re.I)
-            self.logger.info(f" fpga version: {rst}")
-            if len(rst) != pcie_nic_config:
+
+        self.init_eic_env()
+
+        name = self.config["Eic_info"]["name"]
+
+        self.os_run.run(f"cd  {name}/02-DevelopKit/01-Package/platform/driver && make clean && make modulesymfile=Module.symvers", i_exit_code=True)
+        self.os_run.run(f"cd  {name}/02-DevelopKit/01-Package/platform/ && ./platform_test.sh mt 7 -a work -r ")
+        output = self.os_run.run(f"cd  {name}/02-DevelopKit/01-Package/platform && ./platform_test.sh mt 0").data
+        rst = re.findall(r'fpga version.*', output, re.I)
+        self.logger.info(f" fpga version: {rst}")
+        if len(rst) != pcie_nic_config:
+            return Fail(self)
+        for ver in rst:
+            ver = ver.split(":")[1].strip()
+            if ver != eic_ver:
                 return Fail(self)
-            for ver in rst:
-                ver = ver.split(":")[1].strip()
-                if ver != eic_ver:
-                    return Fail(self)
-        return Pass(self)
 
 
 if __name__ == '__main__':

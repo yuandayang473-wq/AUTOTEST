@@ -63,7 +63,7 @@ class InitTestEnvironment(TempItem):
 
         self.os_run.run(f"rpm -ivh --nodeps --force {init_path['aliaom_driver']}")
         self.os_run.run(f"rpm -ivh --nodeps --force {init_path['sshpass']}")
-        self.os_run.run(f"chmod +777 {self.root_path}/tools/ancoan")
+        self.os_run.run(f"chmod -R +777 {self.root_path}/tools/ancoan")
 
 
 if __name__ == '__main__':

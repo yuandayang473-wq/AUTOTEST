@@ -4,7 +4,7 @@
 @Author  :   yuandayang
 @Contact :   Juncheng.Lu@luxshare-ict.com
 @Software:   TestCase
-@File    :   SwFwUpdate.py
+@File    :   SwFwUpdate_1.py
 @Time    :   2022/5/6
 @Version :   1.0
 @License :   Copyright ©LuxShare  2023 . All Rights Reserved.
@@ -33,11 +33,10 @@ load_package(os.path.abspath(__file__))
 
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Utils.Constant import ErrorCode
 from Utils.Init import load_mes_info
 
 
-class SwFwUpdate(TempItem):
+class SwFwUpdate_1(TempItem):
 
     @load_mes_info
     def __init__(self):
@@ -47,16 +46,10 @@ class SwFwUpdate(TempItem):
 
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "FwVersion.yaml", "name": "FwVsersion", "key": "FW-VERSION"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "InitPath", "key": "InitPath"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
-
-            {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
-            {"file": "FwVersion.yaml", "name": "FwVsersion", "key": "FW-VERSION"},
-            {"file": "UUT.yaml", "name": "InitPath", "key": "InitPath"},
-            {"file": "UUT.yaml", "name": "cfg", "key": self.parent.globals["RK"]},
-            {"file": "BmcDevice.yaml", "name": "JBOG_BMC", "key": self.locals["TAIL_ADMIN_BMC"]},
-            {"file": "BmcDevice.yaml", "name": "BMC_HEADER", "key": self.locals["HEAD_BMC"]},
+            {"folder": "LuxAncoanPT/100/Config","file": "FwVersion.yaml", "name": "FwVsersion", "key": "FW-VERSION"},
+            {"folder": "LuxAncoanPT/100/Config","file": "UUT.yaml", "name": "InitPath", "key": "InitPath"},
+            {"folder": "LuxAncoanPT/100/Config","file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
+            {"file": "BmcDevice.yaml", "name": "BMC_HEADER", "key": "BMC_03"},
         ]
 
     def exe(self):
@@ -88,62 +81,9 @@ class SwFwUpdate(TempItem):
                         break
                 self.sleep(3)
 
-        header_bmc_ip = self.config["BMC_HEADER"]["ip_address"]
-        with self.ssh_connect(uut=self.config["UUT"]):
-            self.logger.info("server reset ")
-            self.execute_run(f"ipmitool -I lanplus -H {header_bmc_ip} -U taobao -P 9ijn0okm power reset")
-            self.ping_pang(self.os_ip, sleep_time=60, mode="on")
-
-
-
-        with self.ssh_connect(uut=self.config["UUT"]):
-            ath = self.config["InitPath"]
-            cmd = "mkdir /LogFile;mount -t cifs -o vers=2.0,username=share,password=Password@_,sec=ntlmssp,cache=none,nobrl //172.20.0.103/LogFile/Backup/Data /LogFile"
-            self.execute_run(cmd, i_exit_code=True, save_exit_code=True)
-            self.execute_run(f'''df | grep -iE "{path['source_path']}.*/mnt"''', save_exit_code=True)
-            if self.ssh.get_exit_code() != 0:
-                # self.execute_run("mount -t cifs -o vers=2.0,username=Administrator,password=\`1q,sec=ntlmssp,cache=none,nobrl {path.get('source_path')} /mnt")
-                self.execute_run(f"{path['mount_cmd']}")
-            self.execute_run(f"ls {path.get('fw_path')}", save_exit_code=True)
-            if self.ssh.get_exit_code() != 0:
-                #  创建文件加
-                self.execute_run(f"mkdir -p {path.get('fw_path')}")
-            self.execute_run(f"ls {path.get('fru_path')}", save_exit_code=True)
-            if self.ssh.get_exit_code() != 0:
-                #  创建文件加
-                self.execute_run(f"mkdir -p {path.get('fru_path')}")
-            self.execute_run(f"cp -rf {path.get('mount_path')}{path.get('aliaom_driver')} {path.get('test_path')}")
-            self.execute_run(f"cp -rf {path['fw_source_path']} {path.get('fw_path')}")
-            self.execute_run(f"cp -rf {path['mount_path']}kingkong/{path['kingkong']} {path.get('test_path')}")
-            self.execute_run(f"cp -rf /mnt/fru/* {path.get('fru_path')}")
-            self.execute_run(f"rpm -ivh --nodeps --force {path.get('test_path')}{path.get('aliaom_driver')}")
-            self.execute_run(f"rpm -ivh --nodeps --force {path.get('mount_path')}mft-4.20.1-14.x86_64.rpm")
-            self.execute_run(f"rpm -ivh --nodeps --force {path.get('mount_path')}sshpass-1.09-4.el8.x86_64.rpm")
-            self.execute_run("chmod -R 777 /opt/Alioam/")
-
-            for i in range(1, 5):
-                cmd = f"{path['pciesw_tool']} -i {i} cli rev"
-                data = self.execute_run(cmd, i_exit_code=True, save_exit_code=True).data
-                versions = re.findall("Revision:.*", data, re.I)
-                for ver in versions:
-                    ver = ver.split(":")[1].strip()
-                    if update_switch_fw(ver, i) == 0:
-                        break
-                time.sleep(3)
-
-        with self.ssh_connect(uut=self.config["UUT"]):
-            for i in range(1, 5):
-                cmd = f"{path['pciesw_tool']} -i {i} cli rev"
-                data = self.execute_run(cmd, i_exit_code=True, save_exit_code=True).data
-                versions = re.findall("Revision:.*", data, re.I)
-                for ver in versions:
-                    ver = ver.split(":")[1].strip()
-                    self.assertEqual(f"SwFwcheck ", ver, exp_ver)
-                time.sleep(3)
-            
-        
+        self.platform.put_platform_data(self.config["BMC_HEADER"])
 
 
 if __name__ == '__main__':
-    runner.single_runner(SwFwUpdate)
+    runner.single_runner(SwFwUpdate_1)
 

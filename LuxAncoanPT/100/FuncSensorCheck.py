@@ -45,7 +45,7 @@ class FuncSensorCheck(TempItem):
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
             {"file": "BmcDevice.yaml", "name": "JBOG_BMC", "key": "BMC_01"},
-            {"file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
+            {"folder": "LuxAncoanPT/100/Config","file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
         ]
 
     def exe(self):

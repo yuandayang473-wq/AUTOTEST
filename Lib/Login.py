@@ -15,6 +15,7 @@ import time
 import paramiko
 import re
 import subprocess
+import sys
 
 from Lib.Error import BmcSessionError, SshConnectionError, AuthenticationError, CmdError, PduConfError
 from Lib.Constant import Status
@@ -102,14 +103,14 @@ class OsRunCmd:
         """
         self.set_cmd_retry_count(retry_expt)
         if not i_record_cmd:
-            self.logger.info("SSH Execute command: %s" % command)
+            self.logger.info("os Execute command: %s" % command)
         result = self._run(command, i_exit_code, save_exit_code, timeout, i_timeout_err)
         if result.is_fail():
             self.logger.error("Execute Command Fail, Output below \n%s" % result.get_out_rst())
             raise CmdError(f"cmd execute fail: {command}")
         # success
         parser = getattr(OutData(result.get_out_rst()), parser_type)()
-        self.logger.info("SSH Execute command ok, Output below: \n%s" % parser.get_origin_data())
+        self.logger.info("os Execute command ok, Output below: \n%s" % parser.get_origin_data())
         return parser
 
     @cmd_retry
@@ -387,9 +388,6 @@ class SshConnect(Connection):
                 data = channel.recv(1024).decode("utf-8")
                 end_time = time.time()
                 t = int(end_time - start_time)
-                # self.get_logger().info(t)
-                # self.get_logger().info(cmd_timeout)
-                # if int(end_time - start_time) > cmd_timeout and i_timeout_err:
                 if t > cmd_timeout and i_timeout_err:
                     # if i_timeout_err:
                     self.get_logger().info(f'timeout: {cmd_timeout},auto stop cmd {command}')
@@ -437,23 +435,27 @@ class SshConnect(Connection):
     def invoke_run(self, command, end_with="# ", manual_stop=False, timeout=60):
         channel = self.channel
         cmd = command + "\n"
-        channel.send(cmd)
         buff = ''
+        channel.send(cmd)
+        time.sleep(0.1)
+        channel.recv(len(cmd))  # 剔除掉下发的命令
         ret = re.search(end_with, buff, re.I | re.M)
-        self.get_logger().info(f"ret : {ret}")
         value = 1
         while ret is None:
-            resp = channel.recv(2048)
-            buff += resp.decode('utf-8')
+            resp = channel.recv(1024)
+            temp = resp.decode('utf-8')
+            buff += temp
+            sys.stdout.write(temp)
+            sys.stdout.flush()
             if manual_stop:
                 time.sleep(value)
                 break
             time.sleep(value)
-            ret = re.search(end_with, buff, re.I | re.M)
-            self.get_logger().info(f"ret : {ret}")
+            ret = re.search(end_with, temp, re.I | re.M)
+
             if value >= timeout:
                 break
-            value += 1
+            value += 0.1
 
         if self.first_invoke:
             if buff.count(command) > 1:

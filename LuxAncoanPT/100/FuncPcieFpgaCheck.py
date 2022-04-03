@@ -13,7 +13,6 @@
 import os
 import sys
 
-
 load_list = ["LuxScript"]
 
 
@@ -36,6 +35,7 @@ from Lib.Template import TempItem
 from Lib.Runner import runner
 from Lib.DataBuffer import StrParser
 from Utils.Init import load_mes_info
+from Utils.Constant import ErrorCode
 
 
 class FuncPcieFpgaCheck(TempItem):
@@ -48,8 +48,8 @@ class FuncPcieFpgaCheck(TempItem):
 
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
-            {"file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
-            {"file": "UUT.yaml", "name": "PCIE", "key": "Pcie"},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "PCIE", "key": "Pcie"},
         ]
 
     def exe(self):
@@ -58,27 +58,25 @@ class FuncPcieFpgaCheck(TempItem):
         if pcie_nic_config == "NA":
             return Pass(self)
 
-        with self.ssh_connect(uut=self.config["UUT"]):
-            self.step(1, "get memory info")
-            parser = self.execute_run(
-                r"""lspci -Dnn | grep 0580 |cut -d " " -f1 |xargs -I {} lspci -s {} -vvv |grep -iE 'LnkSta:'""",
-                i_exit_code=True)
+        # with self.ssh_connect(uut=self.config["UUT"]):
+        self.step(1, "get memory info")
+        parser = self.os_run.run(
+            r"""lspci -Dnn | grep 0580 |cut -d " " -f1 |xargs -I {} lspci -s {} -vvv |grep -iE 'LnkSta:'""",
+            i_exit_code=True)
 
-            datas = parser.split(r"([0-9a-z]{4}:[0-9a-z]{2}:[0-9a-z]{2}\.[0-9a-z]{1})")
-            for data in datas:
-                if datas and len(data) == 12:
-                    device = data
-                elif data:
-                    parser = StrParser(data)
-                    speed = parser.get_value(r"Speed ([0-9]+GT/s)")
-                    width = parser.get_value(r"Width (x[0-9]+)")
-                    rst = parser.check_field("downgraded")
-                    self.assertEqual(f"pcie network speed", speed, "32GT/s")
-                    self.assertEqual(f"pcie network width", width, "x8")
-                    self.assertFalse(f"pcie network check exist (downgrade) keyword", rst)
+        datas = parser.split(r"([0-9a-z]{4}:[0-9a-z]{2}:[0-9a-z]{2}\.[0-9a-z]{1})")
+        for data in datas:
+            if datas and len(data) == 12:
+                device = data
+            elif data:
+                parser = StrParser(data)
+                speed = parser.get_value(r"Speed ([0-9]+GT/s)")
+                width = parser.get_value(r"Width (x[0-9]+)")
+                rst = parser.check_field("downgraded")
+                self.assertEqual(ErrorCode.FFFFFFFF, f"pcie network speed", speed, "32GT/s")
+                self.assertEqual(ErrorCode.FFFFFFFF, f"pcie network width", width, "x8")
+                self.assertFalse(ErrorCode.FFFFFFFF, f"pcie network check exist (downgrade) keyword", rst)
 
 
 if __name__ == '__main__':
     runner.single_runner(FuncPcieFpgaCheck)
-
-

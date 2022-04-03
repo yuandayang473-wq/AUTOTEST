@@ -12,7 +12,7 @@ import os
 import re
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -32,7 +32,7 @@ load_package(os.path.abspath(__file__))
 from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Lib.Request import MesSocket
+from Utils.Constant import ErrorCode
 
 
 class OamPowerFwUpdate(TempItem):
@@ -43,11 +43,12 @@ class OamPowerFwUpdate(TempItem):
         self.expect = "This is cpu config check for normal case."
 
         self.config = [
-            {"file": "Device.yaml", "name": "UUT", "key":self.locals["UUT"]},
-            {"file": "BmcDevice.yaml", "name": "JBMC", "key":self.locals["TAIL_TAOBAO_BMC"]},
-            {"file": "FwVersion.yaml", "name": "FwVsersion", "key": "FW-VERSION"},
-            {"file": "UUT.yaml", "name": "InitPath", "key": "InitPath"},
+            {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
+            {"file": "BmcDevice.yaml", "name": "JBMC", "key": "BMC_02"},
+            {"folder": "LuxAncoanPT/100/Config","file": "FwVersion.yaml", "name": "FwVsersion", "key": "FW-VERSION"},
+            {"folder": "LuxAncoanPT/100/Config","file": "UUT.yaml", "name": "InitPath", "key": "InitPath"},
         ]
+
     def exe(self):
         oam_power_ver = self.config["FwVsersion"]["oampower_ver"]
         oam_power_update_file = self.config["InitPath"]["oam_update_file"]
@@ -68,9 +69,8 @@ class OamPowerFwUpdate(TempItem):
                         data = data[0].split(':')[1].strip()
                     else:
                         self.fail(self)
-                    self.assertEqual(f" Hib Chassis Board Serial ", data, oam_power_ver)  
-            # self.assertEqual(f"clear bmc sel log", int(1), len(count))
-        return Pass(self)
+                    self.assertEqual(ErrorCode.FFFFFFFF,f" Hib Chassis Board Serial ", data, oam_power_ver)
+            # self.assertEqual(f"clear bmc sel log", int(1), len(count)))
 
 
 if __name__ == '__main__':
