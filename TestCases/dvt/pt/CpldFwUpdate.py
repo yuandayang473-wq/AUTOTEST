@@ -44,6 +44,7 @@ class CpldFwUpdate(TempItem):
         self.name = "cpld fw update"
         self.expect = "This is cpld fw update for normal case."
 
+
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": self.locals["UUT"]},
             {"file": "BmcDevice.yaml", "name": "BMC_TAIL", "key": self.locals["TAIL_ADMIN_BMC"]},

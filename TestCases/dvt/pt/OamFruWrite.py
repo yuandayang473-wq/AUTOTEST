@@ -80,6 +80,10 @@ class OamFruWrite(TempItem):
                 parser = self.execute_run(
                     f'cat {path.get("fru_path")}{fru["oam_sn"]}.ini | grep -wn part_num | cut -d: -f1 | xargs -I line sed -i "lines/part_num/{fru["oam_part_no"]}/g" {path.get("fru_path")}{fru["oam_sn"]}.ini')
                 parser = self.execute_run(
+                    f'cat {path.get("fru_path")}{fru["oam_sn"]}.ini | grep -wn product_sn | cut -d: -f1 | xargs -I line sed -i "lines/product_sn/{fru["oam_sn"]}/g" {path.get("fru_path")}{fru["oam_sn"]}.ini')
+                parser = self.execute_run(
+                    f'cat {path.get("fru_path")}{fru["oam_sn"]}.ini | grep -wn product_part_num | cut -d: -f1 | xargs -I line sed -i "lines/product_part_num/{fru["oam_part_no"]}/g" {path.get("fru_path")}{fru["oam_sn"]}.ini')
+                parser = self.execute_run(
                     f'python3 {path.get("fru_path")}fru.py {path.get("fru_path")}{fru["oam_sn"]}.ini {path.get("fru_path")}{fru["oam_sn"]}.bin --cmd')
               
                  # # bmc端烧录
@@ -126,8 +130,10 @@ class OamFruWrite(TempItem):
             device_dict = {}
             for i in range(8):
                 parser = self.execute_run(f" ppudbg --device {i} |grep -i moduleid")
-                current_fruinfo = parser.get_origin_data().split(" ")[-1].split(".")[0]
-                device_dict[f'0{int(current_fruinfo)+1}'] = i
+                # current_fruinfo = parser.get_origin_data().split(" ")[-1].split(".")[0]
+                # device_dict[f'0{int(current_fruinfo)+1}'] = i
+                current_fruinfo = parser.get_value(r"ModuleId: (\d+)")
+                device_dict[f'0{int(current_fruinfo) + 1}'] = i
             print(device_dict)
             for fru in fru_info:
                 parser = self.execute_run(

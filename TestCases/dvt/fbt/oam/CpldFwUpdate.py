@@ -79,13 +79,14 @@ class CpldFwUpdate(TempItem):
 
         with self.ssh_connect(uut=user):
 
-            self.execute_run(f"ipmitool -I lanplus -H {tail_bmc_ip} -U admin -P admin power off")
-            self.sleep(20)
             # ubb1
             self.logger.info("========================Start UBB1 fw update Test===========================")
             self.logger.info(
                 f"Current ubb1 cpld version is: {current_versions['ubb1']}, target version is {FwVsersion.get('ubb1')}")
             if current_versions['ubb1'] != FwVsersion.get("ubb1"):
+                self.execute_run(f"ipmitool -I lanplus -H {tail_bmc_ip} -U admin -P admin power off")
+                self.sleep(20)
+
                 flag = "update"
                 self.flash_flag = True
                 self.execute_run("chmod -R 777 /opt/Alioam/")
@@ -105,6 +106,10 @@ class CpldFwUpdate(TempItem):
             self.logger.info(
                 f"Current ubb2 cpld version is: {current_versions['ubb2']}, target version is {FwVsersion.get('ubb2')}")
             if current_versions['ubb2'] != FwVsersion.get("ubb2"):
+                if not self.ubb1_flag:
+                    self.execute_run(f"ipmitool -I lanplus -H {tail_bmc_ip} -U admin -P admin power off")
+                    self.sleep(20)
+
                 flag = "update"
                 self.flash_flag = True
                 self.execute_run("chmod -R 777 /opt/Alioam/")
@@ -122,7 +127,7 @@ class CpldFwUpdate(TempItem):
         return Pass(self)
 
     def tearDown(self):
-        if self.ubb1_flag and self.ubb2_flag:
+        if self.ubb1_flag or self.ubb2_flag:
             tail_bmc_ip = self.config["BMC_TAIL"]["ip_address"]
             header_bmc_ip = self.config["BMC_HEADER"]["ip_address"]
             path = self.config["InitPath"]

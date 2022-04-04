@@ -64,7 +64,29 @@ class BiosFwUpdate(TempItem):
                     self.fail("Header bios flash bure fail")
                 self.execute_run("reboot",  i_exit_code=True)
                 time.sleep(400)
-
+        with self.ssh_connect(uut=self.config["UUT"]):
+            self.execute_run(f'''df | grep -iE "{path['source_path']}.*/mnt"''', save_exit_code=True)
+            if self.ssh.get_exit_code() != 0:
+                # self.execute_run("mount -t cifs -o vers=2.0,username=Administrator,password=\`1q,sec=ntlmssp,cache=none,nobrl {path.get('source_path')} /mnt")
+                self.execute_run(f"{path['mount_cmd']}")
+            self.execute_run(f"ls {path.get('fw_path')}", save_exit_code=True)
+            if self.ssh.get_exit_code() != 0:
+                #  创建文件加
+                self.execute_run(f"mkdir -p {path.get('fw_path')}")
+            self.execute_run(f"ls {path.get('fru_path')}", save_exit_code=True)
+            if self.ssh.get_exit_code() != 0:
+                #  创建文件加
+                self.execute_run(f"mkdir -p {path.get('fru_path')}")
+            # self.execute_run(f"rm -rf {path.get('fw_path')}*")
+            # self.execute_run(f"rm -rf {path.get('fru_path')}*")
+            self.execute_run(f"cp -rf {path.get('mount_path')}{path.get('aliaom_driver')} {path.get('test_path')}")
+            self.execute_run(f"cp -rf {path['fw_source_path']} {path.get('fw_path')}")
+            self.execute_run(f"cp -rf {path['mount_path']}kingkong/{path['kingkong']} {path.get('test_path')}")
+            self.execute_run(f"cp -rf /mnt/fru/* {path.get('fru_path')}")
+            self.execute_run(f"rpm -ivh --nodeps --force {path.get('test_path')}{path.get('aliaom_driver')}")
+            self.execute_run(f"rpm -ivh --nodeps --force {path.get('mount_path')}mft-4.20.1-14.x86_64.rpm")
+            self.execute_run(f"rpm -ivh --nodeps --force {path.get('mount_path')}sshpass-1.09-4.el8.x86_64.rpm")
+            self.execute_run("chmod -R 777 /opt/Alioam/")
         return Pass(self)
 
 

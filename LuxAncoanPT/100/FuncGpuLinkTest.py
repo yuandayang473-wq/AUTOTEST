@@ -33,6 +33,7 @@ load_package(os.path.abspath(__file__))
 from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Constant import ErrorCode
 
 
 class FuncGpuLinkTest(TempItem):
@@ -60,8 +61,8 @@ class FuncGpuLinkTest(TempItem):
                         for p in links["not-scale-out"]:
                             parser = self.execute_run(f"ppudbg --device {n} --micnop stat {p}")
                             status = parser.get_value("Link Status[: ]+(up)")
-                            self.assertEqual(f"oam device {n} ICN link state:", status.lower(), "up")
-
+                            self.assertEqual(ErrorCode.GPUTFT02, f"oam device {n} ICN link state:", status.lower(),
+                                             "up")
             else:
                 # logger 日志器删除 StreamHandler
                 # hander = self.logger.parent.handlers[0]
@@ -81,7 +82,8 @@ class FuncGpuLinkTest(TempItem):
                         for p in links["scale-out"]:
                             parser = self.execute_run(f"ppudbg --device {n} --micnop stat {p}")
                             status = parser.get_value("Link Status[: ]+(up)")
-                            self.assertEqual(f"oam device {n} ICN link state:", status.lower(), "up")
+                            self.assertEqual(ErrorCode.GPUTFT02, f"oam device {n} ICN link state:", status.lower(),
+                                             "up")
                 # else:
                 #     return Fail(self, ErrItemFail("插入200G光纤失败"))
 

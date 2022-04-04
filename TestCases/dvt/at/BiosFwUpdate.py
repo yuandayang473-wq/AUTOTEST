@@ -62,7 +62,10 @@ class BiosFwUpdate(TempItem):
                 if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
                     self.logger.info("Header bios flash bure fail")
                     self.fail("Header bios flash bure fail")
-            parser = self.execute_run("ipmitool chassis bootdev none options=clear-cmos")
+                parser = self.execute_run("ipmitool power cycle")
+                self.sleep(420)
+            
+            
         return Pass(self)
 
 

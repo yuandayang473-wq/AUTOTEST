@@ -41,8 +41,6 @@ class MesSocket():
         else:
             return (data["ErrorMessage"], 404)
 
-
-
     def get_mes_info(self, server_sn):
         with open(f'{reports_path}/{server_sn}_mes.json', 'r', encoding='UTF-8') as f:
             output = eval(f.read())
@@ -59,12 +57,16 @@ class MesSocket():
         payload = {"p": "GetPNFromSN", "cmd": "ATT", "sn": sn}
         response = requests.post(self.url, json=payload)
         data = response.json()
+        with open(f'{reports_path}/{sn}_mes.json', 'w', encoding='UTF-8') as f:
+            f.write(json.dumps(data, indent=4, sort_keys=False) + '\n')
         return data
     
     def get_ubb_info(self, sn):
         payload = {"p": "GetOAMInfo", "cmd": "ATT", "sn": sn}
         response = requests.post(self.url, json=payload)
         data = response.json()
+        with open(f'{reports_path}/{sn}_mes.json', 'w', encoding='UTF-8') as f:
+            f.write(json.dumps(data, indent=4, sort_keys=False) + '\n')
         return data
     
 

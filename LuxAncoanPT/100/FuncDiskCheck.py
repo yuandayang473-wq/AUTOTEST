@@ -35,7 +35,7 @@ from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Utility import multi_column
 from Utils.DataBuffer import StrParser
-from Utils.Constant import TypeCode
+from Utils.Constant import ErrorCode
 
 
 class FuncDiskCheck(TempItem):
@@ -73,11 +73,11 @@ class FuncDiskCheck(TempItem):
                         m2_size = float(m[1][:-1])
                         if m2_size >= 100.0:
                             val = round(float(e_m2_size[:-1]) - m2_size, 1)
-                            self.assertLess(TypeCode.M201, f"m2 {m2_name} size difference value", val, 50)
+                            self.assertLess(ErrorCode.HDTCH004, f"m2 {m2_name} size difference value", val, 50)
                             c += 1
                         else:
                             u_disk = m2_name
-            self.assertEqual(TypeCode.M201, "m2 count", c, e_m2_count)
+            self.assertEqual(ErrorCode.HDTCH001, "m2 count", c, e_m2_count)
 
             if u_disk:
                 disk_type_cmd = f"lsscsi | grep -i '/dev/sd' | grep -iv '{u_disk}'"
@@ -93,7 +93,7 @@ class FuncDiskCheck(TempItem):
                     m2_data.append((line_list[-3], line_list[-1]))
 
             for m2_type, m2_name in m2_data:
-                self.assertIn(TypeCode.M201, f"{m2_name}", m2_type, e_m2_type)
+                self.assertIn(ErrorCode.HDTCH005, f"{m2_name} type", m2_type, e_m2_type)
 
 
 if __name__ == '__main__':

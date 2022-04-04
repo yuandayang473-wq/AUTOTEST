@@ -74,7 +74,7 @@ class BmcFwUpdate(TempItem):
             #if True:
                 #parser = self.execute_run("chmod -R 777 /opt/Alioam/")
                 parser = self.execute_run(
-                    f"{path['bmc_tail_script']} {tail_bmc_ip} taobao 9ijn0okm {path['bmc_tail_fw']} BMCAndConf 1")
+                    f"{path['bmc_tail_script']} {tail_bmc_ip} taobao 9ijn0okm {path['bmc_tail_fw_for_at']} BMCAndConf 1")
                 if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
                     self.logger.info("Tail bmc flash bure fail")
                     self.fail("Tail bmc flash bure fail")
