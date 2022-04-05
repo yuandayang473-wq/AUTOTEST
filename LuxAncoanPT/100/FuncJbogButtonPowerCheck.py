@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -33,6 +33,7 @@ load_package(os.path.abspath(__file__))
 from Lib.Result import Pass, Fail
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Constant import ErrorCode
 from Lib.Error import ErrItemFail
 
 
@@ -181,7 +182,7 @@ class FuncJbogButtonPowerCheck(TempItem):
             else:
                 return Fail(self, ErrItemFail("机头开机失败"))
 
-        return Pass(self)
+        
 
 
 if __name__ == '__main__':

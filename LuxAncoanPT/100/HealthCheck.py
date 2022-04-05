@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -30,9 +30,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Constant import ErrorCode
 
 
 class HealthCheck(TempItem):
@@ -61,7 +61,7 @@ class HealthCheck(TempItem):
             ret = parser.get_value(f"Final_Result: (PASS)")
             self.assertEqual("health check Final_Result ", ret.lower(), "pass")
 
-        return Pass(self)
+        
 
 
 if __name__ == '__main__':

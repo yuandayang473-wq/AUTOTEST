@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -30,9 +30,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Constant import ErrorCode
 from Utils.DataBuffer import StrParser
 
 
@@ -68,7 +68,7 @@ class FuncNvmeCheck(TempItem):
         count = 0
 
         if tail_nvme_size == "NA" and head_nvme_size == "NA":
-            return Pass(self)
+            
 
         with self.ssh_connect(uut=self.config["UUT"]):
             self.step(1, "get nvme info")
@@ -88,7 +88,7 @@ class FuncNvmeCheck(TempItem):
 
             self.assertEqual("nvme count", count, tail_nvme_count + head_nvme_count)
 
-        return Pass(self)
+        
 
 
 if __name__ == '__main__':

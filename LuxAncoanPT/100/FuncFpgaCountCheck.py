@@ -1,7 +1,7 @@
 # !/usr/bin/python3
 # -*- encoding: utf-8 -*-
 '''
-@Author  :   Lujuncheng
+@Author  :   yuandayang
 @Contact :   Juncheng.Lu@luxshare-ict.com
 @Software:   TestCase
 @File    :   FuncFpgaCountCheck.py
@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -30,9 +30,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Constant import ErrorCode
 from Utils.Constant import ErrorCode
 
 
@@ -54,13 +54,13 @@ class FuncFpgaCountCheck(TempItem):
         fpga_count = jbog_cfg["fpga_count"]
 
         if fpga_count == "NA":
-            return Pass(self)
+            
 
         with self.ssh_connect(uut=self.config["UUT"]):
             parser = self.execute_run(f'lspci -Dnn | grep 0580 | grep -icE "1ded"')
             current_fpga_count = int(parser.get_origin_data())
             self.assertEqual(ErrorCode,"Fpga count", current_fpga_count, int(fpga_count*4))
-        return Pass(self)
+        
 
 
 if __name__ == '__main__':

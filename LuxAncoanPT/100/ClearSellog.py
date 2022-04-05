@@ -12,7 +12,7 @@ import os
 import sys
 import time
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -29,10 +29,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Utils.Constant import TypeCode
+from Utils.Constant import ErrorCode
 from Lib.Request import MesSocket
 
 
@@ -45,7 +44,7 @@ class ClearSellog(TempItem):
 
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key":"UUT_01"},
-            {"file": "BmcDevice.yaml", "name": "JBOG_BMC", "key": "BMC_02"},
+            {"file": "BmcDevice.yaml", "name": "JBOG_BMC", "key": "BMC_01"},
             {"file": "BmcDevice.yaml", "name": "SERVER_BMC", "key": "BMC_03"},{"file": "BmcDevice.yaml", "name": "JBMC", "key":"BMC_02"},
         ]
 

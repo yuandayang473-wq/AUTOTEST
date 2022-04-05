@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -30,9 +30,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Constant import ErrorCode
 from Utils.Utility import multi_column
 from Utils.DataBuffer import StrParser
 from Utils.Constant import ErrorCode
@@ -69,7 +69,7 @@ class FuncFanSpeedChcek(TempItem):
                 self.assertEqual(ErrorCode.FANTFT05, f"{name}", v, "100")
             self.execute_run("ipmitool raw 0x3e 0x21 0x00 0x4C 0xA5 0x01 0x01")
             self.sleep(60)
-        return Pass(self)
+        
 
 
 if __name__ == '__main__':

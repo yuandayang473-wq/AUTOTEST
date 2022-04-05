@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -30,9 +30,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Constant import ErrorCode
 from Utils.Utility import power
 
 
@@ -73,7 +73,7 @@ class FuncOamI2cDeviceCheck(TempItem):
                 self.assertEqual("ADC read value", int(val), power(int(dev, 16)))
 
             # self.execute_run("/etc/init.d/ipmistack start")
-        return Pass(self)
+        
 
     def tearDown(self):
         with self.ssh_connect(uut=self.config["JBOG_BMC"]):
