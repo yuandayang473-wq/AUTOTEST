@@ -30,9 +30,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
+from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Utils.Constant import ErrorCode
 
 
 class FuncSensorCheck(TempItem):
@@ -55,8 +55,6 @@ class FuncSensorCheck(TempItem):
         # 获取机尾的sdr
         with self.ssh_connect(uut=self.config["JBOG_BMC"]):
             self.execute_run("ipmitool sdr")
-
-        
 
 
 if __name__ == '__main__':

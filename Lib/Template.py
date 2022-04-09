@@ -11,7 +11,6 @@
 @Desc    :   None
 """
 
-
 import contextlib
 
 from .Case import Item
@@ -132,7 +131,4 @@ class TempItem(Item):
 
     def tips_msg(self, msg):
         return f"[编号: {self.parent.globals['log_prefix']}]--{msg}"
-
-
-
 

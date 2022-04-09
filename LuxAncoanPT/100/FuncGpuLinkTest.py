@@ -30,14 +30,16 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
+from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
-from Utils.Constant import ErrorCode
+from Utils.Init import load_mes_info
 
 
 class FuncGpuLinkTest(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "GPU Link"
@@ -46,7 +48,7 @@ class FuncGpuLinkTest(TempItem):
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
             {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "oam_conf", "key": "OAM"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.parent.globals["RK"]},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
         ]
 
     def exe(self):
@@ -87,7 +89,7 @@ class FuncGpuLinkTest(TempItem):
                 # else:
                 #     return Fail(self, ErrItemFail("插入200G光纤失败"))
 
-        
+        return Pass(self)
 
 
 if __name__ == '__main__':

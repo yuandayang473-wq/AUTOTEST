@@ -30,11 +30,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass, Fail
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
-from Lib.Error import ErrItemFail
 
 
 class FuncJbogAsmLinkLedCheck(TempItem):
@@ -47,7 +45,6 @@ class FuncJbogAsmLinkLedCheck(TempItem):
         self.config = []
 
     def exe(self):
-
         # logger 日志器删除 StreamHandler
         hander = self.logger.parent.handlers[0]
         self.logger.parent.removeHandler(self.logger.parent.handlers[0])
@@ -64,10 +61,8 @@ class FuncJbogAsmLinkLedCheck(TempItem):
 
         # logger日志器添加StreamHandler
         self.logger.parent.addHandler(hander)
-        if status.lower() == 'g':
-            
-
-        return Fail(self, ErrItemFail("机尾ASM Link灯检查失败"))
+        if status.lower() != 'g':
+            self.fail(ErrorCode.LEDT0000, "机尾ASM Link灯检查失败")
 
 
 if __name__ == '__main__':

@@ -33,19 +33,19 @@ load_package(os.path.abspath(__file__))
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
-from Utils.Constant import ErrorCode
+from Utils.Init import load_mes_info
 
 
 class FuncCpuCheck(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "cpu"
         self.expect = "This is cpu function check test on the service"
-
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.parent.globals["RK"]},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
         ]
 
     def exe(self):

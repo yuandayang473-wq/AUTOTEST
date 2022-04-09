@@ -32,12 +32,14 @@ load_package(os.path.abspath(__file__))
 
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Utils.Constant import ErrorCode
 from Utils.DataBuffer import StrParser
+from Utils.Constant import ErrorCode
+from Utils.Init import load_mes_info
 
 
 class FuncPcieRetimerCheck(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "pcie oam"
@@ -46,7 +48,7 @@ class FuncPcieRetimerCheck(TempItem):
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
             {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "PCIE", "key": "Pcie"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.parent.globals["RK"]},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
         ]
 
     def exe(self):
@@ -82,16 +84,13 @@ class FuncPcieRetimerCheck(TempItem):
                     speed = parser.get_value(r"Speed ([0-9]+GT/s)")
                     width = parser.get_value(r"Width (x[0-9]+)")
                     rst = parser.check_field("downgraded")
-                    self.assertEqual(f"pcie retimer {device} speed", speed, config["Speed"])
-                    self.assertEqual(f"pcie retimer {device} width", width, config["Width"])
-                    self.assertFalse(f"pcie retimer {device} check exist (downgrade) keyword", rst)
+                    self.assertEqual(ErrorCode.FFFFFFFF, f"pcie retimer {device} speed", speed, config["Speed"])
+                    self.assertEqual(ErrorCode.FFFFFFFF, f"pcie retimer {device} width", width, config["Width"])
+                    self.assertFalse(ErrorCode.FFFFFFFF, f"pcie retimer {device} check exist (downgrade) keyword", rst)
                     count += 1
 
-            self.assertEqual("retimer count", count, server["retimer"])
-
-        
+            self.assertEqual(ErrorCode.FFFFFFFF, "retimer count", count, server["retimer"])
 
 
 if __name__ == '__main__':
     runner.single_runner(FuncPcieRetimerCheck)
-

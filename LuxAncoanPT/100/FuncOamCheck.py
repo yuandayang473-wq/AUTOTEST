@@ -57,11 +57,9 @@ class FuncOamCheck(TempItem):
                 HBM_FS = parser.filter_list(r"(HBM[0-9]{1}-[0-9]+MHZ)")
                 for h in HBM_FS:
                     h_l = h.split("-")
-                    self.assertEqual(f"oam device {n} {h_l[0]} HBM Frequency", h_l[1], oam_config['HBM_Frequency'])
-
-        
+                    self.assertEqual(ErrorCode.GPUTFT02, f"oam device {n} {h_l[0]} HBM Frequency", h_l[1],
+                                     oam_config['HBM_Frequency'])
 
 
 if __name__ == '__main__':
     runner.single_runner(FuncOamCheck)
-

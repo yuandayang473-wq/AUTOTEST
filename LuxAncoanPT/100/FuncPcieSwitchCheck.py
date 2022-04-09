@@ -34,10 +34,12 @@ load_package(os.path.abspath(__file__))
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
+from Utils.Init import load_mes_info
 
 
 class FuncPcieSwitchCheck(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "pcie oam switch"
@@ -45,7 +47,7 @@ class FuncPcieSwitchCheck(TempItem):
 
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.parent.globals["RK"]},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
             {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "path", "key": "InitPath"},
         ]
 
@@ -69,13 +71,10 @@ class FuncPcieSwitchCheck(TempItem):
             parser = self.invoke_run("quit", end_invoke=True)
             versions = parser.filter_list(r"Associated FW ver[: ]+\d:\d:(\d:\d)")
             for cur_ver in versions:
-                self.assertEqual(f"switch {count} version", cur_ver, exp_ver)
+                self.assertEqual(ErrorCode.FFFFFFFF, f"switch {count} version", cur_ver, exp_ver)
                 count += 1
             time.sleep(2)
-
-        
 
 
 if __name__ == '__main__':
     runner.single_runner(FuncPcieSwitchCheck)
-

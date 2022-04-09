@@ -10,8 +10,9 @@
 @License :   Copyright ©LuxShare  2022 . All Rights Reserved.
 @Desc    :   初始RK,必须要的参数
 '''
+import functools
 
-from Lib.Config import YamlLoadConfig
+from Lib.Config import YamlLoadConfig, JsonLoadConfig
 from Utils.Login import SshConnect
 
 
@@ -104,6 +105,16 @@ class PpuInitLoadConfig(InitLoadConfig):
             }
         }
         bmc_device.set_config(bmc_data)
+
+
+def load_mes_info(func):
+    @functools.wraps(func)
+    def wrapper(self):
+        cfg = JsonLoadConfig(cfg_path_name="", cfg_name="mes_info.json").get_config()
+        setattr(self, "mes_info", cfg)
+        func(self)
+
+    return wrapper
 
 
 if __name__ == '__main__':

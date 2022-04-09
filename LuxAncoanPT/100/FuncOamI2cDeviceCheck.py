@@ -32,8 +32,8 @@ load_package(os.path.abspath(__file__))
 
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Utils.Constant import ErrorCode
 from Utils.Utility import power
+from Utils.Constant import ErrorCode
 
 
 class FuncOamI2cDeviceCheck(TempItem):
@@ -52,7 +52,7 @@ class FuncOamI2cDeviceCheck(TempItem):
         with self.ssh_connect(uut=self.config["JBOG_BMC"]):
             parser = self.execute_run("/etc/init.d/ipmistack stop")
             ret = parser.check_field("stopping")
-            self.assertTrue("exist stopping keyword", ret)
+            self.assertTrue(ErrorCode.FFFFFFFF, "exist stopping keyword", ret)
 
             self.execute_run("i2ctransfer -y 10 w1@0x70 0x00")  # 关闭所有的通道
             for dev in devices:
@@ -60,20 +60,19 @@ class FuncOamI2cDeviceCheck(TempItem):
                 self.execute_run(f"i2ctransfer -y 10 w1@0x70 {dev}")
                 p = self.execute_run("i2ctransfer -y 10 w1@0x18 0x00 r1")
                 val = p.get_origin_data()
-                self.assertEqual(f"oam IO expander", val, "0x8f")
+                self.assertEqual(ErrorCode.FFFFFFFF, f"oam IO expander", val, "0x8f")
                 p = self.execute_run("i2ctransfer -y 10 w1@0x1f 0x00 r1")
                 val = p.get_origin_data()
-                self.assertEqual(f"oam IO expander", val, "0x8f")
+                self.assertEqual(ErrorCode.FFFFFFFF, f"oam IO expander", val, "0x8f")
                 self.logger.info(f"===========OAM I2C device[{dev}] ADC===========")
                 self.execute_run("i2ctransfer -y 10 w3@0x10 0x0b 0x02 0x00")
                 self.execute_run("i2ctransfer -y 10 w3@0x10 0x04 0xff 0xff")
                 self.execute_run(f"i2ctransfer -y 10 w3@0x10 0x02 0x02 {dev}")
                 p = self.execute_run("i2ctransfer -y 10 w1@0x10 0x40 r2")
                 val = p.get_value(r"0x(\d)")
-                self.assertEqual("ADC read value", int(val), power(int(dev, 16)))
+                self.assertEqual(ErrorCode.FFFFFFFF, "ADC read value", int(val), power(int(dev, 16)))
 
             # self.execute_run("/etc/init.d/ipmistack start")
-        
 
     def tearDown(self):
         with self.ssh_connect(uut=self.config["JBOG_BMC"]):
@@ -88,4 +87,3 @@ class FuncOamI2cDeviceCheck(TempItem):
 
 if __name__ == '__main__':
     runner.single_runner(FuncOamI2cDeviceCheck)
-

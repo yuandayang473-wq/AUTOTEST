@@ -58,34 +58,31 @@ class FuncSensorOamCheck(TempItem):
                 cmd_getTemper = 'ppudbg --monitor power --time 1 --device {} '.format(n) + "| awk '{print $9}'"
                 p = self.execute_run(cmd_getTemper)
                 tem_value = float(p.get_value(common_pattern))
-                self.assertLessEqual("oam temperature", tem_value, oam_sensor_cfg["max_temp"])
-                self.assertGreaterEqual("oam temperature", tem_value, oam_sensor_cfg["min_temp"])
+                self.assertLessEqual(ErrorCode.GPUTFT03, "oam temperature", tem_value, oam_sensor_cfg["max_temp"])
+                self.assertGreaterEqual(ErrorCode.GPUTFT03, "oam temperature", tem_value, oam_sensor_cfg["min_temp"])
 
                 # oam 功耗
                 power = 'ppudbg --monitor power --time 1 --device {} '.format(n) + "| awk '{print $2}'"
                 self.execute_run(power)
                 p = self.execute_run(power)
                 power_value = float(p.get_value(common_pattern))
-                self.assertLessEqual("oam power", power_value, oam_sensor_cfg["max_power"])
-                self.assertGreaterEqual("oam power", power_value, oam_sensor_cfg["min_power"])
+                self.assertLessEqual(ErrorCode.GPUTCH04, "oam power", power_value, oam_sensor_cfg["max_power"])
+                self.assertGreaterEqual(ErrorCode.GPUTCH04, "oam power", power_value, oam_sensor_cfg["min_power"])
 
                 # oam 电压
                 cmd_getVoltage = 'ppudbg --monitor power --time 1 --device {} '.format(n) + "| awk '{print $8}'"
                 p = self.execute_run(cmd_getVoltage)
                 valt_value = float(p.get_value(common_pattern))
-                self.assertLessEqual("oam voltage", valt_value, oam_sensor_cfg["max_valt"])
-                self.assertGreaterEqual("oam voltage", valt_value, oam_sensor_cfg["min_valt"])
+                self.assertLessEqual(ErrorCode.FFFFFFFF, "oam voltage", valt_value, oam_sensor_cfg["max_valt"])
+                self.assertGreaterEqual(ErrorCode.FFFFFFFF, "oam voltage", valt_value, oam_sensor_cfg["min_valt"])
 
                 # oam 电流
                 cmd_getElectric = 'ppudbg --monitor power --time 1 --device {} '.format(n) + "| awk '{print $11}'"
                 p = self.execute_run(cmd_getElectric)
                 elec_value = float(p.get_value(common_pattern))
-                self.assertLessEqual("oam electric", elec_value, oam_sensor_cfg["max_elec"])
-                self.assertGreaterEqual("oam electric", elec_value, oam_sensor_cfg["min_elec"])
-
-        
+                self.assertLessEqual(ErrorCode.FFFFFFFF, "oam electric", elec_value, oam_sensor_cfg["max_elec"])
+                self.assertGreaterEqual(ErrorCode.FFFFFFFF, "oam electric", elec_value, oam_sensor_cfg["min_elec"])
 
 
 if __name__ == '__main__':
     runner.single_runner(FuncSensorOamCheck)
-

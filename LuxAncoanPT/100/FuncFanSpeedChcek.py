@@ -30,16 +30,18 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
+from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Utils.Constant import ErrorCode
 from Utils.Utility import multi_column
 from Utils.DataBuffer import StrParser
 from Utils.Constant import ErrorCode
+from Utils.Init import load_mes_info
 
 
 class FuncFanSpeedChcek(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "fan speed"
@@ -47,7 +49,7 @@ class FuncFanSpeedChcek(TempItem):
 
         self.config = [
             {"file": "BmcDevice.yaml", "name": "JBOG_BMC", "key": "BMC_01"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.parent.globals["RK"]},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
         ]
 
     def exe(self):
@@ -69,7 +71,7 @@ class FuncFanSpeedChcek(TempItem):
                 self.assertEqual(ErrorCode.FANTFT05, f"{name}", v, "100")
             self.execute_run("ipmitool raw 0x3e 0x21 0x00 0x4C 0xA5 0x01 0x01")
             self.sleep(60)
-        
+        return Pass(self)
 
 
 if __name__ == '__main__':

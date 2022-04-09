@@ -59,11 +59,8 @@ class HealthCheck(TempItem):
             parser = self.execute_run(cmd)
 
             ret = parser.get_value(f"Final_Result: (PASS)")
-            self.assertEqual("health check Final_Result ", ret.lower(), "pass")
-
-        
+            self.assertEqual(ErrorCode.FFFFFFFF, "health check Final_Result ", ret.lower(), "pass")
 
 
 if __name__ == '__main__':
     runner.single_runner(HealthCheck)
-

@@ -33,8 +33,8 @@ load_package(os.path.abspath(__file__))
 from Lib.Result import Pass, Fail
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Lib.Error import Error
 from Utils.Constant import ErrorCode
-from Lib.Error import ErrItemFail
 
 
 class FuncServerHealthLedTest(TempItem):
@@ -47,7 +47,6 @@ class FuncServerHealthLedTest(TempItem):
         self.config = []
 
     def exe(self):
-
         # logger 日志器删除 StreamHandler
         hander = self.logger.parent.handlers[0]
         self.logger.parent.removeHandler(self.logger.parent.handlers[0])
@@ -65,11 +64,10 @@ class FuncServerHealthLedTest(TempItem):
         # logger日志器添加StreamHandler
         self.logger.parent.addHandler(hander)
         if status.lower() == 'g':
-            
+            return Pass(self)
 
-        return Fail(self, ErrItemFail("机头健康灯检查失败"))
+        return Fail(self, Error("机头健康灯检查失败", ErrorCode.LEDT0008))
 
 
 if __name__ == '__main__':
     runner.single_runner(FuncServerHealthLedTest)
-
