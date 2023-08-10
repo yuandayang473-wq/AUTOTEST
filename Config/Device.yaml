@@ -1,0 +1,4 @@
+UUT_01:
+  ip_address: 192.2.3.186
+  password: '123456'
+  username: root

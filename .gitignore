@@ -1,0 +1,11 @@
+*.pyc
+Lib/__pycache__/
+Log/*
+Log
+.idea
+Utils/test/.pytest_cache
+Utils/test/.pytest_cache/*
+Config/*.xml
+demo*.py
+libs/*
+Config/*.xlsx

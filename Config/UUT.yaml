@@ -1,0 +1,671 @@
+RK0037030011:
+    SERVER:
+        pn: 8082B0000022
+        name: TG88M1S1V5.32.C0V1P0U2
+        type: AliServer-Xuanwu2.0-0323-2URG52PF
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 32
+        m2_size: 240G
+        m2_count: 2
+        m2_type: AF2MA31DTDLT240A
+        m2_fw: E4M9606
+        nic_type: CX5
+        nic_speed: 25GB
+        nic_count: 1
+        nic_fw: 16.31.1014
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        moc_count: NA
+        fan_count: 6
+    JBOG:
+        name: TB33G1.05ZB.C0V1P4U6
+        type: AliOGBOX-Xuanwu2.0-0323-6U8WOS
+        pn: ST0037030021
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: 3.84T
+        nvme_count: 4
+        nvme_type: SoliDigm SSDPF2KX038TZ
+        nvme_fw: JCV102S1
+        nic_type: CX6
+        nic_count: 8
+        nic_speed: 100GB
+        nic_fw: 22.35.1012
+        fpga_type: NA
+        fpga_count: NA
+        fpga_fw: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+
+RK0037030004:
+    SERVER:
+        pn: 8082B0000023
+        name: TG88M1S1V5WS.32.C0V1P0U2
+        type: AliServer-Xuanwu2.0-0323-2URG52PF
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 32
+        m2_size: 240G
+        m2_count: 2
+        m2_type: AF2MA31DTDLT240A
+        m2_fw: E4M9606
+        nic_type: CX5
+        nic_speed: 25GB
+        nic_count: 1
+        nic_fw: 16.31.1014
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        moc_count: NA
+        fan_count: 6
+    JBOG:
+        name: TB33G3WS.05ZB.C0V1P4U6
+        type: AliOGBOX-Xuanwu2.0-0323-6U8WS
+        pn: ST0037030009
+        shangxing: 8
+        config: W scaleout
+        nvme_size: 3.84T
+        nvme_count: 4
+        nvme_type: SoliDigm SSDPF2KX038TZ
+        nvme_fw: JCV102S1
+        nic_type: CX6
+        nic_count: 8
+        nic_speed: 100GB
+        nic_fw: 22.35.1012
+        fpga_type: NA
+        fpga_count: NA
+        fpga_fw: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 12
+
+RK0037030018:
+    SERVER:
+        pn: 8082B0000023
+        name: TG88M1S1V5WS.32.C0V1P0U2
+        type: AliServer-Xuanwu2.0-0323-2URG52PF
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 32
+        m2_size: 240G
+        m2_count: 2
+        m2_type: AF2MA31DTDLT240A
+        m2_fw: E4M9606
+        nic_type: CX5
+        nic_speed: 25GB
+        nic_count: 1
+        nic_fw: 16.31.1014
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        moc_count: NA
+        fan_count: 6
+    JBOG:
+        name: TB33G3WS.05ZB.C0V1P4U6
+        type: AliOGBOX-Xuanwu2.0-0323-6U8WS
+        pn: ST0037030009
+        shangxing: 8
+        config: W scaleout
+        nvme_size: 3.84T
+        nvme_count: 4
+        nvme_type: SoliDigm SSDPF2KX038TZ
+        nvme_fw: JCV102S1
+        nic_type: CX6
+        nic_speed: 100GB
+        nic_count: 8
+        nic_fw: 22.35.1012
+        fpga_type: NA
+        fpga_count: NA
+        fpga_fw: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 12
+
+RK0037030007:
+    SERVER:
+        pn: 8082B0000026
+        name: G89V5C45.N2.C0V1P0U2
+        type: AS2211TG5
+        retimer: 4
+        cpu_type: 8475B
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 32
+        m2_size: NA
+        m2_count: NA
+        m2_type: NA
+        m2_fw: NA
+        nic_type: NA
+        nic_speed: NA
+        nic_count: NA
+        nic_fw: NA
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: J50T1
+        moc_count: 1
+        fan_count: 6
+    JBOG:
+        name: B33O1.00.C0V1P4U6
+        type: AB0611OG1
+        pn: ST0037030012
+        shangxing: 4
+        config: W/O scaleout
+        nvme_size: NA
+        nvme_count: NA
+        nvme_type: NA
+        nvme_fw: NA
+        nic_type: NA
+        nic_count: NA
+        nic_speed: NA
+        nic_fw: NA
+        fpga_type: NA
+        fpga_count: NA
+        fpga_fw: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+
+RK0037030001:
+    SERVER:
+        pn: 8082B0000032
+        name: AG88S1V5.J2.C0V1P0U2
+        type: AS2211TG5
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 32
+        m2_size: 480G
+        m2_count: 2
+        m2_type: SSDSCKKB480GZ
+        m2_fw: 7CV10100
+        nic_type: CX6
+        nic_count: 1
+        nic_speed: 100GB
+        nic_fw: 22.35.1012
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        fan_count: 6
+    JBOG:
+        name: B31O1.05ZB.C0V1P4U6
+        type: AB0611OG1
+        pn: ST0037030016
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: 3.84T
+        nvme_count: 4
+        nvme_type: SoliDigm SSDPF2KX038TZ
+        nvme_fw: JCV102S1
+        nic_type: CX6
+        nic_speed: 100GB
+        nic_count: 8
+        nic_fw: 22.35.1012
+        fpga_type: NA
+        fpga_count: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+
+RK0037030014:
+    SERVER:
+        pn: 8082B0000021
+        name: TAG88S1V5.J2.C0V1P0U2
+        type: AS2211TG5
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 32
+        m2_size: 480G
+        m2_count: 2
+        m2_type: SSDSCKKB480GZ
+        m2_fw: 7CV10100
+        nic_type: CX6
+        nic_count: 1
+        nic_speed: 100GB
+        nic_fw: 22.35.1012
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        fan_count: 6
+    JBOG:
+        name: TB31O1.Y8.C0V1P4U6
+        type: AB0611OG1
+        pn: ST0037030007
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: 3.84T
+        nvme_count: 4
+        nvme_type: SoliDigm SSDPF2KX038TZ
+        nvme_fw: JCV102S1
+        nic_type: NA
+        nic_speed: NA
+        nic_count: NA
+        nic_fw: NA
+        fpga_type: EIC1.0 Xilinx VP1502
+        fpga_count: 4
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+
+RK0037030020:
+    SERVER:
+        pn: 8082B0000021
+        name: TAG88S1V5.J2.C0V1P0U2
+        type: AS2211TG5
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 32
+        m2_size: 480G
+        m2_count: 2
+        m2_type: SSDSCKKB480GZ
+        m2_fw: 7CV10100
+        nic_type: CX6
+        nic_count: 1
+        nic_speed: 100GB
+        nic_fw: 22.35.1012
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        fan_count: 6
+    JBOG:
+        name: B31O1.05ZB.C0V1P4U6
+        type: AB0611OG1
+        pn: ST0037030023
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: 3.84T
+        nvme_count: 4
+        nvme_type: SoliDigm SSDPF2KX038TZ
+        nvme_fw: JCV102S1
+        nic_type: NA
+        nic_speed: NA
+        nic_count: NA
+        nic_fw: NA
+        fpga_type: EIC1.0 Xilinx VP1502
+        fpga_count: 8
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+        
+RK0037030024:
+    SERVER:
+        pn: 8082B0000032
+        name: AG88S1V5.J2.C0V1P0U2
+        type: AS2211TG5
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 32
+        m2_size: 480G
+        m2_count: 2
+        m2_type: SSDSCKKB480GZ
+        m2_fw: 7CV10100
+        nic_type: CX6
+        nic_count: 1
+        nic_speed: 100GB
+        nic_fw: 22.35.1012
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        fan_count: 6
+    JBOG:
+        name: B31O1.05ZB.C0V1P4U6
+        type: AB0611OG1
+        pn: ST0037030027
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: 3.84T
+        nvme_count: 4
+        nvme_type: SoliDigm SSDPF2KX038TZ
+        nvme_fw: JCV102S1
+        nic_type: CX6
+        nic_speed: 100GB
+        nic_count: 8
+        nic_fw: 22.35.1012
+        fpga_type: NA
+        fpga_count: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+        
+RK0037030012:
+    SERVER:
+        pn: 8082B0000033
+        name: G88S2V5.00.C0V1P0U2
+        type: AS2211TG5
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 16
+        m2_size: 240G
+        m2_count: 2
+        m2_type: AF2MA31DTDLT240A
+        m2_fw: E4M9606
+        nvme_size: 1.92T
+        nvme_count: 4
+        nic_type: NA
+        nic_count: NA
+        nic_speed: NA
+        nic_fw: NA
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        fan_count: 6
+    JBOG:
+        name: B32O1.05ZB.C0V1P4U6
+        type: AB0611OG1
+        pn: ST0037030028
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: NA
+        nvme_count: NA
+        nvme_type: NA
+        nvme_fw: NA
+        nic_type: CX6
+        nic_speed: 100GB
+        nic_count: 8
+        nic_fw: 22.35.1012
+        fpga_type: NA
+        fpga_count: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+        
+RK0037030025:
+    SERVER:
+        pn: 8082B0000033
+        name: G88S2V5.00.C0V1P0U2
+        type: AS2211TG5
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 16
+        m2_size: 240G
+        m2_count: 1
+        m2_type: AF2MA31DTDLT240A
+        m2_fw: E4M9606
+        nvme_size: 1.92T
+        nvme_count: 4
+        nic_type: NA
+        nic_count: NA
+        nic_speed: NA
+        nic_fw: NA
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        fan_count: 6
+    JBOG:
+        name: B32O1.05ZB.C0V1P4U6
+        type: AB0611OG1
+        pn: ST0037030028
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: NA
+        nvme_count: NA
+        nvme_type: NA
+        nvme_fw: NA
+        nic_type: CX6
+        nic_speed: 100GB
+        nic_count: 8
+        nic_fw: 22.35.1012
+        fpga_type: NA
+        fpga_count: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+
+
+
+
+OAM:
+    Num: [0,1,2,3,4,5,6,7]
+    Firmware_Version: "1.3.35"
+    #    PPU_Frequency: "1700MHZ"
+    HBM_Frequency: "1800MHZ"
+    #    Update_Path: "/root/AliPPU/0.0.6/fw-4.18.0-15-generic-0.0.6.deb" # dpkg -i --force-overwrite {path} path:指定server os包的路径
+    Link: #GPU ICN link
+        not-scale-out: [p,0,3,4,5]
+        scale-out: [p,0,3,4,5,6]
+    Sensor:
+        min_temp: 20
+        max_temp: 85
+        min_power: 50
+        max_power: 420
+        min_valt: 670   # 电压 单位 mV
+        max_valt: 1020  # 单位 mV
+        min_elec: 5    # 电流 单位 A
+        max_elec: 680   # 电流 单位 A
+Pcie:
+    OAM:
+        Speed: "32GT/s"
+        Width: "x16"
+    CX6:
+        Speed: "16GT/s"
+        Width: "x16"
+    CX5:
+        Speed: "16GT/s"
+        Width: "x16"
+    NVME:
+        Speed: "16GT/s"
+        Width: "x4"
+    Retimer:
+        host-8:
+            Speed: "32GT/s"
+            Width: "x16"
+        host-4:
+            Speed: "32GT/s"
+            Width: "x16"
+        host-4-8475B:
+            Speed: "32GT/s"
+            Width: "x16"
+Fru:
+    Server:
+        ID_0: # FRU device
+            Chassis_Part_Number: "0"
+            Chassis_Extra: "AliType=XXXCXX.00.C0V0P0U0"
+            Board_Mfg: "Inspur"
+            Board_Product: "AS2211TG5"
+            Product_Name: "AS2211TG5"
+            Product_Version: "1.0"
+            Product_Asset_Tag: "TD11101003101121"
+    JBOG:
+        ID_0:  # fru device 0
+            Chassis_Part_Number: "TB33G2"
+            Chassis_Extra: "AliType=TB33G2.00.C0V1P4U6"
+            Board_Mfg: "Inspur Group"
+            Board_Product: "XuanWu-2"
+            Product_Name: "AliOGBOX-Xuanwu2.0-0323-6U8WOS"
+            Product_Version: "1.0"
+            Product_Asset_Tag: "Inspur"
+
+Bmc:
+    bmc_version: "7.11.13"
+
+Cpld:
+    JBOG:
+        HIB:
+            Version: "0x03"
+        UBB:
+            Version: "0x04"
+        UBB2:
+            Version: "0x03"
+        80FCB:
+            Version: "0x13"
+        NVMEBP1:
+            Version: "0x12"
+        NVMEBP2:
+            Version: "0x12"
+
+Cpu:
+    Model_Name: "Intel(R) Xeon(R) Platinum 8469C"
+    Socket_Count: 2
+
+Memory:
+    Count: 16
+    Size: "64 GB"
+    Speed: "4800 MT/s"
+#    HZ: "4800MHZ"
+
+Disk:
+    Nvme:
+        Count: 8
+    #            Size: "7.68TB"
+    M2:
+        Count: 2
+        Size: "223.6G"
+
+Nic:
+    Server:
+        Nic_Count: 1
+        Width: "x8"
+        Speed: "16GT/s"
+    JBOG:
+        Nic_Count: 8
+        Width: "x16"
+        Speed: "16GT/s"
+        FW: "22.29.1016"
+        Downgrade_Path: "/root/Mellanox_CX6_Driver/fw-ConnectX6Dx-rel-22_31_2006-MCX623106AN-CDA_Ax-UEFI-14.24.15-FlexBoot-3.6.404.bin"
+        Upgrade_Cmd: "/root/Mellanox_CX6_Driver/MLNX_OFED_LINUX-5.4-3.1.0.0-ubuntu18.04-x86_64/mlnxofedinstall --fw-update-only"  # 绝对路径
+
+OneKey:
+    Path: "/usr/local/www/aliloginfo/onekey.tar.gz"
+
+
+InitPath:
+    aliaom_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-oam-0.13.0.rpm"
+    kingkong: "kingkong_3.5.22-20.zip"
+    kingkong_dir: "kingkong_3.5.22-20"
+    kingkong_btv: "btv-centos8.2-0.13.0.tar.gz"
+    kingkong_Ppu_zip: "Ppu.zip"
+    source_path: "//172.20.0.201/luxshare/Tool/PPU"
+    fw_source_path: "/mnt/DVT/fw/*"
+    test_path: "/opt/Alioam/"
+    fru_path: "/opt/Alioam/fru/"
+    mount_path: "/mnt/"
+    mount_cmd: "mount -t cifs -o vers=2.0,username=share,password=Password@_,sec=ntlmssp,cache=none,nobrl //172.20.0.201/luxshare/Tool/PPU /mnt"
+    fw_path: "/opt/Alioam/fw/"
+    # bios fw 更新脚本
+    bios_Script: "/opt/Alioam/fw/bios/Flash_FirmWare_xw2_bios.sh"
+    bios_fw: "/opt/Alioam/fw/bios/*.bin"
+    bios_fw_for_at: "/opt/Alioam/fw/bios/at/*.bin"
+    nic_fw: "/opt/Alioam/fw/nic/*.bin"
+    nvme_tool: "/opt/Alioam/fw/nvme"
+    nvme_fw: "/opt/Alioam/fw/nvmefw/*.bin"
+    # oam fw
+    oam_fw: "/opt/Alioam/fw/oam/46/*.bin"
+    oampower_wirte_script: "/opt/Alioam/fw/oampower/fw_write.sh"
+    oampower_read_script: "/opt/Alioam/fw/oampower/fw_read.sh"
+    # 机头bmc
+    bmc_header_script: "/opt/Alioam/fw/bmc/header/Flash_FirmWare_xw2_bmc.sh"
+    bmc_header_fw: "/opt/Alioam/fw/bmc/header/*.bin"
+    bmc_header_fw_for_at: "/opt/Alioam/fw/bmc/header/at/*.bin"
+    # 机头cpld
+    header_cpld_script: "/opt/Alioam/fw/hib/Flash_FirmWare_xw2_cpld.sh"
+    cpubord_cpld_fw: "/opt/Alioam/fw/headercpld/CPUboard/*.bin"
+    cmu_cpld_fw: "/opt/Alioam/fw/headercpld/CMU/*.bin"
+    # 机尾bmc
+    bmc_tail_script: "/opt/Alioam/fw/bmc/header/Flash_FirmWare_xw2_bmc.sh"
+    bmc_tail_fw: "/opt/Alioam/fw/bmc/tail/730/*.bin"
+    bmc_tail_fw_for_at: "/opt/Alioam/fw/bmc/tail/at/730/*.bin"
+    # 机尾hib
+    hib_cpld_script: "/opt/Alioam/fw/hib/Flash_FirmWare_xw2_cpld.sh"
+    hib_cpld_fw: "/opt/Alioam/fw/hib/*.bin"
+    # 机尾ubb1
+    ubb1_cpld_script: "/opt/Alioam/fw/ubb1/Flash_FirmWare_xw2_cpld.sh"
+    ubb1_cpld_fw: "/opt/Alioam/fw/ubb1/*.bin"
+    # 机尾ubb2
+    ubb2_cpld_script: "/opt/Alioam/fw/ubb2/Flash_FirmWare_xw2_cpld.sh"
+    ubb2_cpld_fw: "/opt/Alioam/fw/ubb2/*.bin"
+    # nvme bp1
+    nvmebp1_cpld_script: "/opt/Alioam/fw/nvmebp/Flash_FirmWare_xw2_cpld.sh"
+    nvmebp1_cpld_fw: "/opt/Alioam/fw/nvmebp/cpld_signed_SR6295A_793_CPLD_V16_BP1.bin"
+    # nvme bp2
+    nvmebp2_cpld_script: "/opt/Alioam/fw/nvmebp/Flash_FirmWare_xw2_cpld.sh"
+    nvmebp2_cpld_fw: "/opt/Alioam/fw/nvmebp/cpld_signed_SR6295A_793_CPLD_V16_BP2.bin"
+    # fan board
+    fanboard_cpld_script: "/opt/Alioam/fw/fanboard/Flash_FirmWare_xw2_cpld.sh"
+    40fcb_cpld_fw: "/opt/Alioam/fw/fanboard/40FCB/*.bin"
+    80fcb_cpld_fw: "/opt/Alioam/fw/fanboard/80FCB/*.bin"
+    # pcie switch
+    pciesw_tool: "/opt/Alioam/fw/tailsw/g4Xdiagnostics.x86_64"
+    sw_fw:
+        4: "/opt/Alioam/fw/tailsw/ssw_fw_4host_v22.signed"
+        8: "/opt/Alioam/fw/tailsw/ssw_fw_8host_v23.signed"
+    retimer_fw:
+        header_a: "/opt/Alioam/fw/headerretimer/A/*.bin"
+        header_m: "/opt/Alioam/fw/headerretimer/M/*.bin"
+        tail_a: "/opt/Alioam/fw/tailretimer/A/*.bin"
+        tail_m: "/opt/Alioam/fw/tailretimer/M/*.bin"
+    retimer_script: "/opt/Alioam/fw/headerretimer/Flash_FirmWare_xw2_retimer.sh"
+    4shangxing_fw: "fw_4host*.signed"
+    8shangxing_fw: "fw_8host*.signed"
+
+# oam device_id chanel对应关系
+relation_info:
+    "01":
+        dev_id: "6"
+        chanel: "0x01"
+    "02":
+        dev_id: "7"
+        chanel: "0x02"
+    "03":
+        dev_id: "4"
+        chanel: "0x04"
+    "04":
+        dev_id: "5"
+        chanel: "0x08"
+    "05":
+        dev_id: "0"
+        chanel: "0x10"
+    "06":
+        dev_id: "1"
+        chanel: "0x20"
+    "07":
+        dev_id: "2"
+        chanel: "0x40"
+    "08":
+        dev_id: "3"
+        chanel: "0x80"
+Lspci:
+    file: "/mnt/lspci_json_files/"
+    tool: "/mnt/lspci_json_files/create_lspci_dict.py"
+
+Iperf:
+    iperftool: "iperf-2.1.6-2.el8.x86_64.rpm"
+    iperfscript: "loop_test.py"

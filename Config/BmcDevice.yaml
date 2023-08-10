@@ -1,0 +1,12 @@
+BMC_01:
+  ip_address: 192.2.3.188
+  password: superuser
+  username: sysadmin
+BMC_02:
+  ip_address: 192.2.3.188
+  password: 9ijn0okm
+  username: taobao
+BMC_03:
+  ip_address: 192.2.3.189
+  password: superuser
+  username: sysadmin
