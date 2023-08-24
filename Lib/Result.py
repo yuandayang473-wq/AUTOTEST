@@ -21,7 +21,7 @@ class Result:
     test suite or other objects.
     """
 
-    def __init__(self, name, worker):
+    def __init__(self,name, worker):
         # The result name.
         self.__name = name
 
@@ -33,7 +33,9 @@ class Result:
         self.__pass = False
 
         # The error logs the failure type and message.
-        self.__error = ErrNone()
+        # self.__error = ErrNone()
+
+        self.errors = []
 
         # The timestamp logs the Result instance created time.
         self.__id = None
@@ -77,6 +79,9 @@ class Result:
         """
         return not self.__pass
 
+    def set_status(self, is_pass: bool):
+        self.__pass = is_pass
+
     def set_error(self, is_pass: bool, err: Error):
         """Set the error.
 
@@ -115,7 +120,7 @@ class Pass(Result):
 
     def __init__(self, worker):
         Result.__init__(self, "Passed", worker)
-        self.set_error(True, ErrNone())
+        self.set_status(True)
 
 
 class Fail(Result):
@@ -123,17 +128,8 @@ class Fail(Result):
 
     def __init__(self, worker, err: Error):
         Result.__init__(self, "Failed", worker)
-        self.set_error(False, err)
-
-
-class Undefined(Result):
-    """An Undefined instance indicates the test result is undefined.
-    Generally this means a test hasn't started.
-    """
-
-    def __init__(self, worker):
-        Result.__init__(self, "Undefined", worker)
-        self.set_error(False, ErrNone())
+        self.set_status(False)
+        self.errors.append((err.get_status(), err.get_msg()))
 
 
 class CmdResult:

@@ -12,11 +12,8 @@
 '''
 import os
 import sys
-import time
 
-from Utils.Utility import trans_format
-
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -33,37 +30,34 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Utils.Init import InitLoadConfig
+from Utils.Init import PpuInitLoadConfig
 
 
-class InitParams(TempItem):
+class InitLoadConfig(TempItem):
 
     def __init__(self):
         super().__init__()
         self.name = "init ppu"
         self.expect = "load project info"
-        InitLoadConfig().load_config(self.get_logger())
-        self.config = [
-            {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
-            {"file": "BmcDevice.yaml", "name": "TAIL_TAOBAO_BMC", "key": "TAIL_TAOBAO_BMC"},
-        ]
 
     def exe(self):
+        PpuInitLoadConfig().load_config(self.get_logger())
         self.init_settings()
-        return Pass(self)
 
     def init_settings(self):
         user = {
             "ip_address": "localhost",
-            "password": "1",
+            "password": "123456",
             "username": "root"
         }
 
+        self.config = [
+            {"file": "BmcDevice.yaml", "name": "TAIL_TAOBAO_BMC", "key": "BMC_02"},
+        ]
         with self.ssh_connect(uut=user):
-            for host in [self.config["UUT"], self.config["TAIL_TAOBAO_BMC"]]:
+            for host in [self.config["TAIL_TAOBAO_BMC"]]:
                 ip = host["ip_address"]
                 user = host["username"]
                 password = host["password"]
@@ -80,4 +74,4 @@ class InitParams(TempItem):
 
 
 if __name__ == '__main__':
-    runner.single_runner(InitParams)
+    runner.single_runner(InitLoadConfig)

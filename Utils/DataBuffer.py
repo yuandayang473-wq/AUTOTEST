@@ -17,24 +17,6 @@ import re
 MATCH_FAIL = 'Null'
 
 
-# load_list = ["PPU"]
-#
-#
-# def load_package(path):
-#     parent_folder = os.path.dirname(path)
-#     for dirname in os.listdir(parent_folder):
-#         if dirname in load_list:
-#             sys.path.append(os.path.join(parent_folder, dirname))
-#             load_list.pop(load_list.index(dirname))
-#         if not load_list:
-#             return None
-#     else:
-#         return load_package(parent_folder)
-#
-#
-# load_package(os.path.abspath(__file__))
-
-
 class Parser:
 
     def get_origin_data(self):
@@ -226,24 +208,6 @@ class StrParser(Parser):
         return res_list
 
 
-class SolStrParser(StrParser):
-
-    def __init__(self, data=None) -> None:
-        if isinstance(data, bytes):
-            data = bytes.decode(data)
-        else:
-            data = str(data)
-        self.data = re.sub(r"(?:\\x1b\[[01]+;[0-9]+;[0-9]+m)|(?:\\x1b\[[0-9]+;[0-9]+H)", "", data)
-
-    def show_data(self, data=None):
-        if isinstance(data, bytes):
-            data = bytes.decode(data)
-        else:
-            data = str(data)
-        data = re.sub(r"(?:\\x1b\[[01]+;[0-9]+;[0-9]+m)|(?:\\x1b\[[0-9]+;[0-9]+H)", "", str(data))
-        return "\n".join(data.split("||"))
-
-
 class OutData:
 
     def __init__(self, data) -> None:
@@ -263,8 +227,5 @@ class OutData:
 
 
 if __name__ == '__main__':
-    data = """"""
-    p = StrParser(data)
-    val = p.get_value(r"Chassis Part Number[: ]+(\w+)\.\w+")
-    print(val)
+    pass
 

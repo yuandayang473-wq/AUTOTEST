@@ -15,90 +15,43 @@ import json
 import os
 import csv
 from xml.dom import minidom as xmldom
-import requests
 
 from .Error import KeyNotExistError, MyFileNotFounTError, CSVPermissionError, OverrideError
-
-
-class Config:
-    """A Config instance contains the configuration of a test.
-    """
-
-    def __init__(self, path: str):
-        # The configuration raw data.
-        self.__data = {}
-
-        # Load configuration from file.
-        self.__load_yaml(path)
-
-    def __str__(self):
-        return "%s" % (self.__data)
-
-    def __load_yaml(self, path: str):
-        """Load a YAML configuration file.
-
-        :param path: the YAML file path
-        :type path: str
-        """
-        yaml.warnings({'YAMLLoadWarning': False})
-        with open(path, "r", encoding='utf-8') as f:
-            raw = f.read()
-            self.__data = yaml.full_load(raw)
-
-    def find(self, path: str):
-        """Find data in the configuration.
-
-        :param path: the key path separated by dot, such as 'a.b.c'
-        :type path: str
-        :return: the value found in the configuration
-        :raises KeyError: If the path doesn't exist, raise a KeyError.
-        :rtype: depends on the value found in the configuration
-        """
-        nodes = path.split(".")
-        value = self.__data
-        for node in nodes:
-            value = value[node]
-        return value
 
 
 class LoadConfig(object):
     def __init__(self, cfg_path_name, cfg_name):
         super(LoadConfig, self).__init__()
-        self.project_config = os.environ.get("CLIENT_NAME")
-        self.cfg_path_name = cfg_path_name
+        self.cfg_path_name = config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                                        cfg_path_name)
         self.cfg_name = cfg_name
         self.file_path = None
         self.cnf = None
 
-    def load_config(self, config_path):
+    def _load_config(self, config_path):
         raise OverrideError("must be override load_config()")
+
+    def _dump_config(self, config_path, data):
+        raise OverrideError("must be override dump_config()")
 
     def get_config(self):
         if self.cnf is None:
-            self.cnf = self.load_config(self.get_path())
-        # if self.cnf is None:
-        #     self.cnf = self.load_config_from_nacos(self.cfg_name)
-
+            self.cnf = self._load_config(self.get_path())
         return self.cnf
 
+    def set_config(self, data, is_new_file=False):
+        file = os.path.join(self.cfg_path_name, self.cfg_name) if is_new_file else self.get_path()
+        self._dump_config(file, data)
+
     def get_path(self):
-        config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), self.cfg_path_name)
-        if self.project_config is not None:
-            holding_path = os.path.join(
-                os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), self.cfg_path_name),
-                self.project_config)
-            if os.path.exists(holding_path):
-                config_path = holding_path
+        if self.file_path:
+            return self.file_path
         if self.file_path is None:
-            for root, dirs, files in os.walk(config_path):
+            for root, dirs, files in os.walk(self.cfg_path_name):
                 if self.cfg_name in files:
                     self.file_path = os.path.join(root, self.cfg_name)
                     break
-        if self.file_path is None:
-            for root, dirs, files in os.walk(os.path.join(config_path, os.path.pardir)):
-                if self.cfg_name in files:
-                    self.file_path = os.path.join(root, self.cfg_name)
-                    break
+
         if self.file_path is None:
             raise MyFileNotFounTError("{} file not found".format(self.cfg_name))
         return self.file_path
@@ -118,22 +71,13 @@ class YamlLoadConfig(LoadConfig):
             raise KeyNotExistError("{} not exist".format(config_key))
         return value
 
-    def load_config(self, config_path) -> dict:
+    def _load_config(self, config_path) -> dict:
         with open(config_path, 'r', encoding="utf-8") as f:
             conf = f.read()
             cnf = yaml.load(conf, Loader=yaml.FullLoader)
             return cnf
 
-    def load_config_from_nacos(self, config_name) -> dict:
-        nacos_server = os.environ.get("NACOS_SERVER", "10.67.13.25:8848")
-        res = requests.get(f"http://{nacos_server}/nacos/v1/cs/configs?dataId={config_name}&group=DEFAULT_GROUP")
-        if res.status_code == 200:
-            conf = res.text
-            cnf = yaml.load(conf, Loader=yaml.FullLoader)
-            return cnf
-        return None
-
-    def yaml_dump(self, data):
+    def _dump_config(self, config_path, data):
         config_path = self.get_path()
         with open(config_path, 'w', encoding="utf-8") as f:
             yaml.dump(data, f)
@@ -141,10 +85,10 @@ class YamlLoadConfig(LoadConfig):
 
 class JsonLoadConfig(LoadConfig):
 
-    def __init__(self, cfg_path_name="Config", cfg_name="Device.yaml"):
+    def __init__(self, cfg_path_name="Config", cfg_name="result.yaml"):
         super().__init__(cfg_path_name=cfg_path_name, cfg_name=cfg_name)
 
-    def load_config(self, config_path) -> dict:
+    def _load_config(self, config_path) -> dict:
         with open(config_path, "r", encoding="utf-8") as f:
             cnf = json.loads(f.read())
             return cnf
@@ -155,6 +99,10 @@ class JsonLoadConfig(LoadConfig):
     def dump_config(self, data):
         with open(self.get_path(), "w", encoding="utf-8") as f:
             f.write(json.dumps(data))
+
+    def _dump_config(self, config_path, data):
+        with open(config_path, "w", encoding="utf-8") as f:
+            f.write(json.dumps(data, indent=4, sort_keys=False, ensure_ascii=False) + '\n')
 
 
 class CsvLoader:

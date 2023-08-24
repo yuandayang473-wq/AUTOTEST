@@ -132,18 +132,6 @@ class NotFindElementError(Error):
         super().__init__(message, ErrCode.ELEMENT_NOT_FOUND, *args)
 
 
-class WebNameError(Error):
-
-    def __init__(self, message, *args: object) -> None:
-        super().__init__(message, ErrCode.WEB_NAME_ERROR, *args)
-
-
-class WebUrlAddrError(Error):
-
-    def __init__(self, message, *args: object) -> None:
-        super().__init__(message, ErrCode.URL_ADDR_ERROR, *args)
-
-
 class MyValueError(Error):
 
     def __init__(self, message, *args: object):
@@ -162,8 +150,8 @@ class ReMatchFail(Error):
 
 
 class MyAssertError(Error):
-    def __init__(self, message, *args: object):
-        super().__init__(message, ErrCode.RE_MATCH_FAIL, *args)
+    def __init__(self, type_code, message, *args: object):
+        super().__init__(message, type_code, *args)
 
 
 class PduConfError(Error):
