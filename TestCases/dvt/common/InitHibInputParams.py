@@ -36,7 +36,7 @@ from Lib.Result import Pass, Fail
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Lib.Request import MesSocket
-from Utils.Init import InitLoadConfig
+from Utils.GlobalConfig import InitLoadConfig
 from Lib.Error import ErrItemFail
 from Utils.Utility import trans_format
 

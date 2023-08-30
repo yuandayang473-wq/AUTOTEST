@@ -57,13 +57,11 @@ class BiosFwCheck(TempItem):
             'username': 'taobao',
             'password': '9ijn0okm',
         }
-        with self.ssh_connect(uut=self.config["UUT"]):
-            parser = self.execute_run("ipmitool power cycle")
-        self.sleep(420)
         with self.ssh_connect(uut=server_bmc, login_retry=10):
             parser = self.execute_run("ipmitool alioem version | grep -i bios1 | awk '{print $NF}'")
             current_ver = re.search(r'\d+.\S*\d', parser.get_origin_data(), re.I)
             self.assertEqual("check bios fw version", current_ver.group(), target_bios_ver)
+            parser = self.execute_run("ipmitool chassis bootdev none options=clear-cmos")
         return Pass(self)
 
 

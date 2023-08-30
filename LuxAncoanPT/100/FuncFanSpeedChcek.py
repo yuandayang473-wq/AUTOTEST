@@ -35,6 +35,7 @@ from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Utility import multi_column
 from Utils.DataBuffer import StrParser
+from Utils.Constant import ErrorCode
 
 
 class FuncFanSpeedChcek(TempItem):
@@ -65,7 +66,7 @@ class FuncFanSpeedChcek(TempItem):
             fan_pwms = multi_column(parser.get_origin_data(), column_index=[0, 1])
             for name, value in fan_pwms:
                 v = StrParser(value).get_value(r"(\d+)[ ]+percent")
-                self.assertEqual(f"{name}", v, "100")
+                self.assertEqual(ErrorCode.FANTFT05, f"{name}", v, "100")
             self.execute_run("ipmitool raw 0x3e 0x21 0x00 0x4C 0xA5 0x01 0x01")
             self.sleep(60)
         return Pass(self)

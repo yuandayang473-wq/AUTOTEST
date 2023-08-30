@@ -33,6 +33,7 @@ load_package(os.path.abspath(__file__))
 from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Constant import ErrorCode
 
 
 class FuncFpgaCountCheck(TempItem):
@@ -51,7 +52,6 @@ class FuncFpgaCountCheck(TempItem):
     def exe(self):
         jbog_cfg = self.config["cfg"]["JBOG"]
         fpga_count = jbog_cfg["fpga_count"]
-        count = 0
 
         if fpga_count == "NA":
             return Pass(self)
@@ -59,7 +59,7 @@ class FuncFpgaCountCheck(TempItem):
         with self.ssh_connect(uut=self.config["UUT"]):
             parser = self.execute_run(f'lspci -Dnn | grep 0580 | grep -icE "1ded"')
             current_fpga_count = int(parser.get_origin_data())
-            self.assertEqual("Fpga count", current_fpga_count, int(fpga_count*4))
+            self.assertEqual(ErrorCode,"Fpga count", current_fpga_count, int(fpga_count*4))
         return Pass(self)
 
 

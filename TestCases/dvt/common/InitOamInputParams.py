@@ -147,53 +147,10 @@ class InitOamInputParams(TempItem):
         self.init_settings()
         success = Pass(self)
         data = self.mes.get_ubb_info(self.sn)
-        # ubb_part_number = data["Results"]["ubb_part_number"]
-        # if ubb_part_number is None:
-        #     self.parent.globals["CaseFailStop"] = "yes"
-        #     return Fail(self, ErrItemFail(f"init params fail, UBB {self.sn} info error"))
-
-        data["Results"]["oam_sn"]=[
-            {
-                "slot": "01",
-                "oam_sn": "KS140840033711066",
-                "oam_part_no": "231A14084003"
-            },
-            {
-                "slot": "02",
-                "oam_sn": "KS140840033710810",
-                "oam_part_no": "231A14084003"
-            },
-            {
-                "slot": "03",
-                "oam_sn": "KS140840033710861",
-                "oam_part_no": "231A14084003"
-            },
-            {
-                "slot": "04",
-                "oam_sn": "KS140840033710956",
-                "oam_part_no": "231A14084003"
-            },
-            {
-                "slot": "05",
-                "oam_sn": "KS140840033740169",
-                "oam_part_no": "231A14084003"
-            },
-            {
-                "slot": "06",
-                "oam_sn": "KS140840033711001",
-                "oam_part_no": "231A14084003"
-            },
-            {
-                "slot": "07",
-                "oam_sn": "KS140840033740072",
-                "oam_part_no": "231A14084003"
-            },
-            {
-                "slot": "08",
-                "oam_sn": "KS140840033710957",
-                "oam_part_no": "231A14084003"
-            }
-        ]
+        ubb_part_number = data["Results"]["ubb_part_number"]
+        if ubb_part_number is None:
+            self.parent.globals["CaseFailStop"] = "yes"
+            return Fail(self, ErrItemFail(f"init params fail, UBB {self.sn} info error"))
 
         suite = self.parent
         from_format = "%Y_%m_%d_%H_%M_%S"

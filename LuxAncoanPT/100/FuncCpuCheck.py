@@ -32,7 +32,7 @@ load_package(os.path.abspath(__file__))
 
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Utils.Constant import TypeCode
+from Utils.Constant import ErrorCode
 
 
 class FuncCpuCheck(TempItem):
@@ -58,11 +58,11 @@ class FuncCpuCheck(TempItem):
             self.step(2, "check cpu info")
             # cpu 个数
             socket_count = int(parser.get_value(r"Socket\(s\)[ :]+(\d+)"))
-            self.assertEqual(TypeCode.CP01, f"cpu socket count", socket_count, e_socket_count)
+            self.assertEqual(ErrorCode.CUTCH001, f"cpu socket count", socket_count, e_socket_count)
 
             # cpu 型号
             model_name = parser.get_value(r"Model name[ :]+([\S ]+)")
-            self.assertIn(TypeCode.CP01, f"cpu model name", e_model_name, model_name)
+            self.assertIn(ErrorCode.CUTCH002, f"cpu model name", e_model_name, model_name)
 
 
 if __name__ == '__main__':

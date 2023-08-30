@@ -30,11 +30,10 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Utility import multi_column
-from Utils.Constant import TypeCode
+from Utils.Constant import ErrorCode
 
 
 class FuncFanInfoCheck(TempItem):
@@ -60,8 +59,8 @@ class FuncFanInfoCheck(TempItem):
                 # check fan count
                 head_fans = multi_column(parser.get_origin_data(), column_index=[0, 2])
                 for f_name, status in head_fans:
-                    self.assertEqual(f"{f_name} status", status, "ok")
-                self.assertEqual("server fan count", int(len(head_fans) / 2), server["fan_count"])
+                    self.assertEqual(ErrorCode.FANTCH01, f"{f_name} status", status, "ok")
+                self.assertEqual(ErrorCode.FANTCH02, "server fan count", int(len(head_fans) / 2), server["fan_count"])
 
         # 获取机尾的fan
         with self.action("JBOG fan"):
@@ -75,10 +74,8 @@ class FuncFanInfoCheck(TempItem):
                 # check fan count
                 tail_fans = multi_column(parser.get_origin_data(), column_index=[0, 2])
                 for f_name, status in tail_fans:
-                    self.assertEqual(f"{f_name} status", status, "ok")
-                self.assertEqual("jbog fan count", int(len(tail_fans) / 2), JBOG["fan_count"])
-
-        return Pass(self)
+                    self.assertEqual(ErrorCode.FANTCH01, f"{f_name} status", status, "ok")
+                self.assertEqual(ErrorCode.FANTCH02, "jbog fan count", int(len(tail_fans) / 2), JBOG["fan_count"])
 
 
 if __name__ == '__main__':

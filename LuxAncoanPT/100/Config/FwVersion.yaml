@@ -15,7 +15,7 @@ FW-VERSION:
   # mcx nic fw version
   mcx6_ver: '22.35.1012'
   # oam fw version
-  oam_ver: '1.4.46'
+  oam_ver: '1.4.46-497ca'
   # HIB fw version
   hib_ver: '0x08'
   ubb1: '0x0a'

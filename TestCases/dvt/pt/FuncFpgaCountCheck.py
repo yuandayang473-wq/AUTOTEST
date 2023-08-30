@@ -57,7 +57,7 @@ class FuncFpgaCountCheck(TempItem):
             return Pass(self)
 
         with self.ssh_connect(uut=self.config["UUT"]):
-            parser = self.execute_run(f'lspci -Dnn | grep 0580 | grep -icE "1ded"')
+            parser = self.execute_run(f'lspci -Dnn | grep 0580 | grep -icE "1ded|b03f"')
             current_fpga_count = int(parser.get_origin_data())
             self.assertEqual("Fpga count", current_fpga_count, int(fpga_count*4))
         return Pass(self)

@@ -67,21 +67,26 @@ class OamFruWrite(TempItem):
                 5. 烧录bin文件
             '''
             # 从mes获取sn信息
-            _mes = MesSocket()
-            fru_info = _mes.get_mes_info(self.parent.globals["SN"])["Results"]["oam_sn"]
-            print(fru_info)
+            # _mes = MesSocket()
+            # fru_info = _mes.get_mes_info(self.parent.globals["UBB"])["Results"]["oam_sn"]
+            fru_info =self.parent.globals["UBB"]["Results"]["oam_sn"]
+
             for fru in fru_info:
                 # # 根据sn生成oam 对应的ini文件
-                parser = self.execute_run(
+                self.execute_run(
                     f'cat {path.get("fru_path")}fru_oam.ini > {path.get("fru_path")}{fru["oam_sn"]}.ini')
                 # 将sn 写入.ini文件
-                parser = self.execute_run(
+                self.execute_run(
                     f'cat {path.get("fru_path")}{fru["oam_sn"]}.ini | grep -wn oam_sn | cut -d: -f1 | xargs -I line sed -i "lines/oam_sn/{fru["oam_sn"]}/g" {path.get("fru_path")}{fru["oam_sn"]}.ini')
-                parser = self.execute_run(
+                self.execute_run(
                     f'cat {path.get("fru_path")}{fru["oam_sn"]}.ini | grep -wn part_num | cut -d: -f1 | xargs -I line sed -i "lines/part_num/{fru["oam_part_no"]}/g" {path.get("fru_path")}{fru["oam_sn"]}.ini')
-                parser = self.execute_run(
+                self.execute_run(
+                    f'cat {path.get("fru_path")}{fru["oam_sn"]}.ini | grep -wn product_sn | cut -d: -f1 | xargs -I line sed -i "lines/product_sn/{fru["oam_sn"]}/g" {path.get("fru_path")}{fru["oam_sn"]}.ini')
+                self.execute_run(
+                    f'cat {path.get("fru_path")}{fru["oam_sn"]}.ini | grep -wn product_part_num | cut -d: -f1 | xargs -I line sed -i "lines/product_part_num/{fru["oam_part_no"]}/g" {path.get("fru_path")}{fru["oam_sn"]}.ini')
+                self.execute_run(
                     f'python3 {path.get("fru_path")}fru.py {path.get("fru_path")}{fru["oam_sn"]}.ini {path.get("fru_path")}{fru["oam_sn"]}.bin --cmd')
-              
+
                  # # bmc端烧录
             parser = self.execute_run(
                 f"sshpass -p superuser ssh sysadmin@{tail_bmc_ip} -o StrictHostKeyChecking=no /etc/init.d/ipmistack stop")
@@ -121,7 +126,6 @@ class OamFruWrite(TempItem):
 
             self.execute_run(
                 f"sshpass -p superuser ssh sysadmin@{tail_bmc_ip} -o StrictHostKeyChecking=no /etc/init.d/ipmistack start")
-            
 
             device_dict = {}
             for i in range(8):

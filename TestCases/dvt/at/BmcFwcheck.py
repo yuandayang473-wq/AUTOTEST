@@ -52,7 +52,8 @@ class BmcFwcheck(TempItem):
     def exe(self):
         bmc_tail = self.config["BMC"]["ip_address"]
         target_header_ver = self.config["FwVsersion"]["header_bmc_ver_for_at"]
-        target_tail_ver = self.config["FwVsersion"]["tail_bmc_ver"]
+        # target_tail_ver = self.config["FwVsersion"]["tail_bmc_ver"]
+        target_tail_ver = self.config["FwVsersion"]["tail_bmc_ver_at"]
 
         with self.ssh_connect(uut=self.config["UUT"]):
             # 检查机尾bmc fw版本

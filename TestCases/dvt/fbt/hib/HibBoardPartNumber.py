@@ -52,8 +52,8 @@ class HibBoardPartNumber(TempItem):
             jbmc_passwd = self.config["JBMC"]["password"]
             _mes = MesSocket()
             # write_info = _mes.get_mes_info(self.parent.globals["SN"])["Results"]["hib_part_number"]
-            # hib_part_number = self.parent.globals["HIB"]["Results"][0]["PN"]
-            hib_part_number = "231A14087004"
+            hib_part_number = self.parent.globals["HIB"]["Results"][0]["PN"]
+            # hib_part_number = "231A14087004"
             data = self.execute_run(f"ipmitool  -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru print 0 ", i_exit_code=True)
             parser = self.execute_run(f"ipmitool  -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru edit 0 field b 3 {hib_part_number} ", i_exit_code=True)
             data = self.execute_run(f"ipmitool  -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru print 0 ", i_exit_code=True)

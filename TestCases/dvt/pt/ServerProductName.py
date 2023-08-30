@@ -44,6 +44,8 @@ class ServerProductName(TempItem):
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key":self.locals["UUT"]},
             {"file": "BmcDevice.yaml", "name": "JBMC", "key":self.locals["TAIL_TAOBAO_BMC"]},
+            {"file": "UUT.yaml", "name": "ServerProductNameModel", "key": "ServerProductNameModel"}
+
         ]
 
     def exe(self):
@@ -51,13 +53,14 @@ class ServerProductName(TempItem):
 
             _mes = MesSocket()
             rk_pn =  _mes.get_mes_info(self.parent.globals["SN"])["Results"]["rk_part_number"]
-            list1 = ["RK0037030011" ,"RK0037030004" ,"RK0037030018"]
-            list2 = ["RK0037030007" ,"RK0037030001" ,"RK0037030014", "RK0037030020", "RK0037030024","RK0037030012","RK0037030025"]
+            list1 = self.config["ServerProductNameModel"]['AliServer-Xuanwu2.0-0323-2URG52PF']
+            list2 = self.config["ServerProductNameModel"]['AS2211TG5']
             if rk_pn in list1:
                 write_info = "AliServer-Xuanwu2.0-0323-2URG52PF"
             elif rk_pn in list2 :
                 write_info = "AS2211TG5" 
             else:
+                self.logger.error(f'not found {rk_pn} in server product name model')
                 return Fail(self)
             #表格还未收集到
             data = self.execute_run("ipmitool fru print 0 ")

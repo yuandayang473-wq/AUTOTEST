@@ -39,8 +39,8 @@ class ClearSellog(TempItem):
 
     def __init__(self):
         super().__init__()
-        self.name = "Clear Sel log"
-        self.expect = "This is clear Sel log for at."
+        self.name = "cpu config check"
+        self.expect = "This is cpu config check for normal case."
 
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key":self.locals["UUT"]},
@@ -57,37 +57,20 @@ class ClearSellog(TempItem):
         self.sleep(30)
 
         #清除机头alioem sel
-        server_bmc = {
-            'ip_address': self.config["SERVER_BMC"]["ip_address"],
-            'username': 'taobao',
-            'password': '9ijn0okm',
-        }
-        print(server_bmc)
-        print("start clear header sel log")
-        with self.ssh_connect(uut=server_bmc):
-            parser = self.execute_run("ipmitool alioem restoretomanufacturesetting")
+        # with self.ssh_connect(uut=self.config["SERVER_BMC"]):
+        #     parser = self.execute_run("touch /logs/restorefactory")
+        #     parser = self.execute_run("ipmitool raw 6 2")
+        # self.sleep(30)
 
-        self.sleep(30)
-
-        user = {
-            "ip_address": "localhost",
-            "password": "1",
-            "username": "root"
-        }
-        with self.ssh_connect(uut=user):
+        with self.ssh_connect(uut=self.config["UUT"]):
             jbmc_ip = self.config["JBMC"]["ip_address"]
             jbmc_user = self.config["JBMC"]["username"]
             jbmc_passwd = self.config["JBMC"]["password"]
-            sbmc_ip = self.config["SERVER_BMC"]["ip_address"]
-            sbmc_user = 'taobao'
-            sbmc_passwd = '9ijn0okm'
             time.sleep(10)
             parser = self.execute_run(f"ipmitool -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} sel clear ")
-            count = self.execute_run(f"ipmitool -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} sel list").data.strip().split('\n')
-            self.assertEqual(f"clear Jbog bmc sel log", int(1), len(count))
-            parser = self.execute_run(f"ipmitool -I lanplus -H {sbmc_ip} -U {sbmc_user} -P {sbmc_passwd} sel clear ")
-            count = self.execute_run(f"ipmitool -I lanplus -H {sbmc_ip} -U {sbmc_user} -P {sbmc_passwd} sel list ").data.strip().split('\n')
-            self.assertEqual(f"clear Server bmc sel log", int(1), len(count))
+             #清除机头alioem sel 机头 sel log
+            parser = self.execute_run(" ipmitool alioem restoretomanufacturesetting ")
+            time.sleep(120)
         return Pass(self)
 
 

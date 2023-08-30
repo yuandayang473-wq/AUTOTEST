@@ -44,15 +44,14 @@ class OamFruCheck(TempItem):
         self.expect = "This is oam oam fru write."
 
         self.config = [
-            {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
+            {"file": "Device.yaml", "name": "UUT", "key": self.locals["UUT"]},
             {"file": "UUT.yaml", "name": "InitPath", "key": "InitPath"},
-            {"file": "BmcDevice.yaml", "name": "BMC_TAIL", "key": "BMC_01"},
+            {"file": "BmcDevice.yaml", "name": "BMC_TAIL", "key": self.locals["TAIL_TAOBAO_BMC"]},
         ]
 
     def exe(self):
         path = self.config["InitPath"]
-        #fru_path = path.get("fru_path")
-        fru_path = "/mnt/fru/"
+        fru_path = path.get("fru_path")
         with self.ssh_outband_connect(uut=self.config["UUT"], bmc=self.config["BMC_TAIL"]):
 
             device_dict = {}
@@ -60,7 +59,7 @@ class OamFruCheck(TempItem):
                 parser = self.execute_run(f" ppudbg --device {i} |grep -i moduleid")
                 current_fruinfo = parser.get_value(r"ModuleId: (\d+)")
                 device_dict[f'{int(current_fruinfo) + 1}'] = i
-                
+
             parser = self.outband_run("ipmitool fru")
             ppus = parser.split(r'FRU Device Description[ :]+PPU')[1:]
             for ppu in ppus:

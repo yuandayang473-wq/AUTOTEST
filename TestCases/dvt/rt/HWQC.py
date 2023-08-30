@@ -63,6 +63,8 @@ class HWQC(TempItem):
         test_path = path.get('test_path')
         alidriver_source_rpm = os.path.join(mount_path, path.get('aliaom_driver'))
         alidriver_target_rpm = os.path.join(test_path, path.get('aliaom_driver'))
+        alippudriver_source_rpm = os.path.join(mount_path, path.get('alippu_driver'))
+        alippudriver_target_rpm = os.path.join(test_path, path.get('alippu_driver'))
         hwqc_source_path = os.path.join(mount_path, "HWQC")
         hwqc_target_path = os.path.join("/root", "HWQC")
 
@@ -81,10 +83,12 @@ class HWQC(TempItem):
         self.execute_run(f"[ ! -d {test_path} ] && mkdir -p {test_path}", i_exit_code=True)
         # cp file
         self.execute_run(f"\cp {alidriver_source_rpm} {test_path}")
+        self.execute_run(f"\cp {alippudriver_source_rpm} {test_path}")
 
         # rpm 安装driver
         self.execute_run(f"rpm -ivh --nodeps --force {alidriver_target_rpm}")
         self.execute_run(f"rpm -ivh --nodeps --force {hwqc_pub_rpm}")
+        self.execute_run(f"rpm -ivh --nodeps --force {alippudriver_target_rpm}")
 
         self.execute_run(f"unzip -d {hwqc_target_path} {hwqc_factory_zip}")
         self.execute_run(f"tar -xvf {hwqc_alibaba_tar} -C {hwqc_target_path}")

@@ -44,6 +44,7 @@ class HibProductName(TempItem):
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key":self.locals["UUT"]},
             {"file": "BmcDevice.yaml", "name": "JBMC", "key":self.locals["TAIL_TAOBAO_BMC"]},
+            {"file": "UUT.yaml", "name": "HibModel", "key": "HibModel"}
         ]
 
     def exe(self):
@@ -54,16 +55,17 @@ class HibProductName(TempItem):
             _mes = MesSocket()
             # rk_pn = self.parent.globals["SN"]/
             rk_pn =  _mes.get_mes_info(self.parent.globals["SN"])["Results"]["rk_part_number"]
-            list1 = ["RK0037030004" ,"RK0037030018"]
-            list2 = ["RK0037030007" ,"RK0037030001" ,"RK0037030014", "RK0037030020", "RK0037030024", "RK0037030012", "RK0037030025"]
-            list3 = ["RK0037030011"]
-            if rk_pn in list1:
+            hib_model_list1 = self.config["HibModel"]['AliOGBOX-Xuanwu2.0-0323-6U8WS']
+            hib_model_list2 = self.config["HibModel"]['AB0611OG1']
+            hib_model_list3 = self.config["HibModel"]['AliOGBOX-Xuanwu2.0-0323-6U8WOS']
+            if rk_pn in hib_model_list1:
                 write_info = "AliOGBOX-Xuanwu2.0-0323-6U8WS"
-            elif rk_pn in list2 :
+            elif rk_pn in hib_model_list2 :
                 write_info = "AB0611OG1" 
-            elif rk_pn in list3:
+            elif rk_pn in hib_model_list3:
                 write_info = "AliOGBOX-Xuanwu2.0-0323-6U8WOS"
             else:
+                self.logger.error(f'not found {rk_pn} in hib model')
                 return Fail(self)
                 
             parser = self.execute_run(f" ipmitool -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru edit 0 field p 1 {write_info}")

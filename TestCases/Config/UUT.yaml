@@ -338,6 +338,7 @@ RK0037030024:
         psu_fw: 00.10.11
         moc_cord: NA
         fan_count: 6
+        white_list: ['Disk1_Status','Disk2_Status','Disk3_Status','Disk4_Status','MOC2_CPU_Temp', 'MOC2_FPGA_Temp', 'MOC2_DIMM_Temp', 'MOC2_M2_Temp', 'MOC2_5_CPU_Temp', 'MOC2_5_FPGA_Temp', 'MOC2_5_DIMM_Temp', 'MOC2_5_M2_Temp', 'MOC2_5_F_VR_Temp', 'OCP_Temp', 'PCIE_NIC1_Temp', 'PCIE_NIC2_Temp', 'BF3_NIC_Temp', 'NVMe1_Temp', 'NVMe2_Temp','NVMe3_Temp','NVMe4_Temp']
     JBOG:
         name: B31O1.05ZB.C0V1P4U6
         type: AB0611OG1
@@ -357,6 +358,7 @@ RK0037030024:
         psu_watt: 4000W
         psu_count: 6
         fan_count: 10
+        white_list: ['40FAN1_F_RPM', '40FAN1_R_RPM', '40FAN2_F_RPM', '40FAN2_R_RPM', '40FAN1_PWM', '40FAN2_PWM', '40FAN_Power', 'EIC_Max_Temp', 'EIC_MOS_Max_Temp', 'EIC_AOC_Max_Temp', 'NVMe_Max_Temp', 'QSFP56_Max_Temp']
         
 RK0037030012:
     SERVER:
@@ -430,6 +432,7 @@ RK0037030025:
         psu_fw: 00.10.11
         moc_cord: NA
         fan_count: 6
+        white_list: ['MOC2_CPU_Temp', 'MOC2_FPGA_Temp', 'MOC2_DIMM_Temp', 'MOC2_M2_Temp', 'MOC2_5_CPU_Temp', 'MOC2_5_FPGA_Temp', 'MOC2_5_DIMM_Temp', 'MOC2_5_M2_Temp', 'MOC2_5_F_VR_Temp', 'OCP_Temp', 'PCIE_NIC1_Temp', 'PCIE_NIC2_Temp', 'BF3_NIC_Temp']
     JBOG:
         name: B32O1.05ZB.C0V1P4U6
         type: AB0611OG1
@@ -449,9 +452,149 @@ RK0037030025:
         psu_watt: 4000W
         psu_count: 6
         fan_count: 10
+        white_list: ['40FAN1_F_RPM', '40FAN1_R_RPM', '40FAN2_F_RPM', '40FAN2_R_RPM', '40FAN1_PWM', '40FAN2_PWM', '40FAN_Power', 'EIC_Max_Temp', 'EIC_MOS_Max_Temp', 'EIC_AOC_Max_Temp', 'NVMe_Max_Temp', 'QSFP56_Max_Temp']
+        
+RK0037030021:
+    SERVER:
+        pn: 8082B0000023
+        name: TG88M1S1V5WS.32.C0V1P0U2
+        type: AliServer-Xuanwu2.0-0323-2URG52PF
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 32
+        m2_size: 240G
+        m2_count: 2
+        m2_type: AF2MA31DTDLT240A
+        m2_fw: E4M9606
+        nvme_size: NA
+        nvme_count: NA
+        nic_type: CX5
+        nic_count: 1
+        nic_speed: 25GB
+        nic_fw: 16.31.1014
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        fan_count: 6
+        white_list: ['Disk1_Status','Disk2_Status','Disk3_Status','Disk4_Status','MOC2_CPU_Temp', 'MOC2_FPGA_Temp', 'MOC2_DIMM_Temp', 'MOC2_M2_Temp', 'MOC2_5_CPU_Temp', 'MOC2_5_FPGA_Temp', 'MOC2_5_DIMM_Temp', 'MOC2_5_M2_Temp', 'MOC2_5_F_VR_Temp', 'OCP_Temp', 'PCIE_NIC1_Temp', 'BF3_NIC_Temp','NVMe1_Temp','NVMe2_Temp','NVMe3_Temp','NVMe4_Temp']
+    JBOG:
+        name: TB33G3WS.05ZB.C0V1P4U6
+        type: AliOGBOX-Xuanwu2.0-0323-6U8WS
+        pn: ST0037030024
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: 3.84T
+        nvme_count: 4
+        nvme_type: SoliDigm SSDPF2KX038TZ
+        nvme_fw: JCV102S1
+        nic_type: CX6
+        nic_speed: 100GB
+        nic_count: 8
+        nic_fw: 22.35.1012
+        fpga_type: NA
+        fpga_count: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+        white_list: ['40FAN1_F_RPM', '40FAN1_R_RPM', '40FAN2_F_RPM', '40FAN2_R_RPM', '40FAN1_PWM', '40FAN2_PWM', '40FAN_Power', 'EIC_Max_Temp', 'EIC_MOS_Max_Temp', 'EIC_AOC_Max_Temp', 'QSFP56_Max_Temp']
 
+RK0037030026:
+    SERVER:
+        pn: 8082B0000023
+        name: TG88M1S1V5WS.32.C0V1P0U2
+        type: AliServer-Xuanwu2.0-0323-2URG52PF
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 32
+        m2_size: 240G
+        m2_count: 2
+        m2_type: AF2MA31DTDLT240A
+        m2_fw: E4M9606
+        nvme_size: NA
+        nvme_count: NA
+        nic_type: CX5
+        nic_count: 1
+        nic_speed: 25GB
+        nic_fw: 16.31.1014
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        fan_count: 6
+        white_list: ['Disk1_Status','Disk2_Status','Disk3_Status','Disk4_Status','MOC2_CPU_Temp', 'MOC2_FPGA_Temp', 'MOC2_DIMM_Temp', 'MOC2_M2_Temp', 'MOC2_5_CPU_Temp', 'MOC2_5_FPGA_Temp', 'MOC2_5_DIMM_Temp', 'MOC2_5_M2_Temp', 'MOC2_5_F_VR_Temp', 'OCP_Temp', 'PCIE_NIC1_Temp', 'BF3_NIC_Temp','NVMe1_Temp','NVMe2_Temp','NVMe3_Temp','NVMe4_Temp']
+    JBOG:
+        name: TB33G3WS.05ZB.C0V1P4U6
+        type: AliOGBOX-Xuanwu2.0-0323-6U8WS
+        pn: ST0037030029
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: 3.84T
+        nvme_count: 4
+        nvme_type: SoliDigm SSDPF2KX038TZ
+        nvme_fw: JCV102S1
+        nic_type: CX6
+        nic_speed: 100GB
+        nic_count: 8
+        nic_fw: 22.35.1012
+        fpga_type: NA
+        fpga_count: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+        white_list: ['40FAN1_F_RPM', '40FAN1_R_RPM', '40FAN2_F_RPM', '40FAN2_R_RPM', '40FAN1_PWM', '40FAN2_PWM', '40FAN_Power', 'EIC_Max_Temp', 'EIC_MOS_Max_Temp', 'EIC_AOC_Max_Temp', 'QSFP56_Max_Temp']
 
-
+RK0037030022:
+    SERVER:
+        pn: 8082B0000032
+        name: AG88S1V5X7.0YFH.C0V1P4U8
+        type: AS2211TG5
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 32
+        m2_size: 480G
+        m2_count: 2
+        m2_type: SSDSCKKB480GZ
+        m2_fw: 7CV10100
+        nic_type: CX5
+        nic_count: 1
+        nic_speed: 25GB
+        nic_fw: 16.31.1014
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        fan_count: 6
+        white_list: ['Disk1_Status','Disk2_Status','Disk3_Status','Disk4_Status','MOC2_CPU_Temp', 'MOC2_FPGA_Temp', 'MOC2_DIMM_Temp', 'MOC2_M2_Temp', 'MOC2_5_CPU_Temp', 'MOC2_5_FPGA_Temp', 'MOC2_5_DIMM_Temp', 'MOC2_5_M2_Temp', 'MOC2_5_F_VR_Temp', 'OCP_Temp', 'PCIE_NIC1_Temp', 'EIC_AOC_Max_Temp', 'BF3_NIC_Temp','NVMe1_Temp','NVMe2_Temp','NVMe3_Temp','NVMe4_Temp']
+    JBOG:
+        name: B31O1.Y8.C0V1P4U6
+        type: AB0611OG1
+        pn: ST0037030025
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: 3.84T
+        nvme_count: 4
+        nvme_type: SoliDigm SSDPF2KX038TZ
+        nvme_fw: JCV102S1
+        nic_type: NA
+        nic_speed: NA
+        nic_count: NA
+        nic_fw: NA
+        fpga_type: EIC1.0 Xilinx VP1502
+        fpga_count: 4
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+        white_list: ['40FAN1_F_RPM', '40FAN1_R_RPM', '40FAN2_F_RPM', '40FAN2_R_RPM', '40FAN1_PWM', '40FAN2_PWM', '40FAN_Power', 'QSFP56_Max_Temp','PCIe_NIC1_Temp','PCIe_NIC2_Temp','PCIe_NIC3_Temp','PCIe_NIC4_Temp','PCIe_NIC5_Temp','PCIe_NIC6_Temp','PCIe_NIC7_Temp','PCIe_NIC8_Temp', 'EIC_AOC_Max_Temp']
 
 OAM:
     Num: [0,1,2,3,4,5,6,7]
@@ -568,10 +711,11 @@ OneKey:
 
 
 InitPath:
-    aliaom_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-oam-0.13.0.rpm"
-    kingkong: "kingkong_3.5.22-20.zip"
-    kingkong_dir: "kingkong_3.5.22-20"
-    kingkong_btv: "btv-centos8.2-0.13.0.tar.gz"
+    aliaom_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-0.21.0.rpm"
+    alippu_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-oam-0.13.0.rpm"
+    kingkong: "kingkong_3.5.25-8-OAM.zip"
+    kingkong_dir: "kingkong_3.5.25-8-OAM"
+    kingkong_btv: "btv-centos8.2.tar.gz"
     kingkong_Ppu_zip: "Ppu.zip"
     source_path: "//172.20.0.201/luxshare/Tool/PPU"
     fw_source_path: "/mnt/DVT/fw/*"
@@ -635,6 +779,7 @@ InitPath:
     retimer_script: "/opt/Alioam/fw/headerretimer/Flash_FirmWare_xw2_retimer.sh"
     4shangxing_fw: "fw_4host*.signed"
     8shangxing_fw: "fw_8host*.signed"
+    eictool: "EIC1.0_platfrom_v.1.1.4.2_230731"
 
 # oam device_id chanel对应关系
 relation_info:
@@ -669,3 +814,13 @@ Lspci:
 Iperf:
     iperftool: "iperf-2.1.6-2.el8.x86_64.rpm"
     iperfscript: "loop_test.py"
+
+
+HibModel:
+    AliOGBOX-Xuanwu2.0-0323-6U8WS: ["RK0037030004" ,"RK0037030018", "RK0037030021", "RK0037030026"]
+    AB0611OG1: ["RK0037030007" ,"RK0037030001" ,"RK0037030014", "RK0037030020", "RK0037030024", "RK0037030012", "RK0037030025", "RK0037030022"]
+    AliOGBOX-Xuanwu2.0-0323-6U8WOS: ["RK0037030011"]
+
+ServerProductNameModel:
+    AliServer-Xuanwu2.0-0323-2URG52PF: ["RK0037030011" ,"RK0037030004" ,"RK0037030018", "RK0037030021","RK0037030026"]
+    AS2211TG5: ["RK0037030007" ,"RK0037030001" ,"RK0037030014", "RK0037030020", "RK0037030024","RK0037030012","RK0037030025","RK0037030022"]
