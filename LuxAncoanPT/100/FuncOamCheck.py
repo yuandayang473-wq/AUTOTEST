@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -30,9 +30,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Constant import ErrorCode
 
 
 class FuncOamCheck(TempItem):
@@ -59,7 +59,7 @@ class FuncOamCheck(TempItem):
                     h_l = h.split("-")
                     self.assertEqual(f"oam device {n} {h_l[0]} HBM Frequency", h_l[1], oam_config['HBM_Frequency'])
 
-        return Pass(self)
+        
 
 
 if __name__ == '__main__':

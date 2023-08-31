@@ -30,9 +30,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Constant import ErrorCode
 from Utils.Utility import multi_column
 from Utils.DataBuffer import StrParser
 from Utils.Constant import ErrorCode
@@ -57,7 +57,7 @@ class FuncDiskCheck(TempItem):
         e_m2_type = server["m2_type"]
         c = 0
         if e_m2_size == "NA":
-            return Pass(self)
+            
 
         with self.ssh_connect(uut=self.config["UUT"]):
             self.step(1, "get m.2 info")

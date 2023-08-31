@@ -1,7 +1,7 @@
 # !/usr/bin/python3
 # -*- encoding: utf-8 -*-
 '''
-@Author  :   Lujuncheng
+@Author  :   yuandayang
 @Contact :   Juncheng.Lu@luxshare-ict.com
 @Software:   TestCase
 @File    :   HeaderRetimerFwUpdate.py
@@ -15,7 +15,7 @@ import sys
 import re
 import binascii
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -32,10 +32,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Utils.Constant import TypeCode
+from Utils.Constant import ErrorCode
 
 
 class HeaderRetimerFwUpdate(TempItem):
@@ -47,9 +46,9 @@ class HeaderRetimerFwUpdate(TempItem):
 
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
-            {"file": "BmcDevice.yaml", "name": "BMC_TAIL", "key": "BMC_02"},
+            {"file": "BmcDevice.yaml", "name": "BMC_TAIL", "key": "BMC_01"},
             {"file": "BmcDevice.yaml", "name": "BMC_HEADER", "key": "BMC_03"},
-            {"file": "FwVersion.yaml", "name": "FwVsersion", "key": "FW-VERSION"},
+            {"folder": "LuxAncoanPT/100/Config", "file": "FwVersion.yaml", "name": "FwVsersion", "key": "FW-VERSION"},
             {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "InitPath", "key": "InitPath"},
         ]
 
@@ -86,7 +85,7 @@ class HeaderRetimerFwUpdate(TempItem):
                             count += 1
                         else:
                             self.logger.info("head retimer flash fail")
-                            self.fail(TypeCode.FFFFFFFF, "head retimer flash fail")
+                            self.fail(ErrorCode.FWTUP00F, "head retimer flash fail")
 
         
 

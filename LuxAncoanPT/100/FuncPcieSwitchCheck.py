@@ -14,7 +14,7 @@ import os
 import sys
 import time
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -31,9 +31,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Constant import ErrorCode
 
 
 class FuncPcieSwitchCheck(TempItem):
@@ -73,7 +73,7 @@ class FuncPcieSwitchCheck(TempItem):
                 count += 1
             time.sleep(2)
 
-        return Pass(self)
+        
 
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -30,9 +30,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Constant import ErrorCode
 from Utils.DataBuffer import StrParser
 
 
@@ -56,7 +56,7 @@ class FuncPcieDiskCheck(TempItem):
         nvme_size = jbog_cfg["nvme_size"]
 
         if nvme_size == "NA":
-            return Pass(self)
+            
 
         with self.ssh_connect(uut=self.config["UUT"]):
             self.step(1, "get memory info")
@@ -75,7 +75,7 @@ class FuncPcieDiskCheck(TempItem):
                     self.assertEqual(f"pcie disk {device} width", width, pcie_disk_config["Width"])
                     self.assertFalse(f"pcie oam {device} check exist (downgrade) keyword", rst)
 
-        return Pass(self)
+        
 
 
 if __name__ == '__main__':

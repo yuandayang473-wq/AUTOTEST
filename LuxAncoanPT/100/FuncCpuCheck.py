@@ -33,6 +33,7 @@ load_package(os.path.abspath(__file__))
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
+from Utils.Constant import ErrorCode
 
 
 class FuncCpuCheck(TempItem):

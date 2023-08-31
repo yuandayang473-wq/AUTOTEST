@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -30,9 +30,9 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
+from Utils.Constant import ErrorCode
 from Utils.DataBuffer import StrParser
 
 
@@ -54,7 +54,7 @@ class FuncPcieNetworkCheck(TempItem):
         pcie_config = self.config["PCIE"]
 
         if server["nic_type"] == "NA":
-            return Pass(self)
+            
 
         pcie_nic_config = pcie_config[server["nic_type"]]
 
@@ -77,7 +77,7 @@ class FuncPcieNetworkCheck(TempItem):
                     self.assertEqual(f"pcie network {device} width", width, pcie_nic_config["Width"])
                     self.assertFalse(f"pcie network {device} check exist (downgrade) keyword", rst)
 
-        return Pass(self)
+        
 
 
 if __name__ == '__main__':
