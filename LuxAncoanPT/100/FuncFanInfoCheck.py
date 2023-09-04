@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -34,10 +34,12 @@ from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Utility import multi_column
 from Utils.Constant import ErrorCode
+from Utils.Init import load_mes_info
 
 
 class FuncFanInfoCheck(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "fan"
@@ -46,7 +48,7 @@ class FuncFanInfoCheck(TempItem):
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
             {"file": "BmcDevice.yaml", "name": "JBOG_BMC", "key": "BMC_01"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.parent.globals["RK"]},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
         ]
 
     def exe(self):

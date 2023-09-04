@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -30,10 +30,11 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass, Fail
+from Lib.Result import Fail
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Lib.Error import ErrItemFail
+from Lib.Error import Error
+from Utils.Constant import ErrorCode
 
 
 class FuncJbogButtonPowerCheck(TempItem):
@@ -79,7 +80,7 @@ class FuncJbogButtonPowerCheck(TempItem):
                             break
                         self.sleep(15)
                     else:
-                        return Fail(self, ErrItemFail("ipmitool chassis power on 开机失败"))
+                        return Fail(self, Error("ipmitool chassis power on 开机失败", ErrorCode.FFFFFFFF))
 
         # 先要确认机头关机了
         self.logger.info("SSH登录机头BMC")
@@ -100,7 +101,7 @@ class FuncJbogButtonPowerCheck(TempItem):
                     break
                 self.sleep(15)
             else:
-                return Fail(self, ErrItemFail("机头关机失败"))
+                return Fail(self, Error("机头关机失败", ErrorCode.BTTEST01))
 
         self.sleep(2)
         self.logger.parent.removeHandler(self.logger.parent.handlers[0])
@@ -116,7 +117,7 @@ class FuncJbogButtonPowerCheck(TempItem):
         # logger日志器添加StreamHandler
         self.logger.parent.handlers.insert(0, handler)
         if status.lower() != 'g':
-            return Fail(self, ErrItemFail("长按 5s 机尾Power Button 关机验证失败"))
+            return Fail(self, Error("长按 5s 机尾Power Button 关机验证失败", ErrorCode.BTTEST01))
 
         # 确认机尾已关机
         self.logger.info("SSH登录机尾BMC")
@@ -128,7 +129,7 @@ class FuncJbogButtonPowerCheck(TempItem):
                     self.logger.info("长按 5s 机尾Power Button 关机验证成功")
                     break
             else:
-                return Fail(self, ErrItemFail("长按 5s 机尾Power Button 关机验证失败"))
+                return Fail(self, Error("长按 5s 机尾Power Button 关机验证失败", ErrorCode.BTTEST01))
 
         # 开机先机尾，后机头
         # 先机尾开机
@@ -148,7 +149,7 @@ class FuncJbogButtonPowerCheck(TempItem):
         self.logger.parent.handlers.insert(0, handler)
 
         if status.lower() != 'g':
-            return Fail(self, ErrItemFail("短按机尾开机验证失败"))
+            return Fail(self, Error("短按机尾开机验证失败", ErrorCode.BTTEST01))
 
         # 验证机尾短按是否成功
         self.logger.info("SSH登录机尾BMC")
@@ -161,7 +162,7 @@ class FuncJbogButtonPowerCheck(TempItem):
                     break
                 self.sleep(15)
             else:
-                return Fail(self, ErrItemFail("短按机尾开机验证失败"))
+                return Fail(self, Error("短按机尾开机验证失败", ErrorCode.BTTEST01))
 
         # 机头开机
         self.logger.info("SSH登录机头BMC")
@@ -179,9 +180,7 @@ class FuncJbogButtonPowerCheck(TempItem):
                     break
                 self.sleep(15)
             else:
-                return Fail(self, ErrItemFail("机头开机失败"))
-
-        return Pass(self)
+                return Fail(self, Error("机头开机失败", ErrorCode.BTTEST01))
 
 
 if __name__ == '__main__':

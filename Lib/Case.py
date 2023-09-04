@@ -730,6 +730,10 @@ class Suite:
             "logfolder": self.root_logger.LOG_ROOT_PATH,
         }
 
+        worker = ret.get_worker()
+        if hasattr(worker, "need_exec_cmd"):
+            temp_ret["needexec_cmd"] = getattr(worker, "need_exec_cmd")
+
         if ret.is_pass():
             temp_ret["result"] = "PASS"
         else:

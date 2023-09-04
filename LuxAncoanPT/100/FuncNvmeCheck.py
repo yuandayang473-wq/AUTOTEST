@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -34,21 +34,21 @@ from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.DataBuffer import StrParser
+from Utils.Constant import ErrorCode
+from Utils.Init import load_mes_info
 
 
 class FuncNvmeCheck(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "nvme"
         self.expect = "This is nvme function check test on the server"
 
-
-        # rk = "RK0037030012"
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.parent.globals["RK"]},
-            # {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": rk},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
             {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "path", "key": "InitPath"},
         ]
 
@@ -81,16 +81,13 @@ class FuncNvmeCheck(TempItem):
                 cur_nvme_unit = l[7]
 
                 if cur_nvme_size in tail_nvme_size:
-                    self.assertIn(f"{l[0]} size", tail_nvme_size, cur_nvme_size + cur_nvme_unit)
+                    self.assertIn(ErrorCode.HDTCH004, f"{l[0]} size", tail_nvme_size, cur_nvme_size + cur_nvme_unit)
                 elif cur_nvme_size in head_nvme_size:
-                    self.assertIn(f"{l[0]} size", head_nvme_size, cur_nvme_size + cur_nvme_unit)
+                    self.assertIn(ErrorCode.HDTCH004, f"{l[0]} size", head_nvme_size, cur_nvme_size + cur_nvme_unit)
                 count += 1
 
-            self.assertEqual("nvme count", count, tail_nvme_count + head_nvme_count)
-
-        return Pass(self)
+            self.assertEqual(ErrorCode.HDTCH001, "nvme count", count, tail_nvme_count + head_nvme_count)
 
 
 if __name__ == '__main__':
     runner.single_runner(FuncNvmeCheck)
-

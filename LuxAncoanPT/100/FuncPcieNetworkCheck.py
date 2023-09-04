@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -34,10 +34,13 @@ from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.DataBuffer import StrParser
+from Utils.Constant import ErrorCode
+from Utils.Init import load_mes_info
 
 
 class FuncPcieNetworkCheck(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "pcie network"
@@ -45,7 +48,7 @@ class FuncPcieNetworkCheck(TempItem):
 
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.parent.globals["RK"]},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
             {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "PCIE", "key": "Pcie"},
         ]
 
@@ -73,13 +76,12 @@ class FuncPcieNetworkCheck(TempItem):
                     speed = parser.get_value(r"Speed ([0-9]+GT/s)")
                     width = parser.get_value(r"Width (x[0-9]+)")
                     rst = parser.check_field("downgraded")
-                    self.assertEqual(f"pcie network {device} speed", speed, pcie_nic_config["Speed"])
-                    self.assertEqual(f"pcie network {device} width", width, pcie_nic_config["Width"])
-                    self.assertFalse(f"pcie network {device} check exist (downgrade) keyword", rst)
-
-        return Pass(self)
+                    self.assertEqual(ErrorCode.NICTFT01, f"pcie network {device} speed", speed,
+                                     pcie_nic_config["Speed"])
+                    self.assertEqual(ErrorCode.NICTFT02, f"pcie network {device} width", width,
+                                     pcie_nic_config["Width"])
+                    self.assertFalse(ErrorCode.NICTFT03, f"pcie network {device} check exist (downgrade) keyword", rst)
 
 
 if __name__ == '__main__':
     runner.single_runner(FuncPcieNetworkCheck)
-

@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -30,14 +30,16 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Utility import multi_column
+from Utils.Constant import ErrorCode
+from Utils.Init import load_mes_info
 
 
 class FuncPsuCheck(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "psu"
@@ -46,7 +48,7 @@ class FuncPsuCheck(TempItem):
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
             {"file": "BmcDevice.yaml", "name": "JBOG_BMC", "key": "BMC_01"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.parent.globals["RK"]},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
         ]
 
     def exe(self):
@@ -59,9 +61,9 @@ class FuncPsuCheck(TempItem):
             psus = multi_column(parser.get_origin_data(), column_index=[0, 4])
 
             with self.action(level="server psu info check"):
-                self.assertEqual("server psu count", len(psus), server["psu_count"])
+                self.assertEqual(ErrorCode.PSUTCH03, "server psu count", len(psus), server["psu_count"])
                 for p_name, status in psus:
-                    self.assertEqual(f"{p_name} status", status.lower(), "presence detected")
+                    self.assertEqual(ErrorCode.PSUTCH01, f"{p_name} status", status.lower(), "presence detected")
 
         # 获取机尾的psu
         with self.ssh_connect(uut=self.config["JBOG_BMC"]):
@@ -69,13 +71,10 @@ class FuncPsuCheck(TempItem):
             psus = multi_column(parser.get_origin_data(), column_index=[0, 4])
 
             with self.action(level="JBOG psu info check"):
-                self.assertEqual("JBOG psu count", len(psus), JBOG["psu_count"])
+                self.assertEqual(ErrorCode.PSUTCH03, "JBOG psu count", len(psus), JBOG["psu_count"])
                 for p_name, status in psus:
-                    self.assertEqual(f"{p_name} status", status.lower(), "presence detected")
-
-        return Pass(self)
+                    self.assertEqual(ErrorCode.PSUTCH01, f"{p_name} status", status.lower(), "presence detected")
 
 
 if __name__ == '__main__':
     runner.single_runner(FuncPsuCheck)
-

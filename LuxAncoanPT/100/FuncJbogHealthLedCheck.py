@@ -14,7 +14,7 @@ import os
 import sys
 
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -31,10 +31,11 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass, Fail
+from Lib.Result import Fail
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Lib.Error import ErrItemFail
+from Lib.Error import Error
+from Utils.Constant import ErrorCode
 
 
 class FuncJbogHealthLedCheck(TempItem):
@@ -64,10 +65,8 @@ class FuncJbogHealthLedCheck(TempItem):
 
         # logger日志器添加StreamHandler
         self.logger.parent.addHandler(hander)
-        if status.lower() == 'g':
-            return Pass(self)
-
-        return Fail(self, ErrItemFail(f"机尾健康灯检查失败"))
+        if status.lower() != 'g':
+            return Fail(self, Error(f"机尾健康灯检查失败",ErrorCode.LEDT0008))
 
 
 if __name__ == '__main__':

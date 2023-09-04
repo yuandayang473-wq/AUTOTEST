@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -30,10 +30,11 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass, Fail
+from Lib.Result import Fail
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Lib.Error import ErrItemFail
+from Lib.Error import Error
+from Utils.Constant import ErrorCode
 
 
 class FuncJbogNvmeLedCheck(TempItem):
@@ -76,11 +77,8 @@ class FuncJbogNvmeLedCheck(TempItem):
         # logger日志器添加StreamHandler
         self.logger.parent.addHandler(hander)
         if gpu_led_fail:
-            return Fail(self, ErrItemFail(f"机尾GPU device {gpu_led_fail} 面板指示灯检查失败"))
-
-        return Pass(self)
+            return Fail(self, Error(f"机尾GPU device {gpu_led_fail} 面板指示灯检查失败", ErrorCode.LEDT0004))
 
 
 if __name__ == '__main__':
     runner.single_runner(FuncJbogNvmeLedCheck)
-

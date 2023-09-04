@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -55,8 +55,6 @@ class FuncSensorCheck(TempItem):
         # 获取机尾的sdr
         with self.ssh_connect(uut=self.config["JBOG_BMC"]):
             self.execute_run("ipmitool sdr")
-
-        return Pass(self)
 
 
 if __name__ == '__main__':

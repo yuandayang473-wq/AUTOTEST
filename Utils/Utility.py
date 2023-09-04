@@ -10,7 +10,7 @@
 @License :   Copyright ©LuxShare  2022 . All Rights Reserved.
 @Desc    :   bmc common function
 """
-
+import functools
 import time
 import datetime
 import os
@@ -188,6 +188,18 @@ def continuous_column(data, s_column, e_column, separator="|", exclude=[], keywo
     column_data, count = _data(data, s_column, e_column, separator=separator, exclude=exclude, keyword=keyword,
                                stop=stop, ignore_space=ignore_space)
     return column_data
+
+
+def need_exec_cmd(cmd="reboot"):
+    def reboot(func):
+        @functools.wraps(func)
+        def wrapper(self):
+            setattr(self, "need_exec_cmd", cmd)
+            func(self)
+
+        return wrapper
+
+    return reboot
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@
 import os
 import sys
 
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -33,7 +33,8 @@ load_package(os.path.abspath(__file__))
 from Lib.Result import Pass, Fail
 from Lib.Template import TempItem
 from Lib.Runner import runner
-from Lib.Error import ErrItemFail
+from Lib.Error import Error
+from Utils.Constant import ErrorCode
 
 
 class FuncServerButtonUidCheck(TempItem):
@@ -46,7 +47,6 @@ class FuncServerButtonUidCheck(TempItem):
         self.config = []
 
     def exe(self):
-
         # logger 日志器删除 StreamHandler
         hander = self.logger.parent.handlers[0]
         self.logger.parent.removeHandler(self.logger.parent.handlers[0])
@@ -64,11 +64,10 @@ class FuncServerButtonUidCheck(TempItem):
         # logger日志器添加StreamHandler
         self.logger.parent.addHandler(hander)
         if status.lower() != 'g':
-            return Fail(self, ErrItemFail("短按UID灯蓝色常亮，后面板UID同时蓝色常亮验证失败"))
+            return Fail(self, Error("短按UID灯蓝色常亮，后面板UID同时蓝色常亮验证失败", ErrorCode.LEDT000A))
 
         return Pass(self)
 
 
 if __name__ == '__main__':
     runner.single_runner(FuncServerButtonUidCheck)
-

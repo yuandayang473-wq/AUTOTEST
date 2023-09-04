@@ -13,8 +13,7 @@
 import os
 import sys
 
-
-load_list = ["PPU"]
+load_list = ["LuxScript"]
 
 
 def load_package(path):
@@ -31,14 +30,15 @@ def load_package(path):
 
 load_package(os.path.abspath(__file__))
 
-from Lib.Result import Pass
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.DataBuffer import StrParser
-
+from Utils.Constant import ErrorCode
+from Utils.Init import load_mes_info
 
 class FuncMemoryCheck(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "memory"
@@ -46,7 +46,7 @@ class FuncMemoryCheck(TempItem):
 
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.parent.globals["RK"]},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
         ]
 
     def exe(self):
@@ -68,7 +68,7 @@ class FuncMemoryCheck(TempItem):
                 # 检验 memory 内存大小
                 memory_size = p.get_value(f"Size: ([0-9 ]+GB)")
                 memory_size = "".join(memory_size.split(" "))
-                self.assertIn("memery size", e_memory_size, memory_size)
+                self.assertIn(ErrorCode.MFTCH005, "memery size", e_memory_size, memory_size)
 
                 # # 比较 memory 速率
                 # m_speed = p.get_value(f"Speed: ([0-9 ]+MT/s)")
@@ -77,11 +77,8 @@ class FuncMemoryCheck(TempItem):
                 memory_count += 1
 
             # 检验memory 数量
-            self.assertEqual("memory count", memory_count, e_memory_count)
-
-        return Pass(self)
+            self.assertEqual(ErrorCode.MFTCH001, "memory count", memory_count, e_memory_count)
 
 
 if __name__ == '__main__':
     runner.single_runner(FuncMemoryCheck)
-
