@@ -35,10 +35,12 @@ from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
 from Utils.Login import ApcConnect
+from Utils.Init import load_mes_info
 
 
 class CpldFwUpdate(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "cpld fw update"
@@ -49,8 +51,8 @@ class CpldFwUpdate(TempItem):
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
             {"file": "BmcDevice.yaml", "name": "BMC_TAIL", "key": "BMC_01"},
             {"file": "BmcDevice.yaml", "name": "BMC_HEADER", "key": "BMC_03"},
-            {"file": "PduDevice.yaml", "name": "pdu", "key": self.locals["PDU"]},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.parent.globals["RK"]},
+            {"file": "PduDevice.yaml", "name": "pdu", "key": "PDU_01"},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
             {"folder": "LuxAncoanPT/100/Config", "file": "FwVersion.yaml", "name": "FwVsersion", "key": "FW-VERSION"},
             {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "InitPath", "key": "InitPath"},
         ]
