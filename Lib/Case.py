@@ -21,6 +21,7 @@ from .Error import Error, ErrItemFail, MyAssertError
 from .Config import YamlLoadConfig, JsonLoadConfig
 from .Utility import SleepTime, Step
 from .Logging import LoggerFactory, CaseLogger
+from .Login import OsRunCmd
 
 _MAX_LENGTH = 100
 _LIEN_FEED_LENGTH = 60
@@ -72,6 +73,8 @@ class Case:
 
         self.isSkip = False
         self.result = Pass(self)
+        self.os_run = None
+        self.root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     @property
     def ID(self):
@@ -718,6 +721,7 @@ class Suite:
         case_logger = self.root_logger.case_logger(Log.name, None, Log.debug)
         instance.set_logger(case_logger)
         instance.ID = test_id
+        instance.os_run = OsRunCmd(case_logger)
         ret = instance.run()
         ret.ID = instance.ID
         # 记录结束时间

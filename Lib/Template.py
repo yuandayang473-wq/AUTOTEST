@@ -15,8 +15,8 @@ import contextlib
 
 from .Case import Item
 from .Error import OverrideError, SSHSessionError
-from Utils.Login import SshConnect, BmcConnect
-from Utils.DataBuffer import StrParser
+from .Login import SshConnect, BmcConnect
+from .DataBuffer import StrParser
 
 
 class TempItem(Item):
@@ -131,4 +131,3 @@ class TempItem(Item):
 
     def tips_msg(self, msg):
         return f"[编号: {self.parent.globals['log_prefix']}]--{msg}"
-

@@ -14,11 +14,12 @@
 import time
 import paramiko
 import re
+import subprocess
 
 from Lib.Error import BmcSessionError, SshConnectionError, AuthenticationError, CmdError, PduConfError
 from Lib.Constant import Status
 from Lib.Result import CmdPass, CmdFail
-from Utils.DataBuffer import OutData
+from Lib.DataBuffer import OutData
 
 
 def cmd_retry(origin_func):
@@ -47,6 +48,92 @@ def cmd_retry(origin_func):
             return rst
 
     return wrapper
+
+
+class OsRunCmd:
+    _instance = None
+
+    def __new__(cls, *args, **kw):
+        if cls._instance is None:
+            cls._instance = object.__new__(cls)
+        return cls._instance
+
+    def __init__(self, logger):
+        self.logger = logger
+        self._exit_code = 0
+        self._cmd_count = 3
+
+    def get_logger(self):
+        return self.logger
+
+    def set_logger(self, logger):
+        self.logger = logger
+
+    def get_exit_code(self):
+        """
+        当 run() 中参数 save_exit_code 设置True，返回当前命令的exit code
+        :return:
+        """
+        return self._exit_code
+
+    def get_cmd_retry_count(self):
+        """
+        :return: cmd 重试的次数
+        """
+        return self._cmd_count
+
+    def set_cmd_retry_count(self, count):
+        """
+        设置 cmd 重试的次数
+        :param count: int
+        :return: none
+        """
+        self._cmd_count = count
+
+    def run(self, command, retry_expt=3, i_exit_code=False, save_exit_code=True, timeout=3600, i_timeout_err=False,
+            i_record_cmd=False, parser_type="str_parser"):
+        """
+        :param command: os 下执行的命令
+        :param retry_expt: cmd 执行fail，重试的次数， 默认是3次
+        :param i_exit_code: 忽略退出状态码， 执行命令结果按照返回状态码0为标准，命令执行返回状态码不为0，程序继续执行需要改成True
+        :param i_record_cmd: 忽略当前命令记录日志中
+        :param save_exit_code: 需要获得当前命令返回状态码，则设置为True，通过get_exit_code()
+        :return: DataBuffer模块中 OutData 的实例对象
+        """
+        self.set_cmd_retry_count(retry_expt)
+        if not i_record_cmd:
+            self.logger.info("SSH Execute command: %s" % command)
+        result = self._run(command, i_exit_code, save_exit_code, timeout, i_timeout_err)
+        if result.is_fail():
+            self.logger.error("Execute Command Fail, Output below \n%s" % result.get_out_rst())
+            raise CmdError(f"cmd execute fail: {command}")
+        # success
+        parser = getattr(OutData(result.get_out_rst()), parser_type)()
+        self.logger.info("SSH Execute command ok, Output below: \n%s" % parser.get_origin_data())
+        return parser
+
+    @cmd_retry
+    def _run(self, command, ignore_exit_code, save_exit_code, cmd_timeout, i_timeout_err):
+        returncode = Status.SUCCESS
+        if not isinstance(command, str):
+            raise TypeError(f'command MUST be _cmd string type, {command} is _cmd {type(command)} type')
+        try:
+            p = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=cmd_timeout, shell=True,
+                               encoding='utf-8', check=bool(1 - ignore_exit_code))
+            data = p.stdout + p.stderr
+            returncode = p.returncode
+        except subprocess.TimeoutExpired as e:
+            if i_timeout_err:
+                self.logger.info(f'timeout: {cmd_timeout},auto stop cmd {command}')
+                data = e
+            else:
+                return CmdFail(Status.FAIL, e)
+        except subprocess.CalledProcessError as e:
+            return CmdFail(Status.FAIL, e)
+
+        if save_exit_code:
+            self._exit_code = returncode
+        return CmdPass(Status.SUCCESS, data)
 
 
 class Connection:

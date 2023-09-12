@@ -22,8 +22,7 @@ from .Error import KeyNotExistError, MyFileNotFounTError, CSVPermissionError, Ov
 class LoadConfig(object):
     def __init__(self, cfg_path_name, cfg_name):
         super(LoadConfig, self).__init__()
-        self.cfg_path_name = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                          cfg_path_name)
+        self.cfg_path_name = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), cfg_path_name)
         self.cfg_name = cfg_name
         self.file_path = None
         self.cnf = None

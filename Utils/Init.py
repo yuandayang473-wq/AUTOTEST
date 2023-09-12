@@ -10,10 +10,10 @@
 @License :   Copyright ©LuxShare  2022 . All Rights Reserved.
 @Desc    :   初始RK,必须要的参数
 '''
-import functools
 
+import functools
 from Lib.Config import YamlLoadConfig, JsonLoadConfig
-from Utils.Login import SshConnect
+from Lib.Login import SshConnect
 
 
 class LoadConfig:

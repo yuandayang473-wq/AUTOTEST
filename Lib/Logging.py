@@ -14,6 +14,7 @@
 import logging
 import time
 import os
+import shutil
 
 from .Error import FormatError
 
@@ -100,7 +101,7 @@ class CaseLogger:
         else:
             fmt = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
 
-        fh = logging.FileHandler(log_name, encoding="UTF-8", mode="w")  # for file out
+        fh = logging.FileHandler(log_name, encoding="UTF-8")  # for file out
         fh.setFormatter(fmt)
         self.logger.addHandler(fh)
         sh = logging.StreamHandler()  # for print out
@@ -141,6 +142,7 @@ class CaseLogger:
 
 class RootLogger(object):
     LOG_ROOT_PATH = None
+    CUSTOM_LOG_PATH = None
     ROOT_LOGGER = None
     _instance = None
 
@@ -174,8 +176,8 @@ class RootLogger(object):
         :param sub_folder: 子文件夹名称
         :return:
         """
+        log_parent = self.find_log_folder_prefix(__file__)
         if not self.LOG_ROOT_PATH:
-            log_parent = self.find_log_folder_prefix(__file__)
             if folder is None or folder == '':
                 folder = "Log"
 
@@ -186,8 +188,17 @@ class RootLogger(object):
 
             self.LOG_ROOT_PATH = folder
 
-        if not os.path.isdir(self.LOG_ROOT_PATH):
-            os.makedirs(self.LOG_ROOT_PATH)
+        if os.path.isdir(self.LOG_ROOT_PATH):
+            shutil.rmtree(self.LOG_ROOT_PATH, ignore_errors=True)
+        os.makedirs(self.LOG_ROOT_PATH)
+
+        # 存在客户Log
+        if not self.CUSTOM_LOG_PATH:
+            self.CUSTOM_LOG_PATH = os.path.join(log_parent, "customlog")
+
+        if os.path.isdir(self.CUSTOM_LOG_PATH):
+            shutil.rmtree(self.CUSTOM_LOG_PATH, ignore_errors=True)
+        os.makedirs(self.CUSTOM_LOG_PATH)
 
         return folder
 
