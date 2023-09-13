@@ -154,12 +154,26 @@ class Case:
                     c = YamlLoadConfig(cfg_name=conf["file"])
 
                 if "key" in conf:
-                    data = c.data(conf["key"])
-
+                    keys = conf["key"].split("/")
+                    data = c.data(keys[0])
+                    if len(keys) > 1:
+                        for key in keys[1:]:
+                            data = data[key]
+                        else:
+                            self._gen_tool_abspath(keys, data)
+                    else:
+                        data = c.data(conf["key"])
                 else:
                     data = c.get_config()
 
             self.__config[conf["name"]] = data
+
+    def _gen_tool_abspath(self, keys, data):
+        for k, v in data.items():
+            if isinstance(v, str):
+                data[k] = os.path.join(self.root_path, "/".join(keys), v)
+            else:
+                self._gen_tool_abspath(keys, data[k])
 
     def get_logger(self) -> CaseLogger:
         """Get the logger.

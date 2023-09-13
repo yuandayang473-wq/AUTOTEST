@@ -13,7 +13,7 @@
 
 import functools
 from Lib.Config import YamlLoadConfig, JsonLoadConfig
-from Lib.Login import SshConnect
+from Lib.Login import OsRunCmd
 
 
 class LoadConfig:
@@ -39,9 +39,9 @@ class InitLoadConfig(LoadConfig):
         pass
 
     def get_bmc_ip(self, logger):
-        with SshConnect(ip="127.0.0.1", user="root", password="123456", logger=logger) as ssh:
-            parser = ssh.run("ipmitool lan print").str_parser()
-            bmc_ip = parser.get_value(r"IP Address[ :]+((?:[0-9]+\.){3}[0-9]+)")
+        os_run = OsRunCmd(logger=logger)
+        parser = os_run.run("ipmitool lan print")
+        bmc_ip = parser.get_value(r"IP Address[ :]+((?:[0-9]+\.){3}[0-9]+)")
 
         return bmc_ip
 
@@ -73,15 +73,16 @@ class PpuInitLoadConfig(InitLoadConfig):
     def load_config(self, logger):
         head_bmc_ip, tail_bmc_ip = self.get_ppu_bmc_ip(logger)
         self.write_uut_yaml()
-        self.write_ppu_bmc_yaml(head_bmc_ip, tail_bmc_ip)
+        bmc_data = self.write_ppu_bmc_yaml(head_bmc_ip, tail_bmc_ip)
+        return bmc_data
 
     def get_ppu_bmc_ip(self, logger):
-        with SshConnect(ip="127.0.0.1", user="root", password="123456", logger=logger) as ssh:
-            parser = ssh.run("ipmitool lan print").str_parser()
-            head_bmc_ip = parser.get_value(r"IP Address[ :]+((?:[0-9]+\.){3}[0-9]+)")
+        os_run = OsRunCmd(logger=logger)
+        parser = os_run.run("ipmitool lan print")
+        head_bmc_ip = parser.get_value(r"IP Address[ :]+((?:[0-9]+\.){3}[0-9]+)")
 
-            parser = ssh.run("ipmitool -b 0x0a -t 0x32 lan print 1").str_parser()
-            tail_bmc_ip = parser.get_value(r"IP Address[ :]+((?:[0-9]+\.){3}[0-9]+)")
+        parser = os_run.run("ipmitool -b 0x0a -t 0x32 lan print 1")
+        tail_bmc_ip = parser.get_value(r"IP Address[ :]+((?:[0-9]+\.){3}[0-9]+)")
         return head_bmc_ip, tail_bmc_ip
 
     def write_ppu_bmc_yaml(self, head_bmc_ip, tail_bmc_ip):
@@ -105,6 +106,7 @@ class PpuInitLoadConfig(InitLoadConfig):
             }
         }
         bmc_device.set_config(bmc_data)
+        return bmc_data
 
 
 def load_mes_info(func):

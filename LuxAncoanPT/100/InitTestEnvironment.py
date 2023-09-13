@@ -44,7 +44,7 @@ class InitTestEnvironment(TempItem):
         self.expect = "This is Init test environment write."
 
         self.config = [
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "InitPath", "key": "InitPath"}
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "InitPath", "key": "tools/ancoan/rpm"}
         ]
 
     def exe(self):
@@ -52,7 +52,8 @@ class InitTestEnvironment(TempItem):
         http_server_url = self.mes_info["info"]["http_server_url"]
         _fw = os.path.join(http_server_url, "LuxScript/tools/ancoan/fw/")
         _fru = os.path.join(http_server_url, "LuxScript/tools/ancoan/fru/")
-        ali_driver = os.path.join(http_server_url, f"LuxScript/tools/ancoan/rpm/{init_path['aliaom_driver']}")
+
+        ali_driver = os.path.join(http_server_url, f"LuxScript/tools/ancoan/rpm/{init_path['aliaom_driver'].split('/')[-1]}")
         sshpass_driver = os.path.join(http_server_url, "LuxScript/tools/ancoan/rpm/sshpass-1.09-4.el8.x86_64.rpm")
         path = os.path.dirname(self.root_path)
         self.os_run.run(f"cd {path};wget -t 5 -T 60 -r -np -nH -R index.html {_fw}")
@@ -60,8 +61,8 @@ class InitTestEnvironment(TempItem):
         self.os_run.run(f"cd {path};wget -t 5 -T 60 -r -np -nH -R index.html {ali_driver}")
         self.os_run.run(f"cd {path};wget -t 5 -T 60 -r -np -nH -R index.html {sshpass_driver}")
 
-        self.os_run.run(f"rpm -ivh --nodeps --force {self.root_path}/tools/ancoan/rpm/{init_path['aliaom_driver']}")
-        self.os_run.run(f"rpm -ivh --nodeps --force {self.root_path}/tools/ancoan/rpm/sshpass-1.09-4.el8.x86_64.rpm")
+        self.os_run.run(f"rpm -ivh --nodeps --force {init_path['aliaom_driver']}")
+        self.os_run.run(f"rpm -ivh --nodeps --force {init_path['sshpass']}")
         self.os_run.run(f"chmod +777 {self.root_path}/tools/ancoan")
 
 

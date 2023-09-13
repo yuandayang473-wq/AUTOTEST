@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Script>
+  <Base>
+<Platform>Common</Platform>
+  </Base>
+
+ <Plan>
+<!--    <Module Name="Init" Option="BYPASS" Repeat="1" Description="Init Params"/>-->
+    <Module Name="Init" Option="" Repeat="1" Description="Init Params"/>
+    <Module Name="FuncTest" Option="" Repeat="1" Description="FuncDemo" />
+  </Plan>
+   <Modules>
+    <Module Name="Init" Option="" Description="Init Params and Env">
+      <Item Name="InitLoadConfig" Script="InitLoadConfig.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="InitTestEnvironment" Script="InitTestEnvironment.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+    </Module>
+    <Module Name="FuncTest" Option="" Description="Check Configuration Information">
+      <Item Name="FuncCpuCheck" Script="FuncCpuCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncDiskCheck" Script="FuncDiskCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncFanInfoCheck" Script="FuncFanInfoCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncFanSpeedChcek" Script="FuncFanSpeedChcek.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncFpgaCountCheck" Script="FuncFpgaCountCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncGpuLinkTest" Script="FuncGpuLinkTest.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncMemoryCheck" Script="FuncMemoryCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncNvmeCheck" Script="FuncNvmeCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncOamCheck" Script="FuncOamCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncOamI2cDeviceCheck" Script="FuncOamI2cDeviceCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncPcieDiskCheck" Script="FuncPcieDiskCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncPcieNetworkCheck" Script="FuncPcieNetworkCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncPcieOamCheck" Script="FuncPcieOamCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncPcieRetimerCheck" Script="FuncPcieRetimerCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncPcieSwitchCheck" Script="FuncPcieSwitchCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncPsuCheck" Script="FuncPsuCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncSensorCheck" Script="FuncSensorCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FuncSensorOamCheck" Script="FuncSensorOamCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+<!--      <Item Name="HealthCheck" Script="HealthCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>-->
+    </Module>
+  </Modules>
+</Script>

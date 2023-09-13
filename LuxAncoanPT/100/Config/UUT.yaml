@@ -313,7 +313,7 @@ RK0037030020:
         psu_watt: 4000W
         psu_count: 6
         fan_count: 10
-        
+
 RK0037030024:
     SERVER:
         pn: 8082B0000032
@@ -359,7 +359,7 @@ RK0037030024:
         psu_count: 6
         fan_count: 10
         white_list: ['40FAN1_F_RPM', '40FAN1_R_RPM', '40FAN2_F_RPM', '40FAN2_R_RPM', '40FAN1_PWM', '40FAN2_PWM', '40FAN_Power', 'EIC_Max_Temp', 'EIC_MOS_Max_Temp', 'EIC_AOC_Max_Temp', 'NVMe_Max_Temp', 'QSFP56_Max_Temp']
-        
+
 RK0037030012:
     SERVER:
         pn: 8082B0000033
@@ -405,7 +405,7 @@ RK0037030012:
         psu_watt: 4000W
         psu_count: 6
         fan_count: 10
-        
+
 RK0037030025:
     SERVER:
         pn: 8082B0000033
@@ -453,7 +453,7 @@ RK0037030025:
         psu_count: 6
         fan_count: 10
         white_list: ['40FAN1_F_RPM', '40FAN1_R_RPM', '40FAN2_F_RPM', '40FAN2_R_RPM', '40FAN1_PWM', '40FAN2_PWM', '40FAN_Power', 'EIC_Max_Temp', 'EIC_MOS_Max_Temp', 'EIC_AOC_Max_Temp', 'NVMe_Max_Temp', 'QSFP56_Max_Temp']
-        
+
 RK0037030021:
     SERVER:
         pn: 8082B0000023
@@ -710,6 +710,20 @@ OneKey:
     Path: "/usr/local/www/aliloginfo/onekey.tar.gz"
 
 
+tools:
+    ancoan:
+        fw:
+            nvme_tool: "nvme"
+            sw_fw:
+                4: "tailsw/ssw_fw_4host_v22.signed"
+                8: "tailsw/ssw_fw_8host_v23.signed"
+            bios:
+                bios_Script: "Flash_FirmWare_xw2_bios.sh"
+        rpm:
+            aliaom_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-0.21.0.rpm"
+            alippu_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-oam-0.13.0.rpm"
+            sshpass: "sshpass-1.09-4.el8.x86_64.rpm"
+
 InitPath:
     aliaom_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-0.21.0.rpm"
     alippu_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-oam-0.13.0.rpm"
@@ -729,7 +743,7 @@ InitPath:
     bios_fw: "/opt/Alioam/fw/bios/*.bin"
     bios_fw_for_at: "/opt/Alioam/fw/bios/at/*.bin"
     nic_fw: "/opt/Alioam/fw/nic/*.bin"
-    nvme_tool: "/opt/Alioam/fw/nvme"
+    nvme_tool: "tools/ancoan/nvme"
     nvme_fw: "/opt/Alioam/fw/nvmefw/*.bin"
     # oam fw
     oam_fw: "/opt/Alioam/fw/oam/46/*.bin"
