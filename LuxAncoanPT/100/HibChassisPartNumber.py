@@ -31,12 +31,12 @@ load_package(os.path.abspath(__file__))
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
-from Utils.Constant import TypeCode
+from Utils.Init import load_mes_info
 from Lib.Request import MesSocket
 
 
 class HibChassisPartNumber(TempItem):
-
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "cpu config check"
@@ -51,16 +51,16 @@ class HibChassisPartNumber(TempItem):
             jbmc_ip = self.config["JBMC"]["ip_address"]
             jbmc_user = self.config["JBMC"]["username"]
             jbmc_passwd = self.config["JBMC"]["password"]
-            _mes = MesSocket()
-            part_number =  _mes.get_mes_info(self.parent.globals["SN"])["Results"]["jbog_customer_part_number"]
+            _mes = MesSocket(self.mes_info["info"]["url"],self.mes_info["info"]["sn"])
+            part_number =  _mes.get_mes_info(self.mes_info["info"]["sn"])["Results"]["jbog_customer_part_number"]
             write_info = ".".join(part_number.split(".")[:2])
             # 差一段三段码
             data = self.execute_run("ipmitool  -I lanplus -H %s -U %s -P %s  fru print 0 " % (jbmc_ip, jbmc_user ,jbmc_passwd), i_exit_code=True).data
             parser = self.execute_run(f"ipmitool -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru edit 0 field c 0 '{write_info}' ", i_exit_code=True)
             data = self.execute_run("ipmitool  -I lanplus -H %s -U %s -P %s  fru print 0 " % (jbmc_ip, jbmc_user ,jbmc_passwd), i_exit_code=True).data
             parser = _mes.json_filter(data, "Chassis Part Number" )
-            self.assertEqual(TypeCode.FFFFFFFF, f"Hib Chassis Part Number ", write_info, parser)
-            # self.assertEqual(TypeCode.FFFFFFFF, f"clear bmc sel log", int(1), len(count))
+            self.assertEqual(ErrorCode.FFFFFFFF, f"Hib Chassis Part Number ", write_info, parser)
+            # self.assertEqual(ErrorCode.FFFFFFFF, f"clear bmc sel log", int(1), len(count))
         
 
 

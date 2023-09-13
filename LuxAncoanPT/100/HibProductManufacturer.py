@@ -32,12 +32,12 @@ load_package(os.path.abspath(__file__))
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
-from Utils.Constant import TypeCode
+from Utils.Init import load_mes_info
 from Lib.Request import MesSocket
 
 
 class HibProductManufacturer(TempItem):
-
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "cpu config check"
@@ -52,8 +52,8 @@ class HibProductManufacturer(TempItem):
             jbmc_ip = self.config["JBMC"]["ip_address"]
             jbmc_user = self.config["JBMC"]["username"]
             jbmc_passwd = self.config["JBMC"]["password"]
-            _mes = MesSocket()
-            model_str =  _mes.get_mes_info(self.parent.globals["SN"])["Results"]["rk_customer_part_number"]
+            _mes = MesSocket(self.mes_info["info"]["url"],self.mes_info["info"]["sn"])
+            model_str =  _mes.get_mes_info(self.mes_info["info"]["sn"])["Results"]["rk_customer_part_number"]
             match = re.search('^T', model_str)
             if match:
                 write_info = "luxshare-DC"
@@ -64,8 +64,8 @@ class HibProductManufacturer(TempItem):
             parser = self.execute_run(f"ipmitool -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru edit 0 field p 0 {write_info} ", i_exit_code=True)
             data = self.execute_run("ipmitool  -I lanplus -H %s -U %s -P %s  fru print 0 " % (jbmc_ip, jbmc_user ,jbmc_passwd), i_exit_code=True)
             parser = _mes.json_filter(data, "Product Manufacturer" )
-            self.assertEqual(TypeCode.FFFFFFFF, f"Hib Product Manufacturer ", write_info, parser)
-            # self.assertEqual(TypeCode.FFFFFFFF, f"clear bmc sel log", int(1), len(count))
+            self.assertEqual(ErrorCode.FFFFFFFF, f"Hib Product Manufacturer ", write_info, parser)
+            # self.assertEqual(ErrorCode.FFFFFFFF, f"clear bmc sel log", int(1), len(count))
         
 
 if __name__ == '__main__':

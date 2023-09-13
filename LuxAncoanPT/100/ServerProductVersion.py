@@ -29,13 +29,13 @@ load_package(os.path.abspath(__file__))
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
-from Utils.Constant import TypeCode
+from Utils.Init import load_mes_info
 from Lib.Request import MesSocket
 
 
 
 class ServerProductVersion(TempItem):
-
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "Server Product Version check"
@@ -48,13 +48,13 @@ class ServerProductVersion(TempItem):
     def exe(self):
         with self.ssh_connect(uut=self.config["UUT"]):
             # 差一段三段码
-            _mes = MesSocket()
+            _mes = MesSocket(self.mes_info["info"]["url"],self.mes_info["info"]["sn"])
             write_info = "AX1"
             data = self.execute_run("ipmitool fru print 0 ").data.strip()
             parser = self.execute_run(f"ipmitool fru edit 0 field p 3 '{write_info}' ")
             data = self.execute_run("ipmitool fru print 0 ").data.strip()
             parser = _mes.json_filter(data, "Product Version" )
-            self.assertEqual(TypeCode.FFFFFFFF, f"Server Product Version ", write_info, parser)
+            self.assertEqual(ErrorCode.FFFFFFFF, f"Server Product Version ", write_info, parser)
 
         
 

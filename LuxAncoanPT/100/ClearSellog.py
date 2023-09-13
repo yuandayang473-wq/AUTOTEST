@@ -36,7 +36,7 @@ from Lib.Request import MesSocket
 
 
 class ClearSellog(TempItem):
-
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "cpu config check"

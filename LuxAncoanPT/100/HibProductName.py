@@ -32,12 +32,12 @@ from Lib.Result import Pass, Fail
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
-from Utils.Constant import TypeCode
+from Utils.Init import load_mes_info
 from Lib.Request import MesSocket
 
 
 class HibProductName(TempItem):
-
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "cpu config check"
@@ -54,9 +54,9 @@ class HibProductName(TempItem):
             jbmc_ip = self.config["JBMC"]["ip_address"]
             jbmc_user = self.config["JBMC"]["username"]
             jbmc_passwd = self.config["JBMC"]["password"]
-            _mes = MesSocket()
+            _mes = MesSocket(self.mes_info["info"]["url"],self.mes_info["info"]["sn"])
             # rk_pn = self.parent.globals["SN"]/
-            rk_pn =  _mes.get_mes_info(self.parent.globals["SN"])["Results"]["rk_part_number"]
+            rk_pn =  _mes.get_mes_info(self.mes_info["info"]["sn"])["Results"]["rk_part_number"]
             hib_model_list1 = self.config["HibModel"]['AliOGBOX-Xuanwu2.0-0323-6U8WS']
             hib_model_list2 = self.config["HibModel"]['AB0611OG1']
             hib_model_list3 = self.config["HibModel"]['AliOGBOX-Xuanwu2.0-0323-6U8WOS']
@@ -68,13 +68,13 @@ class HibProductName(TempItem):
                 write_info = "AliOGBOX-Xuanwu2.0-0323-6U8WOS"
             else:
                 self.logger.error(f'not found {rk_pn} in hib model')
-                self.fail(TypeCode.FFFFFFFF, "No model found")
+                self.fail(ErrorCode.FFFFFFFF, "No model found")
                 
             parser = self.execute_run(f" ipmitool -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru edit 0 field p 1 {write_info}")
             data = self.execute_run("ipmitool  -I lanplus -H %s -U %s -P %s  fru print 0 " % (jbmc_ip, jbmc_user ,jbmc_passwd), i_exit_code=True).data.strip()
             parser = _mes.json_filter(data, "Product Name" )
-            self.assertEqual(TypeCode.FFFFFFFF, f"Hib Hib Product Name ", write_info, parser)
-            # self.assertEqual(TypeCode.FFFFFFFF, f"clear Hib bmc sel log", int(1), len(count))
+            self.assertEqual(ErrorCode.FFFFFFFF, f"Hib Hib Product Name ", write_info, parser)
+            # self.assertEqual(ErrorCode.FFFFFFFF, f"clear Hib bmc sel log", int(1), len(count))
         
 
 

@@ -31,12 +31,12 @@ load_package(os.path.abspath(__file__))
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
-from Utils.Constant import TypeCode
+from Utils.Init import load_mes_info
 from Lib.Request import MesSocket
 
 
 class FourNvmeBoardSerial(TempItem):
-
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "cpu config check"
@@ -51,18 +51,18 @@ class FourNvmeBoardSerial(TempItem):
             jbmc_ip = self.config["JBMC"]["ip_address"]
             jbmc_user = self.config["JBMC"]["username"]
             jbmc_passwd = self.config["JBMC"]["password"]
-            _mes = MesSocket()
-            write_info =  _mes.get_mes_info(self.parent.globals["SN"])["Results"]["nvme_board_sn"].split(',')
+            _mes = MesSocket(self.mes_info["info"]["url"],self.mes_info["info"]["sn"])
+            write_info =  _mes.get_mes_info(self.mes_info["info"]["sn"])["Results"]["nvme_board_sn"].split(',')
             data = self.execute_run(f"ipmitool  -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru list ", i_exit_code=True)
             parser = self.execute_run(f"ipmitool  -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru edit 3 field b 2 {write_info[0]} ", i_exit_code=True)
             data = self.execute_run(f"ipmitool  -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru print 3 ", i_exit_code=True)
             parser = _mes.json_filter(data, "Board Serial" )
-            self.assertEqual(TypeCode.FFFFFFFF, f" Hib Chassis Board Serial ", write_info[0], parser)
+            self.assertEqual(ErrorCode.FFFFFFFF, f" Hib Chassis Board Serial ", write_info[0], parser)
             parser = self.execute_run(f"ipmitool  -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru edit 4 field b 2 {write_info[1]} ", i_exit_code=True)
             data = self.execute_run(f"ipmitool  -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru print 4 ", i_exit_code=True)
             parser = _mes.json_filter(data, "Board Serial" )
-            self.assertEqual(TypeCode.FFFFFFFF, f" Hib Chassis Board Serial ", write_info[1], parser)
-            # self.assertEqual(TypeCode.FFFFFFFF, f"clear bmc sel log", int(1), len(count))
+            self.assertEqual(ErrorCode.FFFFFFFF, f" Hib Chassis Board Serial ", write_info[1], parser)
+            # self.assertEqual(ErrorCode.FFFFFFFF, f"clear bmc sel log", int(1), len(count))
         
 
 

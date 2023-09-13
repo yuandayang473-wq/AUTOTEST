@@ -31,7 +31,6 @@ load_package(os.path.abspath(__file__))
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
-from Utils.Constant import TypeCode
 from Lib.Request import MesSocket
 import subprocess
 from collections import namedtuple
@@ -53,7 +52,7 @@ class WriteFruBin(TempItem):
         self.logger.info(output)
         return SysCMD(p.returncode, output)
 
-
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "cpu config check"
@@ -63,7 +62,7 @@ class WriteFruBin(TempItem):
             {"file": "Device.yaml", "name": "UUT", "key":"UUT_01"},
             
             {"file": "BmcDevice.yaml", "name": "ADMIN", "key":"BMC_02"},
-            {"file": "BmcDevice.yaml", "name": "JBMC", "key":"BMC_02"},
+            {"file": "BmcDevice.yaml", "name": "JBMC", "key":"BMC_01"},
         ]
     def exe(self):
         with self.ssh_connect(uut=self.config["JBMC"]):
@@ -112,7 +111,7 @@ class WriteFruBin(TempItem):
             parser = self.os_cmd(f"ipmitool  -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru write 4 {bp_bin_path}  ").output
             self.logger.info(parser)
             data = self.execute_run(f"ipmitool  -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru print 4 ", i_exit_code=True)
-            # self.assertEqual(TypeCode.FFFFFFFF, f"clear bmc sel log", int(1), len(count))
+            # self.assertEqual(ErrorCode.FFFFFFFF, f"clear bmc sel log", int(1), len(count))
         
 
 

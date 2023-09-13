@@ -19,23 +19,25 @@ reports_path = reports_path + '/' + 'Config'
 
 
 class MesSocket():
-    def __init__(self, url):
+    def __init__(self, url, sn_num):
         # self.url = "http://172.20.0.99:9002/MainWebForm.aspx"
         self.url = url
+        self.save_mes_info(sn_num)
 
-    def save_mes_info(self, rk_num):
+
+    def save_mes_info(self, sn_num):
         """
         发送post请求, 携带sn号需要手动输入
         并将返回数据保存到json文件中
         """
-        payload = {"p": "GetAnconaInfo", "cmd": "ATT", "sn": rk_num}
+        payload = {"p": "GetAnconaInfo", "cmd": "ATT", "sn": sn_num}
         response = requests.post(self.url, json=payload)
         data = response.json()
         if data['Flag'] == 0:
             server_sn = data["Results"]["server_sn"]
             rk_part_number = data["Results"]["rk_part_number"]
             data["Results"]["rk_customer_part_number"]
-            with open(f'{reports_path}/{server_sn}_mes.json', 'w', encoding='UTF-8') as f:
+            with open(f'{reports_path}/{sn_num}_mes.json', 'w', encoding='UTF-8') as f:
                 f.write(json.dumps(data, indent=4, sort_keys=False) + '\n')
             return (rk_part_number, 200)
 

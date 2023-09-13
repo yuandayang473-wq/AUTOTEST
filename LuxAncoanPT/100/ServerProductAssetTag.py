@@ -32,12 +32,12 @@ load_package(os.path.abspath(__file__))
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
-from Utils.Constant import TypeCode
+from Utils.Init import load_mes_info
 from Lib.Request import MesSocket
 
 
 class ServerProductAssetTag(TempItem):
-
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "cpu config check"
@@ -50,15 +50,15 @@ class ServerProductAssetTag(TempItem):
 
     def exe(self):
         with self.ssh_connect(uut=self.config["UUT"]):
-            _mes = MesSocket()
+            _mes = MesSocket(self.mes_info["info"]["url"],self.mes_info["info"]["sn"])
             #查看机头的三段码
-            write_info =  _mes.get_mes_info(self.parent.globals["SN"])["Results"]["server_tdid"]
+            write_info =  _mes.get_mes_info(self.mes_info["info"]["sn"])["Results"]["server_tdid"]
             data = self.execute_run("ipmitool fru print 0 ")
             parser = self.execute_run(f" ipmitool fru edit 0 field p 5 {write_info}")
             data = self.execute_run("ipmitool fru print 0 ")
             parser = _mes.json_filter(data, "Product Asset Tag" )
-            self.assertEqual(TypeCode.FFFFFFFF, f"Product Asset Tag ", write_info, parser)
-            # self.assertEqual(TypeCode.FFFFFFFF, f"clear Server bmc sel log", int(1), len(count))
+            self.assertEqual(ErrorCode.FFFFFFFF, f"Product Asset Tag ", write_info, parser)
+            # self.assertEqual(ErrorCode.FFFFFFFF, f"clear Server bmc sel log", int(1), len(count))
         
 
 

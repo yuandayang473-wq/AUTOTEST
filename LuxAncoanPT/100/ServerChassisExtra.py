@@ -31,13 +31,13 @@ load_package(os.path.abspath(__file__))
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
-from Utils.Constant import TypeCode
+from Utils.Init import load_mes_info
 from Lib.Request import MesSocket
 
 
 
 class ServerChassisExtra(TempItem):
-
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "cpu config check"
@@ -50,8 +50,8 @@ class ServerChassisExtra(TempItem):
     def exe(self):
         with self.ssh_connect(uut=self.config["UUT"]):
             # 差一段三段码
-            _mes = MesSocket()
-            part_number =  _mes.get_mes_info(self.parent.globals["SN"])["Results"]["rk_customer_part_number"]
+            _mes = MesSocket(self.mes_info["info"]["url"],self.mes_info["info"]["sn"])
+            part_number =  _mes.get_mes_info(self.mes_info["info"]["sn"])["Results"]["rk_customer_part_number"]
             part_number = part_number if part_number != "TG88M1S1V5X7WS.03ZA.C0V1P4U8" else "TG88M1S1V5X7WS.03ZA.C0V1"
             write_info = "AliType="+part_number
             data = self.execute_run("ipmitool fru print 0 ").data.strip()
@@ -59,7 +59,7 @@ class ServerChassisExtra(TempItem):
             data = self.execute_run("ipmitool fru print 0 ").data.strip()
             parser = _mes.json_filter(data, "Chassis Extra" )
             
-            self.assertEqual(TypeCode.FFFFFFFF, f"Server Chassis Extra ", write_info, parser)
+            self.assertEqual(ErrorCode.FFFFFFFF, f"Server Chassis Extra ", write_info, parser)
 
         
 

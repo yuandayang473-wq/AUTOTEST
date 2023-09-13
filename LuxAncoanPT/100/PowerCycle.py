@@ -33,14 +33,14 @@ load_package(os.path.abspath(__file__))
 from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
-from Utils.Constant import TypeCode
+from Utils.Init import load_mes_info
 from Lib.Request import MesSocket
 from Utils.Login import ApcConnect
 from test_case.BaseConfigCheck import BaseConfigCheck
 
 
 class PowerCycle(BaseConfigCheck):
-
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "PowerCycle"
@@ -69,7 +69,7 @@ class PowerCycle(BaseConfigCheck):
         parser = self.execute_run(cmd, i_exit_code=True)
 
         ret = parser.get_value(f"Final_Result: (PASS)")
-        self.assertEqual(TypeCode.FFFFFFFF, "health check Final_Result ", ret.lower(), "pass")
+        self.assertEqual(ErrorCode.FFFFFFFF, "health check Final_Result ", ret.lower(), "pass")
 
     def check_gpu_monitor(self, count):
         for i in range(count):
@@ -333,8 +333,8 @@ class PowerCycle(BaseConfigCheck):
         #         self.logger.info(f'check lspci busid : {id}, cesta : {lspci_info[id]["cesta"]} {cesta}')
         #         if lspci_info[id]["cesta"].strip() != cesta:
         #             raise Exception(f'check lspci busid : {id}, cesta : {lspci_info[id]["cesta"]} =! {cesta}')
-        _mes = MesSocket()
-        rk_num = _mes.get_mes_info(self.parent.globals["SN"])["Results"]["rk_part_number"]
+        _mes = MesSocket(self.mes_info["info"]["url"],self.mes_info["info"]["sn"])
+        rk_num = _mes.get_mes_info(self.mes_info["info"]["sn"])["Results"]["rk_part_number"]
         cmd = f"cp {_tool} /root "
         output = self.execute_run(cmd)
         cmd = f"python3 /root/create_lspci_dict.py"
