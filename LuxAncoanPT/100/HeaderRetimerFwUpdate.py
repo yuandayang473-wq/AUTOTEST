@@ -58,34 +58,35 @@ class HeaderRetimerFwUpdate(TempItem):
         path = self.config["InitPath"]
         count = 1
 
+        info = {}
         with self.ssh_connect(uut=self.config["BMC_HEADER"]):
-            parser = self.execute_run("ls /var/retimer/ | xargs")
-            retimers = parser.get_origin_data().split(" ")
-            ven = retimers[0]
-            self.logger.info(ven)
-            from_ = 'header_m' if 'm' in ven else 'header_a'
-            parser = self.execute_run('''ipmitool alioem version | grep -i retimer | awk '{print $1"="$NF}' | xargs ''')
-            current_versions = parser.get_origin_data().split()
-            self.logger.info(current_versions)
+            for num in range(1, 9):
+                parser = self.execute_run(f"ipmitool raw 0x3e 0x07 0x00 0x4c 0xa5 0x07 0x03 {num} 9",
+                                          parser_type="raw_parser")
+                flag = parser.raw_str(0)
+
+                from_ = "header_m" if flag.lower() == "0b" else "header_a"
+
+                current_ver = str(binascii.a2b_hex(parser.get_origin_data().replace(' ', '')))[6:-1]
+                # self.logger.info(current_ver)
+                info[num] = (current_ver, from_)
 
         with self.ssh_connect(uut=self.config["UUT"]):
-            for ver in current_versions:
-                if ver:
-                    remiter = ver.split("=")
-                    name = remiter[0].strip().lower()
-                    cur_version = remiter[1].strip().upper()
-                    # 比较版本
-                    if cur_version != FwVsersion['retimer_ver'][from_].upper():
-                        self.logger.info(f"ls {path['retimer_fw'][from_]}")
-                        while count < 3:
-                            cmd = f"{path['retimer_script']} {header_bmc_ip} taobao 9ijn0okm {path['retimer_fw'][from_]} {name[-1]}"
-                            self.execute_run(cmd)
-                            if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
-                                break
-                            count += 1
-                        else:
-                            self.logger.info("head retimer flash fail")
-                            self.fail(ErrorCode.FWTUP00F, "head retimer flash fail")
+            for num in range(1, 9):
+                cur_version = info[num][0].lower()
+                from_ = info[num][1].strip().lower()
+                # 比较版本
+                if cur_version != FwVsersion['retimer_ver'][from_].strip().lower():
+                    self.logger.info(f"ls {path['retimer_fw'][from_]}")
+                    while count < 3:
+                        cmd = f"{path['retimer_script']} {header_bmc_ip} taobao 9ijn0okm {path['retimer_fw'][from_]} {num}"
+                        self.execute_run(cmd)
+                        if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
+                            break
+                        count += 1
+                    else:
+                        self.logger.info("head retimer flash fail")
+                        self.fail(ErrorCode.FWTUP00F, "head retimer flash fail")
 
         
 

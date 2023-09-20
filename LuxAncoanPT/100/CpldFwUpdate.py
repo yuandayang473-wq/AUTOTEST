@@ -132,7 +132,7 @@ class CpldFwUpdate(TempItem):
             if current_versions['ubb1'] != FwVsersion.get("ubb1"):
                 flag = "update"
                 self.flash_flag = True
-                parser = self.execute_run("chmod -R 777 /opt/Alioam/")
+                parser = self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/tools/ancoan/")
                 parser = self.execute_run(
                     f"{path['ubb1_cpld_script']} {tail_bmc_ip} admin admin {path['ubb1_cpld_fw']}")
                 if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
@@ -150,7 +150,7 @@ class CpldFwUpdate(TempItem):
             if current_versions['ubb2'] != FwVsersion.get("ubb2"):
                 flag = "update"
                 self.flash_flag = True
-                parser = self.execute_run("chmod -R 777 /opt/Alioam/")
+                parser = self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/tools/ancoan/")
                 parser = self.execute_run(
                     f"{path['ubb2_cpld_script']} {tail_bmc_ip} admin admin {path['ubb2_cpld_fw']}")
                 if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
@@ -169,7 +169,7 @@ class CpldFwUpdate(TempItem):
                 self.logger.info(current_versions['fanbp80'] != FwVsersion.get("fanbp80"))
                 flag = "update"
                 self.flash_flag = True
-                parser = self.execute_run("chmod -R 777 /opt/Alioam/")
+                parser = self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/tools/ancoan/")
                 parser = self.execute_run(
                     f"{path['fanboard_cpld_script']} {tail_bmc_ip} admin admin {path['80fcb_cpld_fw']}")
                 if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
@@ -186,7 +186,7 @@ class CpldFwUpdate(TempItem):
                 if current_versions['fanbp40'] != FwVsersion.get("fanbp40"):
                     flag = "update"
                     self.flash_flag = True
-                    parser = self.execute_run("chmod -R 777 /opt/Alioam/")
+                    parser = self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/tools/ancoan/")
                     parser = self.execute_run(
                         f"{path['fanboard_cpld_script']} {tail_bmc_ip} admin admin {path['40fcb_cpld_fw']}")
                     if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
@@ -204,7 +204,7 @@ class CpldFwUpdate(TempItem):
             if current_versions['nvmebp1'] != FwVsersion.get("nvmebp1"):
                 flag = "update"
                 self.flash_flag = True
-                parser = self.execute_run("chmod -R 777 /opt/Alioam/")
+                parser = self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/tools/ancoan/")
                 parser = self.execute_run(
                     f"{path['nvmebp1_cpld_script']} {tail_bmc_ip} admin admin {path['nvmebp1_cpld_fw']}")
                 if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
@@ -222,7 +222,7 @@ class CpldFwUpdate(TempItem):
             if current_versions['nvmebp2'] != FwVsersion.get("nvmebp2"):
                 flag = "update"
                 self.flash_flag = True
-                parser = self.execute_run("chmod -R 777 /opt/Alioam/")
+                parser = self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/tools/ancoan/")
                 parser = self.execute_run(
                     f"{path['nvmebp2_cpld_script']} {tail_bmc_ip} admin admin {path['nvmebp2_cpld_fw']}")
                 if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
@@ -242,7 +242,7 @@ class CpldFwUpdate(TempItem):
             if current_versions['hib_ver'] != FwVsersion.get("hib_ver"):
                 flag = "update"
                 self.flash_flag = True
-                parser = self.execute_run("chmod -R 777 /opt/Alioam/")
+                parser = self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/tools/ancoan/")
                 parser = self.execute_run(f"{path['hib_cpld_script']} {tail_bmc_ip} admin admin {path['hib_cpld_fw']}",
                                           cmd_timeout=60 * 5, i_timeout_err=True, retry_expt=1)
                 # self.sleep(300)
@@ -260,7 +260,7 @@ class CpldFwUpdate(TempItem):
             if current_versions['cpuboard_ver'] != FwVsersion.get("cpuboard_ver"):
                 flag = "update"
                 self.flash_flag = True
-                parser = self.execute_run("chmod -R 777 /opt/Alioam/")
+                parser = self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/tools/ancoan/")
                 parser = self.execute_run(
                     f"{path['header_cpld_script']} {header_bmc_ip} taobao 9ijn0okm {path['cpubord_cpld_fw']}")
                 if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
@@ -389,7 +389,7 @@ class CpldFwUpdate(TempItem):
             # self.execute_run(f"rm -rf {path.get('fw_path')}/* ")
             # self.execute_run(f"\cp -rf {path['fw_source_path']} {path.get('fw_path')}")
             # self.execute_run(f"cp -rf {path['mount_path']}kingkong/{path['kingkong']} {path.get('test_path')} ")
-            # self.execute_run("chmod -R 777 /opt/Alioam/")
+            # self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/tools/ancoan/")
             # self.execute_run(f'{path["oampower_read_script"]}')
 
             self.execute_run(f'''df | grep -iE "{path['source_path']}.*/mnt"''', save_exit_code=True)
@@ -419,7 +419,7 @@ class CpldFwUpdate(TempItem):
             self.execute_run(f"rpm -ivh --nodeps --force {path.get('mount_path')}mft-4.20.1-14.x86_64.rpm")
             self.execute_run(f"rpm -ivh --nodeps --force {path.get('mount_path')}sshpass-1.09-4.el8.x86_64.rpm")
 
-            self.execute_run("chmod -R 777 /opt/Alioam/")
+            self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/tools/ancoan/")
 
             # self.execute_run(f'{path["oampower_read_script"]}')
 

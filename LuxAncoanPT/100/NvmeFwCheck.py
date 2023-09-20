@@ -56,7 +56,7 @@ class NvmeFwCheck(TempItem):
             parser = self.execute_run(f"chmod +x {path.get('nvme_tool')} && {path.get('nvme_tool')} list | grep -i 'INTEL' | " + '''awk '{print $1 "-" $NF}' | xargs ''')
             nvme_list = parser.get_origin_data().split()
             for nvme in nvme_list:
-                self.assertEqual(f"check device {nvme.split('-')[0]} fw version", nvme.split('-')[1].strip(), target_nvme_ver.strip())
+                self.assertEqual(ErrorCode.FFFFFFFF, f"check device {nvme.split('-')[0]} fw version", nvme.split('-')[1].strip(), target_nvme_ver.strip())
             # self.assertEqual(f"check device {parser.get_origin_data().split()[0]} fw version", parser.get_origin_data().split()[1], target_nvme_ver)
         
 

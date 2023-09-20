@@ -57,7 +57,7 @@ class BiosFwUpdate(TempItem):
         with self.ssh_connect(uut=self.config["UUT"]):
             parser = self.execute_run("dmidecode -t bios | grep -i version | awk '{print $2}'")
             if parser.get_origin_data() != target_bios_ver:
-                parser = self.execute_run("chmod +x /opt/Alioam/fw/bios/*")
+                parser = self.execute_run("chmod +x /pscuut/9001/work/LuxScript/tools/ancoan/fw/bios/*")
                 parser = self.execute_run(f"{path.get('bios_Script')} {header_bmc_ip} taobao 9ijn0okm {path.get('bios_fw')} 1")
                 if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
                     self.logger.info("Header bios flash bure fail")
@@ -86,7 +86,7 @@ class BiosFwUpdate(TempItem):
             self.execute_run(f"rpm -ivh --nodeps --force {path.get('test_path')}{path.get('aliaom_driver')}")
             self.execute_run(f"rpm -ivh --nodeps --force {path.get('mount_path')}mft-4.20.1-14.x86_64.rpm")
             self.execute_run(f"rpm -ivh --nodeps --force {path.get('mount_path')}sshpass-1.09-4.el8.x86_64.rpm")
-            self.execute_run("chmod -R 777 /opt/Alioam/")
+            self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/tools/ancoan/")
         
 
 

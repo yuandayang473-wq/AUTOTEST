@@ -60,7 +60,7 @@ class RetimeFwUpdate(TempItem):
 
         user = {
             "ip_address": "localhost",
-            "password": "1",
+            "password": "123456",
             "username": "root"
         }
         
