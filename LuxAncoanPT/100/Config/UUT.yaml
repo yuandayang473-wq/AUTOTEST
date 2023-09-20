@@ -454,6 +454,102 @@ RK0037030025:
         fan_count: 10
         white_list: ['40FAN1_F_RPM', '40FAN1_R_RPM', '40FAN2_F_RPM', '40FAN2_R_RPM', '40FAN1_PWM', '40FAN2_PWM', '40FAN_Power', 'EIC_Max_Temp', 'EIC_MOS_Max_Temp', 'EIC_AOC_Max_Temp', 'NVMe_Max_Temp', 'QSFP56_Max_Temp']
 
+RK0037030029:
+    SERVER:
+        pn: ST0037030032
+        name: G88S2V5.00.C0V1P0U2
+        type: AS2211TG5
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 16
+        m2_size: 240G
+        m2_count: 1
+        m2_type: AF2MA31DTDLT240A
+        m2_fw: E4M9606
+        nvme_size: 1.92T
+        nvme_count: 4
+        nic_type: NA
+        nic_count: NA
+        nic_speed: NA
+        nic_fw: NA
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        fan_count: 6
+        white_list: ['MOC2_CPU_Temp', 'MOC2_FPGA_Temp', 'MOC2_DIMM_Temp', 'MOC2_M2_Temp', 'MOC2_5_CPU_Temp', 'MOC2_5_FPGA_Temp', 'MOC2_5_DIMM_Temp', 'MOC2_5_M2_Temp', 'MOC2_5_F_VR_Temp', 'OCP_Temp', 'PCIE_NIC1_Temp', 'PCIE_NIC2_Temp', 'BF3_NIC_Temp']
+    JBOG:
+        name: B32O1.05ZB.C0V1P4U6
+        type: AB0611OG1
+        pn: ST0037030028
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: NA
+        nvme_count: NA
+        nvme_type: NA
+        nvme_fw: NA
+        nic_type: CX6
+        nic_speed: 100GB
+        nic_count: 8
+        nic_fw: 22.35.1012
+        fpga_type: NA
+        fpga_count: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+        white_list: ['40FAN1_F_RPM', '40FAN1_R_RPM', '40FAN2_F_RPM', '40FAN2_R_RPM', '40FAN1_PWM', '40FAN2_PWM', '40FAN_Power', 'EIC_Max_Temp', 'EIC_MOS_Max_Temp', 'EIC_AOC_Max_Temp', 'NVMe_Max_Temp', 'QSFP56_Max_Temp']
+
+RK0037030030:
+    SERVER:
+        pn: 8082B0000033
+        name: G88S2V5.00.C0V1P0U2
+        type: AS2211TG5
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 16
+        m2_size: 240G
+        m2_count: 1
+        m2_type: AF2MA31DTDLT240A
+        m2_fw: E4M9606
+        nvme_size: 1.92T
+        nvme_count: 4
+        nic_type: NA
+        nic_count: NA
+        nic_speed: NA
+        nic_fw: NA
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        fan_count: 6
+        white_list: ['MOC2_CPU_Temp', 'MOC2_FPGA_Temp', 'MOC2_DIMM_Temp', 'MOC2_M2_Temp', 'MOC2_5_CPU_Temp', 'MOC2_5_FPGA_Temp', 'MOC2_5_DIMM_Temp', 'MOC2_5_M2_Temp', 'MOC2_5_F_VR_Temp', 'OCP_Temp', 'PCIE_NIC1_Temp', 'PCIE_NIC2_Temp', 'BF3_NIC_Temp']
+    JBOG:
+        name: B32O1.05ZB.C0V1P4U6
+        type: AB0611OG1
+        pn: ST0037030031
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: NA
+        nvme_count: NA
+        nvme_type: NA
+        nvme_fw: NA
+        nic_type: CX6
+        nic_speed: 100GB
+        nic_count: 8
+        nic_fw: 22.35.1012
+        fpga_type: NA
+        fpga_count: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+        white_list: ['40FAN1_F_RPM', '40FAN1_R_RPM', '40FAN2_F_RPM', '40FAN2_R_RPM', '40FAN1_PWM', '40FAN2_PWM', '40FAN_Power', 'EIC_Max_Temp', 'EIC_MOS_Max_Temp', 'EIC_AOC_Max_Temp', 'NVMe_Max_Temp', 'QSFP56_Max_Temp']
+
 RK0037030021:
     SERVER:
         pn: 8082B0000023
@@ -596,6 +692,100 @@ RK0037030022:
         fan_count: 10
         white_list: ['40FAN1_F_RPM', '40FAN1_R_RPM', '40FAN2_F_RPM', '40FAN2_R_RPM', '40FAN1_PWM', '40FAN2_PWM', '40FAN_Power', 'QSFP56_Max_Temp','PCIe_NIC1_Temp','PCIe_NIC2_Temp','PCIe_NIC3_Temp','PCIe_NIC4_Temp','PCIe_NIC5_Temp','PCIe_NIC6_Temp','PCIe_NIC7_Temp','PCIe_NIC8_Temp', 'EIC_AOC_Max_Temp']
 
+RK0037030111:
+    SERVER:
+        pn: 8082B0000032
+        name: AG88S1V5X7.0YFH.C0V1P4U8
+        type: AS2211TG5
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 32
+        m2_size: 480G
+        m2_count: 2
+        m2_type: SSDSCKKB480GZ
+        m2_fw: 7CV10100
+        nic_type: CX5
+        nic_count: 1
+        nic_speed: 25GB
+        nic_fw: 16.31.1014
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        fan_count: 6
+        white_list: ['Disk1_Status','Disk2_Status','Disk3_Status','Disk4_Status','MOC2_CPU_Temp', 'MOC2_FPGA_Temp', 'MOC2_DIMM_Temp', 'MOC2_M2_Temp', 'MOC2_5_CPU_Temp', 'MOC2_5_FPGA_Temp', 'MOC2_5_DIMM_Temp', 'MOC2_5_M2_Temp', 'MOC2_5_F_VR_Temp', 'OCP_Temp', 'PCIE_NIC1_Temp', 'EIC_AOC_Max_Temp', 'BF3_NIC_Temp','NVMe1_Temp','NVMe2_Temp','NVMe3_Temp','NVMe4_Temp']
+    JBOG:
+        name: B31O1.Y8.C0V1P4U6
+        type: AB0611OG1
+        pn: ST0037030025
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: 3.84T
+        nvme_count: 4
+        nvme_type: SoliDigm SSDPF2KX038TZ
+        nvme_fw: JCV102S1
+        nic_type: CX6
+        nic_speed: 100GB
+        nic_count: 8
+        nic_fw: 22.35.1012
+        fpga_type: NA
+        fpga_count: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+        white_list: ['40FAN1_F_RPM', '40FAN1_R_RPM', '40FAN2_F_RPM', '40FAN2_R_RPM', '40FAN1_PWM', '40FAN2_PWM', '40FAN_Power', 'QSFP56_Max_Temp','PCIe_NIC1_Temp','PCIe_NIC2_Temp','PCIe_NIC3_Temp','PCIe_NIC4_Temp','PCIe_NIC5_Temp','PCIe_NIC6_Temp','PCIe_NIC7_Temp','PCIe_NIC8_Temp', 'EIC_AOC_Max_Temp']
+
+RK0037030100:
+    SERVER:
+        pn: 8082B0000033
+        name: G88S2V5.00.C0V1P0U2
+        type: AS2211TG5
+        retimer: 8
+        cpu_type: 8469C
+        cpu_count: 2
+        mem_size: 64G
+        mem_count: 16
+        m2_size: 240G
+        m2_count: 1
+        m2_type: AF2MA31DTDLT240A
+        m2_fw: E4M9606
+        nvme_size: 1.92T
+        nvme_count: 4
+        nic_type: NA
+        nic_count: NA
+        nic_speed: NA
+        nic_fw: NA
+        psu_watt: 2000W
+        psu_count: 2
+        psu_type: Delta DPST-2030AB D
+        psu_fw: 00.10.11
+        moc_cord: NA
+        fan_count: 6
+        white_list: ['MOC2_CPU_Temp', 'MOC2_FPGA_Temp', 'MOC2_DIMM_Temp', 'MOC2_M2_Temp', 'MOC2_5_CPU_Temp', 'MOC2_5_FPGA_Temp', 'MOC2_5_DIMM_Temp', 'MOC2_5_M2_Temp', 'MOC2_5_F_VR_Temp', 'OCP_Temp', 'PCIE_NIC1_Temp', 'PCIE_NIC2_Temp', 'BF3_NIC_Temp']
+    JBOG:
+        name: B32O1.05ZB.C0V1P4U6
+        type: AB0611OG1
+        pn: ST0037030028
+        shangxing: 8
+        config: W/O scaleout
+        nvme_size: NA
+        nvme_count: NA
+        nvme_type: NA
+        nvme_fw: NA
+        nic_type: CX6
+        nic_speed: 100GB
+        nic_count: 8
+        nic_fw: 22.35.1012
+        fpga_type: NA
+        fpga_count: NA
+        psu_watt: 4000W
+        psu_count: 6
+        fan_count: 10
+        white_list: ['40FAN1_F_RPM', '40FAN1_R_RPM', '40FAN2_F_RPM', '40FAN2_R_RPM', '40FAN1_PWM', '40FAN2_PWM', '40FAN_Power', 'EIC_Max_Temp', 'EIC_MOS_Max_Temp', 'EIC_AOC_Max_Temp', 'NVMe_Max_Temp', 'QSFP56_Max_Temp']
+
 OAM:
     Num: [0,1,2,3,4,5,6,7]
     Firmware_Version: "1.3.35"
@@ -663,11 +853,11 @@ Bmc:
 Cpld:
     JBOG:
         HIB:
-            Version: "0x03"
+            Version: "0x0b"
         UBB:
-            Version: "0x04"
+            Version: "0x0c"
         UBB2:
-            Version: "0x03"
+            Version: "0x04"
         80FCB:
             Version: "0x13"
         NVMEBP1:
@@ -723,16 +913,21 @@ tools:
             aliaom_driver: "alippu-driver-5.10.134-007.ali5000.al8.x86_64.rpm"
             alippu_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-oam-0.13.0.rpm"
             sshpass: "sshpass-1.09-4.el8.x86_64.rpm"
+        kingkong:
+            kingkong: "kingkong_3.5.39.zip"
+            kingkong_btv: "btv-centos8.2-1.0.0.tar.gz"
+            kingkong_Ppu_zip: "Ppu.zip"
+
 
 InitPath:
-    aliaom_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-0.21.0.rpm"
-    alippu_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-oam-0.13.0.rpm"
-    kingkong: "kingkong_3.5.25-8-OAM.zip"
-    kingkong_dir: "kingkong_3.5.25-8-OAM"
-    kingkong_btv: "btv-centos8.2.tar.gz"
+    aliaom_driver: "alippu-driver-5.10.134-007.ali5000.al8.x86_64.rpm"
+    alippu_driver: "alippu-driver-5.10.134-007.ali5000.al8.x86_64.rpm"
+    kingkong: "kingkong_3.5.39.zip"
+    kingkong_dir: "kingkong_3.5.39"
+    kingkong_btv: "btv-centos8.2-1.0.0.tar.gz"
     kingkong_Ppu_zip: "Ppu.zip"
     source_path: "//172.20.0.201/luxshare/Tool/PPU"
-    fw_source_path: "/mnt/DVT/fw/*"
+    fw_source_path: "/mnt/930FW/fw/*"
     test_path: "/opt/Alioam/"
     fru_path: "/opt/Alioam/fru/"
     mount_path: "/mnt/"
@@ -743,10 +938,10 @@ InitPath:
     bios_fw: "/opt/Alioam/fw/bios/*.bin"
     bios_fw_for_at: "/opt/Alioam/fw/bios/at/*.bin"
     nic_fw: "/opt/Alioam/fw/nic/*.bin"
-    nvme_tool: "tools/ancoan/nvme"
+    nvme_tool: "/opt/Alioam/fw/nvme"
     nvme_fw: "/opt/Alioam/fw/nvmefw/*.bin"
     # oam fw
-    oam_fw: "/opt/Alioam/fw/oam/46/*.bin"
+    oam_fw: "/mnt/930FW/fw/oam/100/fw_OAM1.5G_PCIE1.6G.rpm"
     oampower_wirte_script: "/opt/Alioam/fw/oampower/fw_write.sh"
     oampower_read_script: "/opt/Alioam/fw/oampower/fw_read.sh"
     # 机头bmc
@@ -759,8 +954,8 @@ InitPath:
     cmu_cpld_fw: "/opt/Alioam/fw/headercpld/CMU/*.bin"
     # 机尾bmc
     bmc_tail_script: "/opt/Alioam/fw/bmc/header/Flash_FirmWare_xw2_bmc.sh"
-    bmc_tail_fw: "/opt/Alioam/fw/bmc/tail/730/*.bin"
-    bmc_tail_fw_for_at: "/opt/Alioam/fw/bmc/tail/at/730/*.bin"
+    bmc_tail_fw: "/opt/Alioam/fw/bmc/tail/930/*.bin"
+    bmc_tail_fw_for_at: "/opt/Alioam/fw/bmc/tail/at/930/*.bin"
     # 机尾hib
     hib_cpld_script: "/opt/Alioam/fw/hib/Flash_FirmWare_xw2_cpld.sh"
     hib_cpld_fw: "/opt/Alioam/fw/hib/*.bin"
@@ -772,10 +967,10 @@ InitPath:
     ubb2_cpld_fw: "/opt/Alioam/fw/ubb2/*.bin"
     # nvme bp1
     nvmebp1_cpld_script: "/opt/Alioam/fw/nvmebp/Flash_FirmWare_xw2_cpld.sh"
-    nvmebp1_cpld_fw: "/opt/Alioam/fw/nvmebp/cpld_signed_SR6295A_793_CPLD_V16_BP1.bin"
+    nvmebp1_cpld_fw: "/opt/Alioam/fw/nvmebp/cpld_signed_SR6295A_BP1_V17_793_HITLESS.bin"
     # nvme bp2
     nvmebp2_cpld_script: "/opt/Alioam/fw/nvmebp/Flash_FirmWare_xw2_cpld.sh"
-    nvmebp2_cpld_fw: "/opt/Alioam/fw/nvmebp/cpld_signed_SR6295A_793_CPLD_V16_BP2.bin"
+    nvmebp2_cpld_fw: "/opt/Alioam/fw/nvmebp/cpld_signed_SR6295A_BP2_V17_793_HITLESS.bin"
     # fan board
     fanboard_cpld_script: "/opt/Alioam/fw/fanboard/Flash_FirmWare_xw2_cpld.sh"
     40fcb_cpld_fw: "/opt/Alioam/fw/fanboard/40FCB/*.bin"
@@ -783,8 +978,8 @@ InitPath:
     # pcie switch
     pciesw_tool: "/opt/Alioam/fw/tailsw/g4Xdiagnostics.x86_64"
     sw_fw:
-        4: "/opt/Alioam/fw/tailsw/ssw_fw_4host_v22.signed"
-        8: "/opt/Alioam/fw/tailsw/ssw_fw_8host_v23.signed"
+        4: "/opt/Alioam/fw/tailsw/ssw_fw_4host_v28.signed"
+        8: "/opt/Alioam/fw/tailsw/ssw_fw_8host_v29.signed"
     retimer_fw:
         header_a: "/opt/Alioam/fw/headerretimer/A/*.bin"
         header_m: "/opt/Alioam/fw/headerretimer/M/*.bin"
@@ -793,7 +988,9 @@ InitPath:
     retimer_script: "/opt/Alioam/fw/headerretimer/Flash_FirmWare_xw2_retimer.sh"
     4shangxing_fw: "fw_4host*.signed"
     8shangxing_fw: "fw_8host*.signed"
+    oam_update_file: "/mnt/930FW/fw/oampower/2891_U36_0X20_VCORE_Rev3-Rev4.txt"
     eictool: "EIC1.0_platfrom_v.1.1.4.2_230731"
+    eicupdatefile: "eic_top_306_linux.pdi "
 
 # oam device_id chanel对应关系
 relation_info:
@@ -832,9 +1029,9 @@ Iperf:
 
 HibModel:
     AliOGBOX-Xuanwu2.0-0323-6U8WS: ["RK0037030004" ,"RK0037030018", "RK0037030021", "RK0037030026"]
-    AB0611OG1: ["RK0037030007" ,"RK0037030001" ,"RK0037030014", "RK0037030020", "RK0037030024", "RK0037030012", "RK0037030025", "RK0037030022"]
+    AB0611OG1: ["RK0037030007" ,"RK0037030001" ,"RK0037030014", "RK0037030020", "RK0037030024", "RK0037030012", "RK0037030025", "RK0037030022","RK0037030029","RK0037030030"]
     AliOGBOX-Xuanwu2.0-0323-6U8WOS: ["RK0037030011"]
 
 ServerProductNameModel:
     AliServer-Xuanwu2.0-0323-2URG52PF: ["RK0037030011" ,"RK0037030004" ,"RK0037030018", "RK0037030021","RK0037030026"]
-    AS2211TG5: ["RK0037030007" ,"RK0037030001" ,"RK0037030014", "RK0037030020", "RK0037030024","RK0037030012","RK0037030025","RK0037030022"]
+    AS2211TG5: ["RK0037030007" ,"RK0037030001" ,"RK0037030014", "RK0037030020", "RK0037030024","RK0037030012","RK0037030025","RK0037030022","RK0037030029","RK0037030030"]

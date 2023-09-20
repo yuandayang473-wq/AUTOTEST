@@ -13,7 +13,8 @@
 import os
 import sys
 
-load_list = ["LuxScript"]
+# load_list = ["LuxScript"]
+load_list = ["EPT"]
 
 
 def load_package(path):
@@ -44,17 +45,20 @@ class HealthCheck(TempItem):
 
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
-            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "path", "key": "InitPath"},
+            {"folder": "LuxAncoanPT/100/Config", "file": "UUT.yaml", "name": "path", "key": "tools/ancoan/kingkong"},
         ]
 
     def exe(self):
         path = self.config["path"]
-        kingkong_path_zip = os.path.join(path["test_path"], path["kingkong"])
-        kingkong_dir = os.path.join("/root", path['kingkong_dir'])
+        kingkong_path_zip = path["kingkong"]
+
+        kingkong_zip = os.path.split(kingkong_path_zip)[-1]
+        kingkong_name = kingkong_zip[:-4]
+
+        kingkong_dir = os.path.join("/root", kingkong_name)
         with self.ssh_connect(uut=self.config["UUT"]):
             self.execute_run(f"rm -rf {kingkong_dir}")
             self.execute_run(f"unzip {kingkong_path_zip}")
-            # cmd = "python kk.pyc -t default -m default -c ./testcase/testcase_healthcheck.yaml -d default"
             cmd = f"python {kingkong_dir}/kk.pyc -t default -m default -c {kingkong_dir}/testcase/testcase_healthcheck.yaml -d default"
             parser = self.execute_run(cmd)
 

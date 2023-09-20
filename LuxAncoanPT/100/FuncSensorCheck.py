@@ -32,10 +32,11 @@ load_package(os.path.abspath(__file__))
 
 from Lib.Template import TempItem
 from Lib.Runner import runner
-
+from Utils.Init import load_mes_info
 
 class FuncSensorCheck(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "uart"
@@ -44,16 +45,46 @@ class FuncSensorCheck(TempItem):
         self.config = [
             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
             {"file": "BmcDevice.yaml", "name": "JBOG_BMC", "key": "BMC_01"},
+            {"file": "UUT.yaml", "name": "cfg", "key": self.mes_info["info"]["rk"]},
         ]
 
     def exe(self):
-        # 获取机头的sdr
+        server = self.config["cfg"]["SERVER"]
+        jbog = self.config["cfg"]["JBOG"]
+        server_white_list = server["white_list"]
+        jbog_white_list = jbog["white_list"]
+
         with self.ssh_connect(uut=self.config["UUT"]):
-            self.execute_run("ipmitool sdr")
+            data = self.execute_run("ipmitool sdr")
+            data_list = data.split('\r\n')
+            error_info = []
+            # llist = []
+            for info in data_list:
+                if '| ok' not in info and info:
+                    check = info.split()[0]
+                    if check not in server_white_list:
+                        error_info.append(info)
+            # for i in error_info:
+            #     if i :
+            #         a = i.split()[0]
+            #         llist.append(a)
+            # print(llist)
+            if error_info:
+                self.fail(f"check server sdr list is fail : {error_info}")
 
         # 获取机尾的sdr
         with self.ssh_connect(uut=self.config["JBOG_BMC"]):
-            self.execute_run("ipmitool sdr")
+            data = self.execute_run("ipmitool sdr")
+            data_list = data.split('\r\n')
+            error_info = []
+            for info in data_list:
+                if '| ok' not in info and info:
+                    check = info.split()[0]
+                    if check not in jbog_white_list:
+                        error_info.append(info)
+
+            if error_info:
+                self.fail(f"check jbog sdr list is fail : {error_info}")
 
 
 if __name__ == '__main__':
