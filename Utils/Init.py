@@ -27,7 +27,7 @@ class LoadConfig:
                 "password": '123456'
             }
         }
-        device.set_config(UUT)
+        device.dump_config(UUT)
 
     def load_config(self, logger):
         pass
@@ -54,7 +54,7 @@ class InitLoadConfig(LoadConfig):
                 "password": 'superuser'
             }
         }
-        bmc_device.set_config(bmc_data)
+        bmc_device.dump_config(bmc_data)
 
     def load_config(self, logger):
         bmc_ip = self.get_bmc_ip(logger)
@@ -105,7 +105,7 @@ class PpuInitLoadConfig(InitLoadConfig):
                 "password": 'superuser'
             }
         }
-        bmc_device.set_config(bmc_data)
+        bmc_device.dump_config(bmc_data)
         return bmc_data
 
 

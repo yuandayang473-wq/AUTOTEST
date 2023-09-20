@@ -720,7 +720,7 @@ tools:
             bios:
                 bios_Script: "Flash_FirmWare_xw2_bios.sh"
         rpm:
-            aliaom_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-0.21.0.rpm"
+            aliaom_driver: "alippu-driver-5.10.134-007.ali5000.al8.x86_64.rpm"
             alippu_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-oam-0.13.0.rpm"
             sshpass: "sshpass-1.09-4.el8.x86_64.rpm"
 

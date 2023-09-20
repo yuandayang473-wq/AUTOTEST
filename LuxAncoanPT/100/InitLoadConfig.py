@@ -48,6 +48,7 @@ class InitLoadConfig(TempItem):
         self.expect = "load project info"
 
     def exe(self):
+
         cfg = JsonLoadConfig(cfg_path_name="", cfg_name="jobcontext.json").get_config()
         sn = cfg["unitData"]["name"].strip()
         url = cfg["flowdata"]["tcs_data_url"].strip()
@@ -62,12 +63,13 @@ class InitLoadConfig(TempItem):
                 "sn": sn,
                 "url": url,
                 "rk": rk,
-                "http_server_url": http_server_url
+                "http_server_url": http_server_url,
             }
         }
-        JsonLoadConfig(cfg_path_name="", cfg_name="mes_info.json").set_config(data, is_new_file=True)
+        JsonLoadConfig(cfg_path_name="", cfg_name="mes_info.json").dump_config(data, is_new_file=True)
 
-        bmc_data = PpuInitLoadConfig().load_config(self.get_logger())
+        PpuInitLoadConfig().load_config(self.get_logger())
+        # bmc_data = PpuInitLoadConfig().load_config(self.get_logger())
         # self.init_settings(uut_data, bmc_data)
 
     def init_settings(self, bmc_data):
