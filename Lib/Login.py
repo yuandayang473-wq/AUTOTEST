@@ -58,7 +58,7 @@ class OsRunCmd:
             cls._instance = object.__new__(cls)
         return cls._instance
 
-    def __init__(self, logger):
+    def __init__(self, logger=None):
         self.logger = logger
         self._exit_code = 0
         self._cmd_count = 3
@@ -119,7 +119,7 @@ class OsRunCmd:
             raise TypeError(f'command MUST be _cmd string type, {command} is _cmd {type(command)} type')
         try:
             p = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=cmd_timeout, shell=True,
-                               encoding='utf-8', check=bool(1 - ignore_exit_code))
+                               encoding='utf-8', check=bool(1 - ignore_exit_code), errors="ignore")
             data = p.stdout + p.stderr
             returncode = p.returncode
         except subprocess.TimeoutExpired as e:
@@ -134,6 +134,33 @@ class OsRunCmd:
         if save_exit_code:
             self._exit_code = returncode
         return CmdPass(Status.SUCCESS, data)
+
+    def ping_ip(self, ip, sleep_sec=5, action="off"):
+        """
+        :param ip:
+        :param sleep_time:
+        :param action:
+        :return: bool, true 成功
+        """
+        count = 0
+        while count < 20:
+            parser = self.run(f"ping {ip} -w 3", i_exit_code=True, retry_expt=1)
+
+            if action == "off" and (parser.check_field(r"100% packet loss") or parser.check_field("请求超时")):
+                self.logger.info(f"this is {ip} uut is power off")
+                break
+
+            if action != "off" and not (parser.check_field(r"100% packet loss") or parser.check_field("请求超时")):
+                self.logger.info(f"this is {ip} uut is power on")
+                break
+
+            self.logger.info(f"delay time: {sleep_sec} second")
+            time.sleep(sleep_sec)
+            count += 1
+        else:
+            return False
+
+        return True
 
 
 class Connection:
@@ -511,17 +538,17 @@ class ApcConnect:
         port_list = port.split()
         on_list = []
         for p in port_list:
-            set_cmd = f'snmpset -v 1 -c private {self.ip} {self.pdu_model}.{p}.0 s "{status}"'
-            time.sleep(2)
+            # set_cmd = f'snmpset -v 1 -c private {self.ip} {self.pdu_model}.{p}.0 s "{status}"'
+            # time.sleep(2)
             set_cmd = f'snmpset -v 1 -c private {self.ip} {self.pdu_model}.{p}.0 s "{status}"'
             get_cmd = f'snmpget -v 1 -c private {self.ip} {self.pdu_model}.{p}.0 s'
             on_list.append((get_cmd, set_cmd))
         return on_list
 
     def _ac_action(self, obj, snmpget, snmpset, status):
-        obj.execute_run(snmpset)
+        obj.os_run.run(snmpset)
         time.sleep(2)
-        parser = obj.execute_run(snmpget, i_exit_code=True)
+        parser = obj.os_run.run(snmpget, i_exit_code=True)
         pattern = f'STRING: "{status}"'
         if parser.check_field(pattern):
             return None
@@ -529,7 +556,7 @@ class ApcConnect:
             count = 3
             while count > 0:
                 time.sleep(10)
-                parser = obj.execute_run(snmpget, i_exit_code=True)
+                parser = obj.os_run.run(snmpget, i_exit_code=True)
                 if parser.check_field(pattern):
                     return None
                 count -= 1

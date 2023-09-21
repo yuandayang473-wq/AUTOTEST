@@ -133,37 +133,42 @@ class ControlPlatform:
 
     def get_pdu_info(self):
         pdu_api = JsonLoadConfig(cfg_path_name="", cfg_name="jobcontext.json").data(f"flowdata.tcs_locationservice_url")
+        self.case.get_logger().info(f"request get {pdu_api}")
         res = Requests.get(pdu_api)
+        if not res:
+            self.case.fail(ErrCode.INIT_PARAMS, f"{pdu_api} request fail")
+
         devices = res["device"]
 
         pdu_data = {
-            'ip_address': "",
-            'head_port': "",
-            'pdu_model': '',
+            'ip_address': "191.102.120.1",
+            'pdu_model': '1.3.6.1.4.1.23273.3.1.1.6',
+            "head_port": "20",
+            "tail_port": "5 7 9 11 13 15"
         }
 
-        for device in devices:
-            if device["DEVICETYPE"] == "PDU":
-                pdu_data["ip_address"] = device["DEVICEIP"]
-                device["MIBNODE"] = "19,20~1.3.6.1.4.1.23273.3.1.1.6~8,10,12,14,16,18"
-                pdu_port_info = device["MIBNODE"].strip()
-                if not pdu_port_info:
-                    self.case.fail(ErrCode.INIT_PARAMS, "please configuration pdu info")
-
-                prots = pdu_port_info.split("~")
-
-                if len(prots) > 3:
-                    self.case.fail(ErrCode.INIT_PARAMS, "please configuration pdu info")
-
-                if len(prots) == 3:
-                    pdu_data["head_port"] = " ".join(prots[0].split(","))
-                    pdu_data["tail_port"] = " ".join(prots[2].split(","))
-                    pdu_data["pdu_model"] = prots[1]
-                else:
-                    pdu_data["port"] = " ".join(prots[0].split(","))
-                    pdu_data["pdu_model"] = prots[1]
-                break
-        else:
-            self.case.fail(ErrCode.INIT_PARAMS, "please configuration pdu info")
+        # pdu_data = {
+        #     'ip_address': "",
+        #     'pdu_model': '',
+        # }
+        #
+        # for device in devices:
+        #     if device["DEVICETYPE"] == "PDU":
+        #         pdu_data["ip_address"] = device["DEVICEIP"]
+        #         device["MIBNODE"] = "1.3.6.1.4.1.23273.3.1.1.6"
+        #         device["PORT"] = "20"
+        #         device["PORT_EXTEND"] = "5,7,9,11,13,15"
+        #         pdu_data["pdu_model"] = device["MIBNODE"]
+        #         if not device["PORT"]:
+        #             self.case.fail(ErrCode.INIT_PARAMS, "please configuration pdu info")
+        #
+        #         if device["PORT_EXTEND"]:
+        #             pdu_data["head_port"] = " ".join(device["PORT"].split(","))
+        #             pdu_data["tail_port"] = " ".join(device["PORT_EXTEND"].split(","))
+        #         else:
+        #             pdu_data["port"] = " ".join(device["PORT"].split(","))
+        #         break
+        # else:
+        #     self.case.fail(ErrCode.INIT_PARAMS, "please configuration pdu info")
 
         return pdu_data
