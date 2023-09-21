@@ -8,6 +8,7 @@
 <!--    <Module Name="Init" Option="BYPASS" Repeat="1" Description="Init Params"/>-->
     <Module Name="Init" Option="" Repeat="1" Description="Init Params"/>
     <Module Name="FuncTest" Option="" Repeat="1" Description="FuncDemo" />
+    <Module Name="FruWrite" Option="" Repeat="1" Description="FuncDemo" />
   </Plan>
    <Modules>
     <Module Name="Init" Option="" Description="Init Params and Env">
@@ -34,6 +35,35 @@
       <Item Name="FuncSensorCheck" Script="FuncSensorCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
       <Item Name="FuncSensorOamCheck" Script="FuncSensorOamCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
 <!--      <Item Name="HealthCheck" Script="HealthCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>-->
+    </Module>
+    <Module Name="FruWrite" Option="" Description="fru write ">
+      <Item Name="WriteFruBin" Script="WriteFruBin.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="UbbBoardPartNumber" Script="UbbBoardPartNumber.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="UbbBoardPartNumber" Script="UbbBoardPartNumber.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="UbbBoardProduct" Script="UbbBoardProduct.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="UbbBoardSerial" Script="UbbBoardSerial.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="ServerChassisExtra" Script="ServerChassisExtra.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="ServerChassisPartNumber" Script="ServerChassisPartNumber.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="ServerProductAssetTag" Script="ServerProductAssetTag.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="ServerProductManufacturer" Script="ServerProductManufacturer.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="ServerProductName" Script="ServerProductName.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="ServerProductSerial" Script="ServerProductSerial.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="ServerProductPartNumber" Script="ServerProductPartNumber.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="ServerProductVersion" Script="ServerProductVersion.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="HibBoardSerial" Script="HibBoardSerial.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="HibBoardPartNumber" Script="HibBoardPartNumber.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="HibChassisPartNumber" Script="HibChassisPartNumber.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="HibChassisExtra" Script="HibChassisExtra.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="HibProductAssetTag" Script="HibProductAssetTag.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="HibProductManufacturer" Script="HibProductManufacturer.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="HibProductName" Script="HibProductName.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="HibProductSerial" Script="HibProductSerial.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="HibProductVersion" Script="HibProductVersion.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="EightyFcbBoardSerial" Script="EightyFcbBoardSerial.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FortyFcbBoardProduct" Script="FortyFcbBoardProduct.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FortyFcbBoardSerial" Script="FortyFcbBoardSerial.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FortyFcbChassisPartNumber" Script="FortyFcbChassisPartNumber.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="FourNvmeBoardSerial" Script="FourNvmeBoardSerial.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
     </Module>
   </Modules>
 </Script>

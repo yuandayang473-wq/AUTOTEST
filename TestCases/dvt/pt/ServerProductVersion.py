@@ -48,7 +48,7 @@ class ServerProductVersion(TempItem):
         with self.ssh_connect(uut=self.config["UUT"]):
             # 差一段三段码
             _mes = MesSocket()
-            write_info = "AX1"
+            write_info = "A01"
             data = self.execute_run("ipmitool fru print 0 ").data.strip()
             parser = self.execute_run(f"ipmitool fru edit 0 field p 3 '{write_info}' ")
             data = self.execute_run("ipmitool fru print 0 ").data.strip()

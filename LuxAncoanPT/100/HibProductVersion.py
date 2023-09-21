@@ -53,7 +53,7 @@ class HibProductVersion(TempItem):
             jbmc_user = self.config["JBMC"]["username"]
             jbmc_passwd = self.config["JBMC"]["password"]
             _mes = MesSocket(self.mes_info["info"]["url"],self.mes_info["info"]["sn"])
-            write_info = "AX1"
+            write_info = "A01"
             data = self.execute_run("ipmitool  -I lanplus -H %s -U %s -P %s  fru print 0 " % (jbmc_ip, jbmc_user ,jbmc_passwd), i_exit_code=True).data.strip()
             parser = self.execute_run(f" ipmitool -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} fru edit 0 field p 3 {write_info}")
             data = self.execute_run("ipmitool  -I lanplus -H %s -U %s -P %s  fru print 0 " % (jbmc_ip, jbmc_user ,jbmc_passwd), i_exit_code=True).data.strip()

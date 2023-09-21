@@ -52,7 +52,6 @@ class WriteFruBin(TempItem):
         self.logger.info(output)
         return SysCMD(p.returncode, output)
 
-    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "cpu config check"
@@ -84,7 +83,7 @@ class WriteFruBin(TempItem):
             # path = os.path.split(os.path.realpath(__file__))[0]
             # path = path.split('/')[0:-1]
             # path.append("Utils")
-            path = os.path.join(self.parent.globals["root_path"], "Utils")
+            path = os.path.join(self.root_path, "Utils")
             four_bin_path = path+"/ubb_40.bin"
             bp_bin_path = path+"/bp.bin"
             hib_bin_path = path+"/hib.bin"
