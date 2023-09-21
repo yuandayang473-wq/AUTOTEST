@@ -75,7 +75,7 @@ class ControlPlatform:
         b_ready = False
         if action == "on":  # check uut ready
             # ======= need wait while uut listen =====
-            max_time = 17 * 60
+            max_time = 30 * 60
             logger.info("wait uut poweron timout {0}s.".format(max_time))
             while not b_ready and curr_time < max_time:  # 1000s +1=17mins
                 if ret == 0:
@@ -141,34 +141,24 @@ class ControlPlatform:
         devices = res["device"]
 
         pdu_data = {
-            'ip_address': "191.102.120.1",
-            'pdu_model': '1.3.6.1.4.1.23273.3.1.1.6',
-            "head_port": "20",
-            "tail_port": "5 7 9 11 13 15"
+            'ip_address': "",
+            'pdu_model': '',
         }
 
-        # pdu_data = {
-        #     'ip_address': "",
-        #     'pdu_model': '',
-        # }
-        #
-        # for device in devices:
-        #     if device["DEVICETYPE"] == "PDU":
-        #         pdu_data["ip_address"] = device["DEVICEIP"]
-        #         device["MIBNODE"] = "1.3.6.1.4.1.23273.3.1.1.6"
-        #         device["PORT"] = "20"
-        #         device["PORT_EXTEND"] = "5,7,9,11,13,15"
-        #         pdu_data["pdu_model"] = device["MIBNODE"]
-        #         if not device["PORT"]:
-        #             self.case.fail(ErrCode.INIT_PARAMS, "please configuration pdu info")
-        #
-        #         if device["PORT_EXTEND"]:
-        #             pdu_data["head_port"] = " ".join(device["PORT"].split(","))
-        #             pdu_data["tail_port"] = " ".join(device["PORT_EXTEND"].split(","))
-        #         else:
-        #             pdu_data["port"] = " ".join(device["PORT"].split(","))
-        #         break
-        # else:
-        #     self.case.fail(ErrCode.INIT_PARAMS, "please configuration pdu info")
+        for device in devices:
+            if device["DEVICETYPE"] == "PDU":
+                pdu_data["ip_address"] = device["DEVICEIP"]
+                pdu_data["pdu_model"] = device["DEVICEMIBNODE"]
+                if not device["DEVICEPORT"]:
+                    self.case.fail(ErrCode.INIT_PARAMS, "please configuration pdu info")
+
+                if device["DEVICEPORTEXTEND"]:
+                    pdu_data["head_port"] = " ".join(device["DEVICEPORT"].split(","))
+                    pdu_data["tail_port"] = " ".join(device["DEVICEPORTEXTEND"].split(","))
+                else:
+                    pdu_data["port"] = " ".join(device["DEVICEPORT"].split(","))
+                break
+        else:
+            self.case.fail(ErrCode.INIT_PARAMS, "please configuration pdu info")
 
         return pdu_data
