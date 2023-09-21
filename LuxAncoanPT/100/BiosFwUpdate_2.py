@@ -4,7 +4,7 @@
 @Author  :   yuandayang
 @Contact :   jinwen.chen@luxshare-ict.com
 @Software:   TestCase
-@File    :   BiosFwUpdate.py
+@File    :   BiosFwUpdate_1.py
 @Time    :   2022/2/1
 @Version :   1.0
 @License :   Copyright ©LuxShare  2022 . All Rights Reserved.
@@ -36,11 +36,11 @@ from Lib.Runner import runner
 from Utils.Constant import ErrorCode
 
 
-class BiosFwUpdate(TempItem):
+class BiosFwUpdate_1(TempItem):
 
     def __init__(self):
         super().__init__()
-        self.name = "bios fw check"
+        self.name = "bios fw update"
         self.expect = "This is bios fw update for normal case."
 
         self.config = [
@@ -52,18 +52,7 @@ class BiosFwUpdate(TempItem):
 
     def exe(self):
         path = self.config["InitPath"]
-        header_bmc_ip = self.config["HEADER_TAIL"]["ip_address"]
-        target_bios_ver = self.config["FwVsersion"]["bios_ver"]
-        with self.ssh_connect(uut=self.config["UUT"]):
-            parser = self.execute_run("dmidecode -t bios | grep -i version | awk '{print $2}'")
-            if parser.get_origin_data() != target_bios_ver:
-                parser = self.execute_run("chmod +x /pscuut/9001/work/LuxScript/tools/ancoan/fw/bios/*")
-                parser = self.execute_run(f"{path.get('bios_Script')} {header_bmc_ip} taobao 9ijn0okm {path.get('bios_fw')} 1")
-                if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
-                    self.logger.info("Header bios flash bure fail")
-                    self.fail(ErrorCode.FFFFFFFF, "Header bios flash bure fail")
-                self.execute_run("reboot",  i_exit_code=True)
-                time.sleep(400)
+        time.sleep(400)
         with self.ssh_connect(uut=self.config["UUT"]):
             self.execute_run(f'''df | grep -iE "{path['source_path']}.*/mnt"''', save_exit_code=True)
             if self.ssh.get_exit_code() != 0:
@@ -91,5 +80,5 @@ class BiosFwUpdate(TempItem):
 
 
 if __name__ == '__main__':
-    runner.single_runner(BiosFwUpdate)
+    runner.single_runner(BiosFwUpdate_1)
 

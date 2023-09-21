@@ -57,7 +57,7 @@ class SwFwUpdate(TempItem):
         shangxing = self.config["cfg"]["JBOG"]["shangxing"]
 
         exp_ver = "2:3" if shangxing == 8 else "2:2"
-
+        self.execute_run("chmod -R 777 /pscuut/9001/work/LuxScript/")
         def update_switch_fw(ver,index):
             with self.ssh_connect(uut=self.config["UUT"]):
                 if ver != exp_ver:
