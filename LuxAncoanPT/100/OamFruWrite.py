@@ -35,10 +35,12 @@ from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
 from Lib.Request import MesSocket
+from Utils.Init import load_mes_info
 
 
 class OamFruWrite(TempItem):
 
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "oam fru write"
@@ -67,8 +69,8 @@ class OamFruWrite(TempItem):
                 5. 烧录bin文件
             '''
             # 从mes获取sn信息
-            _mes = MesSocket()
-            fru_info = _mes.get_mes_info(self.parent.globals["SN"])["Results"]["oam_sn"]
+            _mes = MesSocket(self.mes_info["info"]["url"],self.mes_info["info"]["sn"])
+            fru_info = _mes.get_mes_info(self.mes_info["info"]["sn"])["Results"]["oam_sn"]
             print(fru_info)
             for fru in fru_info:
                 # # 根据sn生成oam 对应的ini文件

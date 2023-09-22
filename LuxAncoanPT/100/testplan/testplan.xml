@@ -9,6 +9,7 @@
     <Module Name="Init" Option="" Repeat="1" Description="Init Params"/>
     <Module Name="FuncTest" Option="" Repeat="1" Description="FuncDemo" />
     <Module Name="FruWrite" Option="" Repeat="1" Description="FuncDemo" />
+    <Module Name="ShinyTest" Option="" Repeat="1" Description="ShinyDemo" />
   </Plan>
    <Modules>
     <Module Name="Init" Option="" Description="Init Params and Env">
@@ -34,6 +35,36 @@
       <Item Name="FuncPsuCheck" Script="FuncPsuCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
       <Item Name="FuncSensorCheck" Script="FuncSensorCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
       <Item Name="FuncSensorOamCheck" Script="FuncSensorOamCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+<!--      <Item Name="HealthCheck" Script="HealthCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>-->
+    </Module>
+    <Module Name="ShinyTest" Option="" Description="ShinyDemo">
+      <Item Name="BmcFwcheck.py" Script="BmcFwcheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="BmcFwUpdate" Script="BmcFwUpdate.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="ClearSellog" Script="ClearSellog.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="CpldFwCheck" Script="CpldFwCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="HeaderRetimerFwcheck" Script="HeaderRetimerFwcheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="HeaderRetimerUpdate" Script="HeaderRetimerUpdate.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="NicFwCheck" Script="NicFwCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="NicFwUpdate" Script="NicFwUpdate.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="NvmeFwCheck" Script="NvmeFwCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="NvmeFwUpdate" Script="NvmeFwUpdate.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="OamFruCheck" Script="OamFruCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="OamFruWrite" Script="OamFruWrite.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="OamFwUpdate" Script="OamFwUpdate.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="OamFwCheck" Script="OamFwCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="OamPowerFw_Bat" Script="OamPowerFw_Bat.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="OamPowerFwCheck_Bat" Script="OamPowerFwCheck_Bat.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="PsuFwcheck" Script="PsuFwcheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="RetimeFwcheck" Script="RetimeFwcheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="RetimeFwUpdate" Script="RetimeFwUpdate.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="SwFwCheck" Script="SwFwCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="SwFwUpdate" Script="SwFwUpdate.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="TailRetimerFwcheck" Script="TailRetimerFwcheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="TailRetimerFwUpdate" Script="TailRetimerFwUpdate.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="BiosFwUpdate_1" Script="BiosFwUpdate_1.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="RESTART" Description=""/>
+      <Item Name="BiosFwUpdate_2" Script="BiosFwUpdate_2.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="BiosFwUpdate_2" Script="BiosFwUpdate_2.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>
+      <Item Name="CpldFwUpdate" Script="CpldFwUpdate.py" Parameter="check" Type="SERVER" isSTU="true" Timeout="1440" Repeat="1" Option="RESTART" Description=""/>
 <!--      <Item Name="HealthCheck" Script="HealthCheck.py" Parameter="check" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Option="" Description=""/>-->
     </Module>
     <Module Name="FruWrite" Option="" Description="fru write ">
