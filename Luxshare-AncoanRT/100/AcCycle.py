@@ -36,7 +36,7 @@ from Lib.Login import ApcConnect
 from Utils.Constant import ErrorCode
 
 
-class Ac(TempItem):
+class AcCycle(TempItem):
 
     def __init__(self):
         super().__init__()
@@ -77,4 +77,4 @@ class Ac(TempItem):
 
 
 if __name__ == '__main__':
-    runner.single_runner(Ac)
+    runner.single_runner(AcCycle)
