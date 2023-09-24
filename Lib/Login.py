@@ -547,6 +547,10 @@ class ApcConnect:
 
     def _ac_action(self, obj, snmpget, snmpset, status):
         obj.os_run.run(snmpset)
+        time.sleep(0.5)
+        obj.os_run.run(snmpset)
+        time.sleep(0.5)
+        obj.os_run.run(snmpset)
         time.sleep(2)
         parser = obj.os_run.run(snmpget, i_exit_code=True)
         pattern = f'STRING: "{status}"'

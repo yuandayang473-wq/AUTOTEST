@@ -93,14 +93,17 @@ class JsonLoadConfig(LoadConfig):
             return cnf
 
     def data(self, key):
-        data = self.get_config()
-        keys = key.split(".")
-        if len(keys) > 1:
-            for key in keys:
+        try:
+            data = self.get_config()
+            keys = key.split(".")
+            if len(keys) > 1:
+                for key in keys:
+                    data = data[key]
+            else:
                 data = data[key]
-        else:
-            data = data[key]
-        return data
+            return data
+        except Exception as e:
+            return None
 
     def _dump_config(self, config_path, data):
         with open(config_path, "w", encoding="utf-8") as f:
