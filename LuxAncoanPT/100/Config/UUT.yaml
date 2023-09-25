@@ -947,12 +947,17 @@ tools:
 
         rpm:
             aliaom_driver: "alippu-driver-5.10.134-007.ali5000.al8.x86_64.rpm"
-            alippu_driver: "alippu-driver-5.10.134-006.ali5000.TinyOS.alios7.x86_64-oam-0.13.0.rpm"
+            alippu_driver: "alippu-driver-5.10.134-007.ali5000.al8.x86_64.rpm"
             sshpass: "sshpass-1.09-4.el8.x86_64.rpm"
         kingkong:
             kingkong: "kingkong_3.5.39.zip"
+            kingkong_name: "kingkong_3.5.39"
             kingkong_btv: "btv-centos8.2-1.0.0.tar.gz"
             kingkong_Ppu_zip: "Ppu.zip"
+        Eic:
+            tar: "EIC1.0_platfrom_v.1.1.4.2_230731.tar.gz"
+            name: "EIC1.0_platfrom_v.1.1.4.2_230731"
+            eicupdatefile: "eic_top_306_linux.pdi "
 
 
 InitPath:

@@ -73,20 +73,14 @@ class FuncDiskCheck(TempItem):
                     m2_type = m[2]
                     if m2_type == 'disk':
                         m2_size = float(m[1][:-1])
-                        if m2_size >= 100.0:
-                            val = round(float(e_m2_size[:-1]) - m2_size, 1)
-                            self.assertLess(ErrorCode.HDTCH004, f"m2 {m2_name} size difference value", val, 50)
-                            c += 1
-                        else:
-                            u_disk = m2_name
-            self.assertEqual(ErrorCode.HDTCH001, "m2 count", c, e_m2_count)
+                        val = round(float(e_m2_size[:-1]) - m2_size, 1)
+                        self.assertLess(ErrorCode.HDTCH004, f"m2 {m2_name} size difference value", val, 50)
+                        c += 1
+                self.assertEqual(ErrorCode.HDTCH001, "m2 count", c, e_m2_count)
 
-            if u_disk:
-                disk_type_cmd = f"lsscsi | grep -i '/dev/sd' | grep -iv '{u_disk}'"
-            else:
-                disk_type_cmd = f"lsscsi | grep -i '/dev/sd'"
+            disk_type_cmd = f"lsscsi | grep -i '/dev/sd'"
             parser = self.execute_run(disk_type_cmd)
-            lines = parser.split("\r\n")
+            lines = parser.split("\n")
             m2_data = []
             for line in lines:
                 if line:

@@ -36,7 +36,7 @@ from Lib.Config import JsonLoadConfig
 from Utils.Constant import ErrorCode
 
 
-class InitLoadConfig(TempItem):
+class InitCheckSn(TempItem):
 
     def __init__(self):
         super().__init__()
@@ -55,4 +55,4 @@ class InitLoadConfig(TempItem):
 
 
 if __name__ == '__main__':
-    runner.single_runner(InitLoadConfig)
+    runner.single_runner(InitCheckSn)

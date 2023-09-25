@@ -4,7 +4,7 @@
 @Author  :   yuandayang
 @Contact :   jinwen.chen@luxshare-ict.com
 @Software:   TestCase
-@File    :   BiosFwUpdate_1.py
+@File    :   BiosFwUpdate.py
 @Time    :   2022/2/1
 @Version :   1.0
 @License :   Copyright ©LuxShare  2022 . All Rights Reserved.
@@ -36,7 +36,7 @@ from Lib.Runner import runner
 from Utils.Constant import ErrorCode
 
 
-class BiosFwUpdate_1(TempItem):
+class BiosFwUpdate(TempItem):
 
     def __init__(self):
         super().__init__()
@@ -62,9 +62,10 @@ class BiosFwUpdate_1(TempItem):
                 if not re.search(r'Flash\s*Complete', parser.get_origin_data(), re.I):
                     self.logger.info("Header bios flash bure fail")
                     self.fail(ErrorCode.FFFFFFFF, "Header bios flash bure fail")
-                self.platform.run(cmd="reboot")
+
+        self.platform.run(cmd="reboot")
 
 
 if __name__ == '__main__':
-    runner.single_runner(BiosFwUpdate_1)
+    runner.single_runner(BiosFwUpdate)
 

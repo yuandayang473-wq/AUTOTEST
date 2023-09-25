@@ -54,6 +54,10 @@ class ControlPlatform:
             return json.loads(data)
         return str_data
 
+    def skip_dynamic_tool(self, reason):
+        self.case.get_logger().info("skip dynamic tool reason: %s" % reason)
+        self.case.skip_dynamic_tool = reason
+
     def getFileContent(self, name, path="."):
         return get_file_content(os.path.join(path, name))
 

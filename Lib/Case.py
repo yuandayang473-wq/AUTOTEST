@@ -157,14 +157,20 @@ class Case:
                     data = conf["key"]
                 else:
                     keys = conf["key"].split("/")
-                    data = c.data(keys[0])
                     if len(keys) > 1:
+                        data = c.data(keys[0])
                         for key in keys[1:]:
                             data = data[key]
                         else:
                             self._gen_tool_abspath(keys, data)
                     else:
-                        data = c.data(conf["key"])
+                        if "." in conf["key"]:
+                            keys = conf["key"].split(".")
+                            data = c.get_config()
+                            for key in keys:
+                                data = data[key]
+                        else:
+                            data = c.data(keys[0])
             else:
                 data = c.get_config()
 
@@ -639,6 +645,8 @@ class Suite:
 
         self.add_tests(tests)
 
+        self.clear_env()
+
     @property
     def name(self):
         return self.__name
@@ -759,6 +767,9 @@ class Suite:
         if hasattr(worker, "need_exec_cmd"):
             temp_ret["needexec_cmd"] = getattr(worker, "need_exec_cmd")
 
+        if hasattr(worker, "skip_dynamic_tool"):
+            temp_ret["skipdynamictool"] = getattr(worker, "skip_dynamic_tool")
+
         if ret.is_pass():
             temp_ret["result"] = "PASS"
         else:
@@ -773,3 +784,9 @@ class Suite:
             temp_ret["errlist"] = errlist
 
         JsonLoadConfig(cfg_path_name="", cfg_name="result.json").dump_config(temp_ret, is_new_file=True)
+
+    def clear_env(self):
+        # 删除 result.json 文件
+        result_json_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "result.json")
+        if os.path.isfile(result_json_path):
+            os.remove(result_json_path)

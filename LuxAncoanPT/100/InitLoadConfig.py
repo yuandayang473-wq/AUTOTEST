@@ -54,8 +54,6 @@ class InitLoadConfig(TempItem):
         url = cfg["flowdata"]["tcs_data_url"].strip()
         http_server_url = cfg["flowdata"]["http_server_url"].strip()
 
-        self.check_sn(sn)
-
         mes = MesSocket(url, sn)
         rk, status = mes.save_mes_info(sn)
         if status != 200:
