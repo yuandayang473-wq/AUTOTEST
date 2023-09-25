@@ -39,13 +39,13 @@ from Lib.Template import TempItem
 from Utils.Init import load_mes_info
 
 
-class PowerCycleCheck(TempItem):
+class AcPowerCycleCheck(TempItem):
 
     @load_mes_info
     def __init__(self):
         super().__init__()
-        self.name = "PowerCycleCheck"
-        self.expect = "This is PowerCycleCheck for normal case."
+        self.name = "AcPowerCycleCheck"
+        self.expect = "This is AcPowerCycleCheck for normal case."
 
         self.config = [
             {"folder": "Luxshare-AncoanRT/100/Config", "file": "UUT.yaml", "name": "InitPath", "key": "InitPath"},
@@ -325,4 +325,4 @@ class PowerCycleCheck(TempItem):
         self.check_receiver_rx(receiver_list, rx_list, False)
 
 if __name__ == '__main__':
-    runner.single_runner(PowerCycleCheck)
+    runner.single_runner(AcPowerCycleCheck)

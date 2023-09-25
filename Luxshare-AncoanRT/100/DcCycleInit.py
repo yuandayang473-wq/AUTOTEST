@@ -34,20 +34,20 @@ from Lib.Template import TempItem
 from Lib.Runner import runner
 
 
-class Acinit(TempItem):
+class DcCycleInit(TempItem):
 
     def __init__(self):
         super().__init__()
         self.name = "cpu"
         self.expect = "This is cpu function check test on the service"
         self.config = [
-            {"file": "BmcDevice.yaml", "name": "tail_admin_info", "key": "BMC_01"},
+            {"file": "BmcDevice.yaml", "name": "bmc_info"},
         ]
 
     def exe(self):
         self.assertEqual("00000000", "test demo", 2, 2)
-        self.platform.put_platform_data(self.config["tail_admin_info"])
+        self.platform.put_platform_data(self.config["bmc_info"])
 
 
 if __name__ == '__main__':
-    runner.single_runner(Acinit)
+    runner.single_runner(DcCycleInit)
