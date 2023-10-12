@@ -313,7 +313,15 @@ class AcPowerCycleCheck(TempItem):
             cmd = f"python3 /root/create_lspci_dict.py"
             output = self.execute_run(cmd)
             cmd = f"diff /root/lspci.json {json_file}"
-            output = self.execute_run(cmd)
+            output = self.execute_run(cmd, save_exit_code=True)
+            if self.ssh.get_exit_code() != 0 :
+                id_list = re.findall(r'\d+c\d+', output.get_origin_data())
+                for bus_id in id_list:
+                    _id = re.search(r"(\d+)c", bus_id).group(1)
+                    cmd = f"cat /root/lspci.json |head -n {_id} |tail -n 5"
+                    output = self.execute_run(cmd)
+                raise Exception("check lspci is fail")
+
 
     def exe(self):
         self.clear_sel_log()
