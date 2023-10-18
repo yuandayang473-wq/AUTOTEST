@@ -1,0 +1,11 @@
+
+tools:
+    ancoan:
+        rpm:
+            aliaom_driver: "alippu-driver-5.10.134-007.ali5000.al8.x86_64.rpm"
+            alippu_driver: "alippu-driver-5.10.134-007.ali5000.al8.x86_64.rpm"
+            sshpass: "sshpass-1.09-4.el8.x86_64.rpm"
+        HWQC:
+            pub_rpm: "pub_*.rpm"
+            hwqc_zip: "hwqc_*.zip"
+            alibabacloud_tar: "alibabacloud*.tar"

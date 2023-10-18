@@ -73,10 +73,7 @@ class Step:
     def log_step_result(self, step_num, res="PASS"):
         if not hasattr(self, "step_num"):
             return None
-        if res == "PASS":
-            self._logger.info(f"step_{step_num}: {res}".center(80, "="))
-        else:
-            self._logger.error(f"step_{step_num}: {res}".center(80, "="))
+        self._logger.info(f"step_{step_num}: {res}".center(80, "="))
 
     def callback(self):
         pass
