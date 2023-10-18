@@ -22,7 +22,7 @@ class RequestFile:
     def __init__(self, logger):
         self.logger = logger
 
-    def wget(self, url, path):
+    def wget(self, url, path=os.path.dirname(__file__)):
 
         def _progress(block_num, block_size, total_size):
             pass

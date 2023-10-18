@@ -438,7 +438,7 @@ class SshConnect(Connection):
         buff = ''
         channel.send(cmd)
         time.sleep(0.1)
-        channel.recv(len(cmd))  # 剔除掉下发的命令
+        # channel.recv(len(cmd))  # 剔除掉下发的命令
         ret = re.search(end_with, buff, re.I | re.M)
         value = 1
         while ret is None:
@@ -455,7 +455,7 @@ class SshConnect(Connection):
 
             if value >= timeout:
                 break
-            value += 0.1
+            value += 1
 
         if self.first_invoke:
             if buff.count(command) > 1:

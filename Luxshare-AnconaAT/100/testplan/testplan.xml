@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Script>
+    <Base>
+        <Platform>Common</Platform>
+        <!-- Yes: 失败停止，No: 失败不停止 -->
+        <StopOnError>Yes</StopOnError>
+    </Base>
+
+    <Plan>
+        <!--    <Module Name="Init" Option="BYPASS" Repeat="1" Description="Init Params"/>-->
+        <Module Name="Init" Option="" Repeat="1" Description="Init Params"/>
+        <Module Name="AT" Option="" Repeat="1" Description="HWQC"/>
+    </Plan>
+    <Modules>
+        <Module Name="Init" Option="" Description="Init Params and Env">
+            <Item Name="InitLoadConfig" Script="InitLoadConfig.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="InitTestEnvironment" Script="InitTestEnvironment.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+        </Module>
+        <Module Name="AT" Option="" Description="AT">
+            <Item Name="FuncCpuCheck" Script="FuncCpuCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncDiskCheck" Script="FuncDiskCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncFanInfoCheck" Script="FuncFanInfoCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncGpuLinkTest" Script="FuncGpuLinkTest.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncMemoryCheck" Script="FuncMemoryCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncNvmeCheck" Script="FuncNvmeCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncOamCheck" Script="FuncOamCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncOamI2cDeviceCheck" Script="FuncOamI2cDeviceCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncPcieDiskCheck" Script="FuncPcieDiskCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncPcieOamCheck" Script="FuncPcieOamCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncPcieRetimerCheck" Script="FuncPcieRetimerCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncPcieSwitchCheck" Script="FuncPcieSwitchCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncPsuCheck" Script="FuncPsuCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="PsuFwcheck" Script="PsuFwcheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncSensorCheck" Script="FuncSensorCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="FuncSensorOamCheck" Script="FuncSensorOamCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="BmcFwUpdate" Script="BmcFwUpdate.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="BmcFwcheck" Script="BmcFwcheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="BiosFwUpdate" Script="BiosFwUpdate.py" Parameter="check" Type="SERVER" isSTU="false"
+                  Timeout="2440" Repeat="1" Option="RESTART" Description=""/>
+            <Item Name="InitLoadConfig" Script="InitLoadConfig.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Dynamic="true" Option="" Description=""/>
+<!--            <Item Name="InitTestEnvironment" Script="InitTestEnvironment.py" Parameter="" Type="SERVER" isSTU="false" Timeout="1440" Repeat="1" Dynamic="true" Option="" Description=""/>-->
+
+            <Item Name="BiosFwCheck" Script="BiosFwCheck.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+            <Item Name="ClearSellog" Script="ClearSellog.py" Parameter="" Type="SERVER" isSTU="false"
+                  Timeout="1440" Repeat="1" Option="" Description=""/>
+        </Module>
+
+    </Modules>
+</Script>

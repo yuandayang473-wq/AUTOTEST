@@ -15,7 +15,8 @@ import time
 import logging
 import os
 import shutil
-
+import traceback
+import sys
 
 from Lib.Constant import Log
 from .Result import Pass, Fail, Result
@@ -72,7 +73,7 @@ class Case:
         self.root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.platform = ControlPlatform(self)
 
-        self.CUSTOM_LOG_PATH = os.path.join(self.root_path, "customlog")
+        self.CUSTOM_LOG_PATH = os.path.join(self.root_path, "customerlog")
 
         if os.path.isdir(self.CUSTOM_LOG_PATH):
             shutil.rmtree(self.CUSTOM_LOG_PATH, ignore_errors=True)
@@ -179,7 +180,8 @@ class Case:
     def _gen_tool_abspath(self, keys, data):
         for k, v in data.items():
             if isinstance(v, str):
-                data[k] = os.path.join(self.root_path, "/".join(keys), v)
+                # data[k] = os.path.join(self.root_path, "/".join(keys), v)
+                data[k] = os.path.join("/run/LuxScript", "/".join(keys), v)
             else:
                 keys.append(k)
                 self._gen_tool_abspath(keys, data[k])
@@ -353,8 +355,7 @@ class Item(Case):
 
     def run(self):
         logger = self.get_logger()
-        step = Step()
-        step.set_logger(logger=self.get_logger())
+        self._step.set_logger(logger=self.get_logger())
         try:
             self.update_start_time()
             logger.info(self.head_to_string())
@@ -367,22 +368,40 @@ class Item(Case):
 
             self.tearDown()
             self.update_end_time()
-            step.log_step_result(step.step_num) if hasattr(step, "step_num") else None
+            step_msg = "PASS"
         except (AssertionError, Error) as err:
-            self.update_end_time()
-            step.log_step_result(step.step_num, "FAILED") if hasattr(step, "step_num") else None
-            self.get_logger().error(err)
-            errors = self.result.errors
-            self.result = Fail(self, err)
-            self.result.errors.extend(errors)
-            try:
-                self.tearError()
-            except Error as err:
-                logger.info(err.get_msg())
+            step_msg = "FAILED"
+            self._gen_error_result(err)
+        except:
+            step_msg = "FAILED"
+            full_err_reason = traceback.format_exc(limit=None, chain=True)
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            err = ErrItemFail(str(exc_value))
+            self._gen_error_result(err, full_err_reason)
+
+        if hasattr(self._step, "step_num"):
+            self._step.log_step_result(self._step.step_num, step_msg)
 
         logger.info(self.show_result())
 
         return self.result
+
+    def _gen_error_result(self, err: Error, err_msg=None):
+        self.get_logger().error(err_msg if err_msg else err)
+        errors = self.result.errors
+        self.result = Fail(self, err)
+        self.result.errors.extend(errors)
+        self._tearError()
+        self.update_end_time()
+
+    def _tearError(self):
+        try:
+            self.tearError()
+        except Error as err:
+            self.get_logger().info(err.get_msg())
+        except:
+            full_err_reason = traceback.format_exc(limit=None, chain=True)
+            self.get_logger().error(full_err_reason)
 
     def _auto_line_feed(self, data):
 
@@ -622,6 +641,8 @@ class Item(Case):
     def upload_log(self):
         pass
 
+    def wget(self, pack):
+        self.os_run.run(f"cd /run;wget -t 5 -T 60 -r -np -nH -R index.html {pack}")
 
 class Suite:
     """A Suite instance executes several test cases."""

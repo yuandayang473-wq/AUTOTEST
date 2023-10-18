@@ -58,7 +58,7 @@ class ControlPlatform:
         self.case.get_logger().info("skip dynamic tool reason: %s" % reason)
         self.case.skip_dynamic_tool = reason
 
-    def getFileContent(self, name, path="."):
+    def getFileContent(self, name, path=os.path.dirname(__file__)):
         return get_file_content(os.path.join(path, name))
 
     def check_uut(self, action="on"):
@@ -81,7 +81,7 @@ class ControlPlatform:
         b_ready = False
         if action == "on":  # check uut ready
             # ======= need wait while uut listen =====
-            max_time = 30 * 60
+            max_time = 60 * 60
             logger.info("wait uut poweron timout {0}s.".format(max_time))
             while not b_ready and curr_time < max_time:  # 1000s +1=17mins
                 if ret == 0:
@@ -111,7 +111,7 @@ class ControlPlatform:
 
         elif action == "off":  # check uut poweroff.
             # ======= need wait while uut can not connect =====
-            max_time = 5 * 60
+            max_time = 10 * 60
             message = ""
             while not b_ready and curr_time < max_time:  # 4+1=5mins
                 if ret != 0:
