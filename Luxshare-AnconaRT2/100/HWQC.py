@@ -34,10 +34,12 @@ from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Init import load_mes_info
 from Utils.Constant import ErrorCode
-
+from Lib.Request import MesSocket
+import time
 
 class HWQC(TempItem):
-
+    
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "hwqc"
@@ -51,7 +53,6 @@ class HWQC(TempItem):
             {"folder": "Luxshare-AnconaRT2/100/Config", "file": "UUT.yaml", "name": "hwqc", "key": "tools/ancoan/HWQC"},
         ]
 
-    @load_mes_info
     def init_env(self):
         hwqc_target_path = os.path.join("/root", "HWQC")
 
@@ -97,12 +98,16 @@ class HWQC(TempItem):
         self.os_run.run(f"cp {baseline_cfg_path} {baseline_path}")
 
     def copy_log(self, log_path):
-        logs = os.path.join(log_path, "hwqc.*.log")
-        reports = os.path.join(log_path, "hwqc.*.report")
-        self.os_run.run(f"mv {logs} {self.CUSTOM_LOG_PATH}")
-        self.os_run.run(f"mv {reports} {self.CUSTOM_LOG_PATH}")
+        _server_sn = self._mes.get_mes_info(self.mes_info["info"]["sn"])["Results"]["server_sn"]
+        _jbog_sn = self._mes.get_mes_info(self.mes_info["info"]["sn"])["Results"]["jbog_sn"]
+        _datatime = time.strftime('%Y%m%d%H%M%S')
+        server_reports = os.path.join(log_path, f"hwqc.{_server_sn}.report")
+        jbog_reports = os.path.join(log_path, f"hwqc.{_jbog_sn}.report")
+        self.os_run.run(f"mv {server_reports} {self.CUSTOM_LOG_PATH}/{_server_sn}_HWQC_{_datatime}_hwqc.report")
+        self.os_run.run(f"mv {jbog_reports} {self.CUSTOM_LOG_PATH}/{_jbog_sn}_HWQC_{_datatime}_hwqc.report")
 
     def exe(self):
+        self._mes = MesSocket(self.mes_info["info"]["url"],self.mes_info["info"]["sn"])
         hwqc_factory_path = os.path.join("/root", "HWQC", "hwqc_factory")
         hwqc_pyc_path = os.path.join(hwqc_factory_path, "hwqc.pyc")
         tail_bmc_ip = self.config["JBMC"]["ip_address"]

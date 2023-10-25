@@ -35,10 +35,11 @@ from Lib.Template import TempItem
 from Lib.Runner import runner
 from Utils.Constant import ErrorCode
 from Utils.Init import load_mes_info
-
+from Lib.Request import MesSocket
 
 class KKStress_2(TempItem):
-
+    
+    @load_mes_info
     def __init__(self):
         super().__init__()
         self.name = "kk stress"
@@ -57,7 +58,6 @@ class KKStress_2(TempItem):
              "key": "tools.ancoan.rpm"},
         ]
 
-    @load_mes_info
     def init_env(self):
         http_server_url = self.mes_info["info"]["http_server_url"]
         _kingkong = os.path.join(http_server_url, f"LuxScript/tools/ancoan/kingkong/")
@@ -93,18 +93,11 @@ class KKStress_2(TempItem):
 
     def copy_kk_log(self):
         # 拷贝kk log
+        _server_sn = self._mes.get_mes_info(self.mes_info["info"]["sn"])["Results"]["server_sn"]
+        _datatime = time.strftime('%Y%m%d%H%M%S')
         kk_log_path = os.path.join("/root", self.config["kingkong_info"]["kingkong_name"], "kklog*.tar.xz")
-        sn = self.mes_info['info']["sn"]
-        from_format = "%Y_%m_%d_%H_%M_%S"
-        to_format_2 = "%Y%m%d%H%M%S"
-        struct_time = time.strftime(from_format, time.localtime())
-        time_struct = time.strptime(struct_time, from_format)
-        settime = time.strftime(to_format_2, time_struct)
-
         self.os_run.run(f"cp {kk_log_path} {self.CUSTOM_LOG_PATH}")
-        self.os_run.run(f"mkdir {self.CUSTOM_LOG_PATH}/Luxshare-PPU_Kingkong_Test")
-        self.os_run.run(f"cd {self.CUSTOM_LOG_PATH}; zip -r -q {self.CUSTOM_LOG_PATH}/Luxshare-PPU_Kingkong_Test/{sn}{settime}.zip *.tar.xz")
-        self.os_run.run(f"rm -rf {self.CUSTOM_LOG_PATH}/kklog*.tar.xz")
+        self.os_run.run(f"cd {self.CUSTOM_LOG_PATH}; mv *.tar.xz {_server_sn}_Run-in_{_datatime}_kingkong.report.tar.xz")
 
     def check_enable_ifs(self):
         parser = self.os_run.run("ipmitool raw 0x3e 0x5f 0x37 0x01", parser_type="raw_parser")
@@ -146,7 +139,7 @@ class KKStress_2(TempItem):
         self.platform.run(cmd="reboot")
 
     def exe(self):
-
+        self._mes = MesSocket(self.mes_info["info"]["url"],self.mes_info["info"]["sn"])
         self.check_enable_ifs()
         self.clear_sel_log()
 
