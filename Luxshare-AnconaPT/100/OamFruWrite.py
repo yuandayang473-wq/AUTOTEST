@@ -88,7 +88,7 @@ class OamFruWrite(TempItem):
                 parser = self.execute_run(
                     f'python3 {path.get("fru_path")}fru.py {path.get("fru_path")}{fru["oam_sn"]}.ini {path.get("fru_path")}{fru["oam_sn"]}.bin --cmd')
               
-                 # # bmc端烧录
+            # bmc端烧录
             parser = self.execute_run(
                 f"sshpass -p superuser ssh sysadmin@{tail_bmc_ip} -o StrictHostKeyChecking=no /etc/init.d/ipmistack stop")
             if not re.search(r"Stopping IPMI Stack", parser.get_origin_data(), re.I):
@@ -118,6 +118,7 @@ class OamFruWrite(TempItem):
                     f"sshpass -p superuser ssh sysadmin@{tail_bmc_ip} -o StrictHostKeyChecking=no i2ctransfer -y 10 w2@0x56 0x00 0x00 r256")
                 if target_hex not in parser.get_origin_data().strip():
                     self.logger.info("Hex code not match bmc fru write fail")
+                # 关闭所有通道
                 parser = self.execute_run(
                     f"sshpass -p superuser ssh sysadmin@{tail_bmc_ip} -o StrictHostKeyChecking=no i2ctransfer -y 10 w1@0x70 0x00")
             parser = self.execute_run(

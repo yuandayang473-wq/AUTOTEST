@@ -442,6 +442,7 @@ class SshConnect(Connection):
         ret = re.search(end_with, buff, re.I | re.M)
         value = 1
         while ret is None:
+            time.sleep(value)
             resp = channel.recv(1024)
             temp = resp.decode('utf-8')
             buff += temp
@@ -450,7 +451,6 @@ class SshConnect(Connection):
             if manual_stop:
                 time.sleep(value)
                 break
-            time.sleep(value)
             ret = re.search(end_with, temp, re.I | re.M)
 
             if value >= timeout:

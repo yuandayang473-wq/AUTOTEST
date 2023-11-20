@@ -67,7 +67,7 @@ class ClearSellog(TempItem):
             jbmc_passwd = self.config["JBMC"]["password"]
             time.sleep(10)
             parser = self.execute_run(f"ipmitool -I lanplus -H {jbmc_ip} -U {jbmc_user} -P {jbmc_passwd} sel clear ")
-             #清除机头alioem sel 机头 sel log
+        #清除机头alioem sel 机头 sel log
             parser = self.execute_run(" ipmitool alioem restoretomanufacturesetting ")
             time.sleep(120)
             self.execute_run("modprobe -r alixpu && modprobe alixpu")     

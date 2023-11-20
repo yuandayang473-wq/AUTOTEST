@@ -75,7 +75,7 @@ class WriteFruBin(TempItem):
             "password": "1",
             "username": "root"
         }
-        
+        # 刷fru过程中的第一步，刷bin，并且在刷bin之前和之后打印fru信息便于debug
         with self.ssh_connect(uut=self.config["UUT"]):
             jbmc_ip = self.config["ADMIN"]["ip_address"]
             jbmc_user = self.config["ADMIN"]["username"]
