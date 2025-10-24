@@ -2,12 +2,12 @@
 # coding=utf-8
 """
 @Author  :   陈进文
-@Contact :   jinwen.chen@luxshare-ict.com
+@Contact :   jinwen.chen@ins-ict.com
 @Software:   V2
 @File    :   Result.py
 @Time    :   2022/8/17
 @Version :   1.0
-@License :   Copyright ©LuxShare  2022 . All Rights Reserved.
+@License :   Copyright ©ins  2022 . All Rights Reserved.
 @Desc    :   None
 """
 

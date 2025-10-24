@@ -2,12 +2,12 @@
 # coding=utf-8
 """
 @Author  :   陈进文
-@Contact :   jinwen.chen@luxshare-ict.com
+@Contact :   jinwen.chen@ins-ict.com
 @Software:   V2
 @File    :   Case.py
 @Time    :   2022/8/17
 @Version :   1.0
-@License :   Copyright ©LuxShare  2022 . All Rights Reserved.
+@License :   Copyright ©ins  2022 . All Rights Reserved.
 @Desc    :   None
 """
 import contextlib
@@ -365,20 +365,18 @@ class Item(Case):
                 errors = self.result.errors
                 self.result = ret
                 self.result.errors.extend(errors)
-
-            self.tearDown()
-            self.update_end_time()
             step_msg = "PASS"
-        except (AssertionError, Error) as err:
-            step_msg = "FAILED"
-            self._gen_error_result(err)
         except:
             step_msg = "FAILED"
             full_err_reason = traceback.format_exc(limit=None, chain=True)
             exc_type, exc_value, exc_traceback = sys.exc_info()
             err = ErrItemFail(str(exc_value))
             self._gen_error_result(err, full_err_reason)
-
+        finally:
+            try:
+                self.tearDown()
+            except Exception as e:
+                logger.error("tearDown error: %s" % str(e))
         if hasattr(self._step, "step_num"):
             self._step.log_step_result(self._step.step_num, step_msg)
 
@@ -387,7 +385,7 @@ class Item(Case):
         return self.result
 
     def _gen_error_result(self, err: Error, err_msg=None):
-        self.get_logger().error(err_msg if err_msg else err)
+        self.logger.error(err_msg if err_msg else err)
         errors = self.result.errors
         self.result = Fail(self, err)
         self.result.errors.extend(errors)
@@ -760,23 +758,24 @@ class Suite:
             return self.__end_time - self.__start_time
         return 0
 
-    def single_run(self):
+    def suite_run(self):
         self.update_start_time()
         self.create_root_logger()
-        test_id = 1
-        # for test in self._tests:
-        test = self._tests[0]
-        instance = test()
-        # case_logger = self.root_logger.case_logger(test.__name__, None, Log.normal)
-        case_logger = self.root_logger.case_logger(Log.name, None, Log.debug)
-        instance.set_logger(case_logger)
-        instance.ID = test_id
-        instance.os_run.set_logger(case_logger)
-        ret = instance.run()
-        ret.ID = instance.ID
-        # 记录结束时间
-        self.update_end_time()
-        self.generate_test_report(ret)
+        test_id = 0
+        for test in self._tests:
+            # test = self._tests[0]
+            test_id += 1
+            instance = test()
+            case_logger = self.root_logger.case_logger(test.__name__, None, Log.debug)
+            # case_logger = self.root_logger.case_logger(Log.name, None, Log.debug)
+            instance.set_logger(case_logger)
+            instance.ID = test_id
+            instance.os_run.set_logger(case_logger)
+            ret = instance.run()
+            ret.ID = instance.ID
+            # 记录结束时间
+            self.update_end_time()
+            self.generate_test_report(ret)
 
     def generate_test_report(self, ret: Result):
         temp_ret = {

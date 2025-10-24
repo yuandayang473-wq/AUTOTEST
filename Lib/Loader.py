@@ -19,9 +19,7 @@ class TestLoader(object):
     def __init__(self, options=None):
         self.options = options
 
-    def load_tests_from_name(self, case_class: str):
-        if not (case_class or issubclass(case_class, Case)):
-            raise TestCaseError(f"{case_class} is must Item subclass ")
+    def load_tests_from_name(self, case_list: list):
 
-        return self.suiteClass([case_class])
+        return self.suiteClass(case_list)
 

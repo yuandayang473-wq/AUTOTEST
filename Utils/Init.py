@@ -2,12 +2,12 @@
 # -*- encoding: utf-8 -*-
 '''
 @Author  :   陈进文
-@Contact :   jinwen.chen@luxshare-ict.com
+@Contact :   jinwen.chen@ins-ict.com
 @Software:   TestCase
 @File    :   InitParams.py
 @Time    :   2023/5/8
 @Version :   1.0
-@License :   Copyright ©LuxShare  2022 . All Rights Reserved.
+@License :   Copyright ©ins  2022 . All Rights Reserved.
 @Desc    :   初始RK,必须要的参数
 '''
 

@@ -5,7 +5,7 @@
 @Software:   TestCase
 @Time    :   2023/5/5
 @Version :   1.0
-@License :   Copyright ©LuxShare  2022 . All Rights Reserved.
+@License :   Copyright ©ins  2022 . All Rights Reserved.
 @Desc    :   None
 '''
 import requests

@@ -2,12 +2,12 @@
 # coding=utf-8
 """
 @Author  :   陈进文
-@Contact :   jinwen.chen@luxshare-ict.com
+@Contact :   jinwen.chen@ins-ict.com
 @Software:   V2
 @File    :   Login.py
 @Time    :   2022/8/17
 @Version :   1.0
-@License :   Copyright ©LuxShare  2022 . All Rights Reserved.
+@License :   Copyright ©ins  2022 . All Rights Reserved.
 @Desc    :   None
 """
 
@@ -91,7 +91,7 @@ class OsRunCmd:
         """
         self._cmd_count = count
 
-    def run(self, command, retry_expt=3, i_exit_code=False, save_exit_code=True, timeout=3600, i_timeout_err=False,
+    def run(self, command, retry_expt=1, i_exit_code=False, save_exit_code=True, timeout=3600, i_timeout_err=False,
             i_record_cmd=False, parser_type="str_parser"):
         """
         :param command: os 下执行的命令
@@ -344,7 +344,7 @@ class SshConnect(Connection):
         remote_cmd = bmc_con.build_command(cmd)
         return remote_cmd
 
-    def run(self, command, retry_expt=3, ipmi_I=False, i_exit_code=False, i_record_cmd=False, save_exit_code=False,
+    def run(self, command, retry_expt=1, ipmi_I=False, i_exit_code=False, i_record_cmd=False, save_exit_code=False,
             cmd_timeout=3600, i_timeout_err=False):
         """
         :param command: os 下执行的命令

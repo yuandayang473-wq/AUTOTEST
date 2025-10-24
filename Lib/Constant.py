@@ -2,14 +2,15 @@
 # coding=utf-8
 """
 @Author  :   陈进文
-@Contact :   jinwen.chen@luxshare-ict.com
+@Contact :   jinwen.chen@ins-ict.com
 @Software:   V2
 @File    :   Constant.py
 @Time    :   2022/8/17
 @Version :   1.0
-@License :   Copyright ©LuxShare  2022 . All Rights Reserved.
+@License :   Copyright ©ins  2022 . All Rights Reserved.
 @Desc    :   None
 """
+import re
 
 
 class Status:
@@ -48,4 +49,15 @@ class Log:
     normal = "normal"
 
 
+# Long PCI address format is as follows
+# Domain(32bits):Bus(8bits):Device(5bits):Function(3bits)
+# Domain is *not* always 0! (ARM systems have multiple ones)
+LONG_PCI_ADDR_REGEX = re.compile(
+    r"^([0-9a-fA-F]{2,8}):([0-9a-fA-F]{2}):([01][0-9a-fA-F])[:\.]0*([0-7])$"
+)
 
+# Short PCI address format is as follows
+# Bus(8bits):Device(5bits).Function(3bits)
+SHORT_PCI_ADDR_REGEX = re.compile(r"^([0-9a-fA-F]{2}):([01][0-9a-fA-F])\.([0-7])$")
+
+SYSFS_PCI_BUS_DEVICES = "/sys/bus/pci/devices/"

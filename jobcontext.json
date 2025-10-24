@@ -11,7 +11,7 @@
         "serverId": "172.17.232.65", 
         "unitId": "KS000202256122P002", 
         "scriptId": "KS000202256122P002,RT", 
-        "parameter": "{\"JobMessage\":\"Station : [RT]\\nMDS State : []->[RT]\\nMDS wc no changed...\",\"JobMode\":\"proc\",\"action\":\"\",\"loopcount\":\"0\",\"nodeCount\":\"1\",\"opid\":\"psc\",\"po\":\"\",\"scriptName\":\"Luxshare-PalosRT\",\"scriptVersion\":\"102\",\"testType\":\"\",\"type\":\"\"}"
+        "parameter": "{\"JobMessage\":\"Station : [RT]\\nMDS State : []->[RT]\\nMDS wc no changed...\",\"JobMode\":\"proc\",\"action\":\"\",\"loopcount\":\"0\",\"nodeCount\":\"1\",\"opid\":\"psc\",\"po\":\"\",\"scriptName\":\"ins-PalosRT\",\"scriptVersion\":\"102\",\"testType\":\"\",\"type\":\"\"}"
     }, 
     "serverData": {
         "controlServer": "172.17.232.65", 
@@ -40,7 +40,7 @@
         "defaultCode": null, 
         "parameter": "check", 
         "os": null, 
-        "toolPath": "LuxScript/Luxshare-PalosRT/102", 
+        "toolPath": "LuxScript/ins-PalosRT/102",
         "bootStrap": "NicFw.py", 
         "estimateTime": "0", 
         "timeout": "1440", 
@@ -82,11 +82,11 @@
             "nextwc": "RT", 
             "ProjectRoot": "LuxScript", 
             "StationCombine": "0", 
-            "ScriptName": "Luxshare-PalosRT", 
+            "ScriptName": "ins-PalosRT",
             "U": "n", 
             "ParentId": "0", 
             "target": "10.190.4.121", 
-            "ProjectName": "Luxshare-PalosRT", 
+            "ProjectName": "ins-PalosRT",
             "TEProduct": null, 
             "UnitModel": "ST0002020018", 
             "ScriptVersion": "102", 
@@ -161,7 +161,7 @@
             {
                 "string": [
                     "scriptName", 
-                    "Luxshare-PalosRT"
+                    "ins-PalosRT"
                 ]
             }, 
             {
@@ -192,7 +192,7 @@
     "flowdata": {
         "uutfrusn": "", 
         "scansn": "KS000202256122P002", 
-        "tcs_data_url": "http://10.102.1.21:2032/luxshare/manufacture/mesapi",
+        "tcs_data_url": "http://10.102.1.21:2032/ins/manufacture/mesapi",
         "http_server_url": "http://191.102.121.21:8080",
         "tcs_server_api": "http://191.102.121.21:8080"
     }
