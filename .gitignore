@@ -9,4 +9,3 @@ Config/*.xml
 demo*.py
 libs/*
 Config/*.xlsx
-result.json

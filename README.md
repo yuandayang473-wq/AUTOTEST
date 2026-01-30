@@ -1,3 +1,1 @@
-# EPT
-
-equip production test
+# AUTOTEST

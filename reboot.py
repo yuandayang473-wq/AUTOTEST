@@ -32,8 +32,6 @@ import time
 #
 # load_package(os.path.abspath(__file__))
 
-from Lib.Template import TempItem
-from Utils.Constant import ErrorCode
 
 
 class reboot(TempItem):
@@ -54,7 +52,7 @@ class reboot(TempItem):
             base_log_name = "{}_pretest0.log".format(time.strftime("%Y%m%d_%H%M%S"))
             self.execute_run(
                 "python3 fw_check.py |tee {}".format(base_log_name))
-        for i in range(1, 4):
+        for i in range(1, 5):
             self.logger.info("第{}次power cycle".format(i))
             with self.ssh_connect(uut=self.config["UUT"]):
                 self.execute_run(
@@ -73,7 +71,7 @@ class reboot(TempItem):
                 self.execute_run(
                 "diff {} {}".format(log_name, base_log_name))
 
-        for i in range(1, 4):
+        for i in range(1, 5):
             self.logger.info("第{}次reboot".format(i))
             with self.ssh_connect(uut=self.config["UUT"]):
                 self.execute_run(

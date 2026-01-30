@@ -12,83 +12,89 @@
 """
 
 import time
+from Lib.logger import Logger
+LOGGER = Logger()
+from Lib.Config import YamlLoadConfig
+import os
 
+def singleton(cls):
+    """A decorator to make a class a Singleton."""
+    instances = {}
 
+    def get_instance(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+
+    return get_instance
+
+@singleton
 class SleepTime:
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-
-        if cls._instance:  # If there is already a singleton, do not grab the lock, to avoid IO wait
-            return cls._instance
-
-        if not cls._instance:
-            cls._instance = super().__new__(cls, *args, **kwargs)
-        return cls._instance
-
-    def __init__(self):
-        self.logger = None
 
     def __call__(self, sec):
-        self.set_sleep_sec(sec)
-
-    def set_logger(self, logger):
-        self.logger = logger
-
-    def _logger_info(self, sec):
-        self.logger.info(f"delay time: {sec} second")
-
-    def set_sleep_sec(self, sec):
-        self._logger_info(sec)
+        LOGGER.info(f"sleep {sec}s")
         time.sleep(sec)
 
-
-class Step:
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-
-        if cls._instance:  # If there is already a singleton, do not grab the lock, to avoid IO wait
-            return cls._instance
-
-        if not cls._instance:
-            cls._instance = super().__new__(cls, *args, **kwargs)
-        return cls._instance
+@singleton
+class ConfigDeal:
 
     def __init__(self):
-        self._logger = None
+        self.__config = {}
 
-    def __call__(self, num=None, desc=None):
-        if num is None and desc is not None:
-            self._logger.info(f"{desc}".center(80, "="))
-        else:
-            self.step_num = num
-            if num >= 2:
-                self.log_step_result(num - 1)
-            self._logger.info(f"step_{num}: {desc}".center(80, "="))
+    @property
+    def config(self):
+        return self.__config
 
-    def set_logger(self, logger):
-        self._logger = logger
+    @config.setter
+    def config(self, confs: list):
+        """解析参数
+        [
+            {
+                "file": "config.yaml",
+                "folder": "Config",
+                "name": "config"
+                "value": "$config:boot"
+            },
+        ]
+        """
+        for conf in confs:
+            if "folder" in conf:
+                c = YamlLoadConfig(cfg_path_name=conf["folder"], cfg_name=conf["file"])
+            else:
+                c = YamlLoadConfig(cfg_name=conf["file"])
 
-    def log_step_result(self, step_num, res="PASS"):
-        if not hasattr(self, "step_num"):
-            return None
-        self._logger.info(f"step_{step_num}: {res}".center(80, "="))
+            if "key" in conf:
+                if isinstance(conf["key"], dict):
+                    data = conf["key"]
+                else:
+                    keys = conf["key"].split("/")
+                    if len(keys) > 1:
+                        data = c.data(keys[0])
+                        for key in keys[1:]:
+                            data = data[key]
+                        else:
+                            self._gen_tool_abspath(keys, data)
+                    else:
+                        if "." in conf["key"]:
+                            keys = conf["key"].split(".")
+                            data = c.get_config()
+                            for key in keys:
+                                data = data[key]
+                        else:
+                            data = c.data(keys[0])
+            else:
+                data = c.get_config()
 
-    def callback(self):
-        pass
-
-
-def get_file_content(file):
-    data = ""
-    with open(file, "r", encoding="utf-8", errors='ignore') as f:
-        while True:
-            d = f.read(1024)
-            if not d:
-                break
-            data += d
-    return data
-
+            self.__config[conf["name"]] = data
+    def _gen_tool_abspath(self, keys, data):
+        for k, v in data.items():
+            if isinstance(v, str):
+                # data[k] = os.path.join(self.root_path, "/".join(keys), v)
+                data[k] = os.path.join("/run/LuxScript", "/".join(keys), v)
+            else:
+                keys.append(k)
+                self._gen_tool_abspath(keys, data[k])
+                keys.pop(keys.index(k))
 
 if __name__ == '__main__':
     pass

@@ -19,7 +19,6 @@ import sys
 
 from Lib.Error import BmcSessionError, SshConnectionError, AuthenticationError, CmdError, PduConfError
 from Lib.Constant import Status
-from Lib.Result import CmdPass, CmdFail
 from Lib.DataBuffer import OutData
 
 
