@@ -27,12 +27,14 @@ def pytest_exception_interact(node, call, report):
 
         # 将格式化后的错误信息写入日志
         LOGGER.error(error_message)
+
 @pytest.fixture(scope="function", autouse=True)
 def show_test_case(request):
-    LOGGER.sys(f"开始测试用例{request.node.name}".center(100, "-"))
+    m = request.node.get_closest_marker("author")
+    name = m.args[0] if m and m.args else "unknown"
+    LOGGER.sys(f"开始测试用例{request.node.name}，用例作者：{name}".center(100, "-"))
     t1 =  time.time()
     yield
     t2 = time.time()
     time_use = round(t2 - t1)
-    LOGGER.sys(f"用例{request.node.name}测试完成".center(100, "-"))
-    LOGGER.sys(f"用例{request.node.name}总用时{time_use}s".center(100, "-"))
+    LOGGER.sys(f"用例{request.node.name}测试完成，总用时{time_use}s".center(100, "-"))

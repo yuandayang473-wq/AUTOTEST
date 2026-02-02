@@ -1,20 +1,5 @@
 # !/usr/bin/python3
 # -*- encoding: utf-8 -*-
-'''
-@Author  :   yuandayang
-@Contact :   Juncheng.Lu@ins-ict.com
-@Software:   TestCase
-@File    :   BmcFwcheck.py
-@Time    :   2023/5/6
-@Version :   1.0
-@License :   Copyright ©ins  2023 . All Rights Reserved.
-@Desc    :   None
-'''
-import os
-import sys
-import subprocess
-import time
-
 import pytest
 
 
@@ -59,7 +44,7 @@ class TestD3hotLoop:
             LOGGER.info("恢复D0状态")
             METHOD.set_power_state(self.ep_bdf, "D0")
 
-    def test_D3_hot_001(self):
+    def test_D3_hot_loop_001(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.set_power_state(self.ep_bdf, "D3hot")
             SLEEP(4)

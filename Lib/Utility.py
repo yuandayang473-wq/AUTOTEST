@@ -12,8 +12,6 @@
 """
 
 import time
-from Lib.logger import Logger
-LOGGER = Logger()
 from Lib.Config import YamlLoadConfig
 import os
 
