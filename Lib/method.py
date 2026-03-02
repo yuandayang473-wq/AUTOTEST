@@ -422,3 +422,76 @@ class Method:
             raise ValueError(f"Invalid power state: {state}")
         LOGGER.info(f"设置{bdf}对应电源状态为{state}")
         self.setpci_bits(bdf, "CAP_PM+4", 1, 0, valid_states[state])
+
+    def get_cx7_devices(self):
+        """
+            获取系统中所有CX7设备的信息
+            :return: 包含CX7设备信息的列表
+        """
+        devices = BASE.execute_run("ibdev2netdev").get_origin_data().split("\n")
+        rdmalink_devices = [line.split()[0] for line in devices]
+        ip_devices = [line.split()[4] for line in devices]
+        return {"rdmalink": rdmalink_devices, "ip": ip_devices}
+
+    def net_test_set_up(self, ip_devices):
+        """
+            网络测试环境准备
+            :param ip_devices: IP设备列表
+        """
+        for i in range(len(ip_devices)):
+            BASE.execute_run(f"ip netns add ns{i}")
+            BASE.execute_run(f"ip link set {ip_devices[i]} netns ns{i}")
+            BASE.execute_run(f"ip netns exec ns{i} ip addr add 100.1.1.{i}/24 dev {ip_devices[i]}")
+            BASE.execute_run(f"ip netns exec ns{i} ip link set {ip_devices[i]} up")
+
+    def start_opensm(self):
+        """
+            启动OpenSM子网管理器
+        """
+        list1 = BASE.execute_run("ibstat |grep 'Port GUID'|awk '{print $NF}'").get_origin_data().strip().split("\n")
+        for i in list1:
+            BASE.execute_run(f"opensm -g {i} -B -p 14")
+
+    def cx7_start_server(self, rdmalink_devices):
+        """
+            启动CX7服务端
+            :param rdmalink_device: RDMA名称
+        """
+        for i in range(len(rdmalink_devices)):
+            BASE.execute_run(f"ip netns exec ns{i} ib_send_bw --report_gbits --run_infinitely --cpu_util -d mlx5_{i} -FD2 -q 4 -m 4096 -s 512K &>/dev/null &")
+
+    def cx7_start_client(self, rdmalink_devices):
+        """
+            启动CX7客户端
+            :param rdmalink_device: RDMA名称
+        """
+        for i in range(len(rdmalink_devices)):
+            for j in range(len(rdmalink_devices)):
+                if j != i:
+                    remote_ip = f"100.1.1.{j}"
+                    BASE.execute_run(f"ip netns exec ns{i} ping -c 2 -W 1 {remote_ip}", i_exit_code=True)
+                    if BASE.ssh.get_exit_code() == 0:
+                        LOGGER.info(f"发现可达IP{remote_ip}")
+                        BASE.execute_run(f"ip netns exec ns{i} ib_send_bw --report_gbits --run_infinitely --cpu_util -d mlx5_{i} -FD2 -q 4 -m 4096 -s 512K {remote_ip} &>/dev/null &")
+                        break
+            else:
+                LOGGER.info(f"未发现可达IP，无法启动客户端{rdmalink_devices[i]}")
+
+    def clear_netns(self):
+        """
+            清理网络命名空间
+        """
+        namespaces = BASE.execute_run("ip netns list").get_origin_data().strip().split("\n")
+        for ns in namespaces:
+            ns_name = ns.split()[0]
+            if ns_name != "Null":
+                BASE.execute_run(f"ip netns delete {ns_name}")
+            else:
+                LOGGER.info("未发现网络命名空间，无需清理")
+
+    def kill_ib_process(self):
+        """
+            杀死所有ib进程
+        """
+        LOGGER.info("杀死所有ib进程")
+        BASE.execute_run("killall ib_send_bw ib_send_lat ib_write_bw ib_write_lat ib_read_bw ib_read_lat ib_atomic_bw ib_atomic_lat", i_exit_code=True)

@@ -12,6 +12,7 @@
 """
 
 import logging
+import threading
 import time
 import os
 import shutil
@@ -35,7 +36,6 @@ LOG_INFO: Fore.WHITE,
 LOG_WARN: Fore.YELLOW,
 LOG_ERROR: Fore.RED,
 LOG_SYS: Fore.GREEN}
-
 @singleton
 class Logger:
 
@@ -58,7 +58,6 @@ class Logger:
         self.logger.addHandler(sh)
         fh.addFilter(self._remove_color_filter())  # 添加过滤器移除颜色代码
         self.logger.addHandler(fh)
-
 
     def sys(self, msg, *args, **kwargs):
         t = time.strftime("[%Y-%m-%d %H:%M:%S]", time.localtime())

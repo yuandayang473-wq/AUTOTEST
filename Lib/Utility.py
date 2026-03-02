@@ -12,19 +12,13 @@
 """
 
 import time
+
+from Lib.decorate import singleton
+from Lib.logger import Logger
 from Lib.Config import YamlLoadConfig
 import os
+LOGGER = Logger()
 
-def singleton(cls):
-    """A decorator to make a class a Singleton."""
-    instances = {}
-
-    def get_instance(*args, **kwargs):
-        if cls not in instances:
-            instances[cls] = cls(*args, **kwargs)
-        return instances[cls]
-
-    return get_instance
 
 @singleton
 class SleepTime:

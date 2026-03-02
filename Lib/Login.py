@@ -20,15 +20,16 @@ import sys
 from Lib.Error import BmcSessionError, SshConnectionError, AuthenticationError, CmdError, PduConfError
 from Lib.Constant import Status
 from Lib.DataBuffer import OutData
-
+from Lib.Result import CmdFail, CmdPass
+from SSHLibrary import SSHLibrary
 
 def cmd_retry(origin_func):
-    def wrapper(self, command, ignore_exit_code, save_exit_code, cmd_timeout, i_timeout_err):
+    def wrapper(self, command, ignore_exit_code, cmd_timeout):
         count = self.get_cmd_retry_count()
         init_val = 1
         while init_val <= count:
             try:
-                rst = origin_func(self, command, ignore_exit_code, save_exit_code, cmd_timeout, i_timeout_err)
+                rst = origin_func(self, command, ignore_exit_code, cmd_timeout)
             except Exception as error:
                 self.get_logger().error(error)
                 msg = "Execute Command Fail,start retry %d command: %s" % (init_val, command)
@@ -242,12 +243,13 @@ class SshConnect(Connection):
         # self.__timeout = timeout
         self.__cmd_count = 3
         self._bmc_con = bmc_con
-        self.trans = None
+        self.ssh_library = None
+        # self.trans = None
         self.__exit_code = Status.SUCCESS
-        self.channel = None
-        self.invoke_buff = []
-        self.first_invoke = True
-        self.s_invoke = True
+        # self.channel = None
+        # self.invoke_buff = []
+        # self.first_invoke = True
+        # self.s_invoke = True
         self.__port = port
 
     def __enter__(self):
@@ -257,13 +259,18 @@ class SshConnect(Connection):
         while init_val <= count:
             try:
                 #  instance a sshclient
-                trans = paramiko.Transport((self.get_host(), self.__port))  # 如果你使用 paramiko.SSHClient() cd后会回到连接的初始状态
-                trans.start_client()
-                trans.set_keepalive(60)
-                # username and password
-                trans.auth_password(username=self.get_username(), password=self.get_password())
-                self.trans = trans
-                # get a terminal
+                if self.ssh_library is None:
+                    self.ssh_library = SSHLibrary(30)
+                self.ssh_library.open_connection(host=self.get_host(), alias='vps', port=int(self.__port), timeout=30)
+                self.ssh_library.login(username=self.get_username(), password=self.get_password())
+
+                # trans = paramiko.Transport((self.get_host(), self.__port))  # 如果你使用 paramiko.SSHClient() cd后会回到连接的初始状态
+                # trans.start_client()
+                # trans.set_keepalive(60)
+                # # username and password
+                # trans.auth_password(username=self.get_username(), password=self.get_password())
+                # self.trans = trans
+                # # get a terminal
                 log.info("ssh connect success, ip: {os_ip}".format(os_ip=self.get_host()))
                 return self
 
@@ -289,9 +296,8 @@ class SshConnect(Connection):
     def __exit__(self, exc_type, exc_value, exc_tb):
         log = self.get_logger()
         log.info("ssh Disconnect, ip: {os_ip}".format(os_ip=self.get_host()))
-        if self.trans is not None:
-            self.trans.close()
-
+        if self.ssh_library is not None:
+            self.ssh_library.close_connection()
         if exc_type is not None:
             raise exc_value
 
@@ -343,15 +349,14 @@ class SshConnect(Connection):
         remote_cmd = bmc_con.build_command(cmd)
         return remote_cmd
 
-    def run(self, command, retry_expt=1, ipmi_I=False, i_exit_code=False, i_record_cmd=False, save_exit_code=False,
-            cmd_timeout=3600, i_timeout_err=False):
+    def run(self, command, retry_expt=1, ipmi_I=False, i_exit_code=False, i_record_cmd=False,
+            cmd_timeout=3600):
         """
         :param command: os 下执行的命令
         :param retry_expt: cmd 执行fail，重试的次数， 默认是3次
         :param ipmi_I: True 开启 ipmitool -I -H -U -P [cmd] 格式
         :param i_exit_code: 忽略退出状态码， 执行命令结果按照返回状态码0为标准，命令执行返回状态码不为0，程序继续执行需要改成True
         :param i_record_cmd: 忽略当前命令记录日志中
-        :param save_exit_code: 需要获得当前命令返回状态码，则设置为True，通过get_exit_code()
         :return: DataBuffer模块中 OutData 的实例对象
         """
         self.set_cmd_retry_count(retry_expt)
@@ -359,7 +364,7 @@ class SshConnect(Connection):
             command = self.build_remote_cmd(command)
         if not i_record_cmd:
             self.get_logger().info("SSH Execute command: %s" % command)
-        result = self._run(command, i_exit_code, save_exit_code, cmd_timeout, i_timeout_err)
+        result = self._run(command, i_exit_code, cmd_timeout)
         if result.is_fail():
             self.get_logger().error("Execute Command Fail, Output below \n%s" % result.get_out_rst())
             raise CmdError(f"cmd execute fail: {command}")
@@ -367,51 +372,50 @@ class SshConnect(Connection):
         return OutData(result.get_out_rst())
 
     @cmd_retry
-    def _run(self, command, ignore_exit_code, save_exit_code, cmd_timeout, i_timeout_err):
-        # opne a transport
-        channel = self.trans.open_session()
-        # channel.settimeout(self.get_timeout())
-        channel.settimeout(cmd_timeout)
-        channel.get_pty()
-        # try:
-        channel.exec_command(command)
-
-        # if i_timeout_err:
-        #     return CmdPass(Status.SUCCESS, f'timeout: {cmd_timeout},auto stop cmd {command}')
-        all_data = ""
-        start_time = time.time()  # 命令开始时间
+    def _run(self, command, ignore_exit_code, cmd_timeout):
+        # # opne a transport
+        # channel = self.trans.open_session()
+        # # channel.settimeout(self.get_timeout())
+        # channel.settimeout(cmd_timeout)
+        # channel.get_pty()
+        # # try:
+        # channel.exec_command(command)
+        #
+        # # if i_timeout_err:
+        # #     return CmdPass(Status.SUCCESS, f'timeout: {cmd_timeout},auto stop cmd {command}')
+        # all_data = ""
+        # start_time = time.time()  # 命令开始时间
         try:
-            data = channel.recv(1024).decode("utf-8")
-            while data:
-                all_data += data
-                data = channel.recv(1024).decode("utf-8")
-                end_time = time.time()
-                t = int(end_time - start_time)
-                if t > cmd_timeout and i_timeout_err:
-                    # if i_timeout_err:
-                    self.get_logger().info(f'timeout: {cmd_timeout},auto stop cmd {command}')
-                    return CmdPass(Status.SUCCESS, all_data)
-                time.sleep(1)
-        except Exception as err:
             # data = channel.recv(1024).decode("utf-8")
-            # all_data += data
-            if i_timeout_err:
-                self.get_logger().info(f'timeout: {cmd_timeout},auto stop cmd {command}')
-                return CmdPass(Status.SUCCESS, all_data)
-        status_code = channel.recv_exit_status()
-        channel.close()
+            # while data:
+            #     all_data += data
+            #     data = channel.recv(1024).decode("utf-8")
+            #     end_time = time.time()
+            #     t = int(end_time - start_time)
+            #     if t > cmd_timeout and i_timeout_err:
+            #         self.get_logger().info(f'timeout: {cmd_timeout},auto stop cmd {command}')
+            #         return CmdPass(Status.SUCCESS, all_data)
+            #     time.sleep(1)
+            stdout, stderr, result_code = self.ssh_library.execute_command(command, return_rc=True, return_stderr=True,
+                                                                           timeout=cmd_timeout)
+            result = stdout + stderr
+
+        except Exception as err:
+            # if i_timeout_err:
+            #     self.get_logger().info(f'timeout: {cmd_timeout},auto stop cmd {command}')
+            #     return CmdPass(Status.SUCCESS, all_data)
+        # status_code = channel.recv_exit_status()
+        # channel.close()
+            pass
+        self.__exit_code = result_code
 
         if ignore_exit_code:
-            return CmdPass(Status.SUCCESS, all_data)
+            return CmdPass(Status.SUCCESS, result)
 
-        if save_exit_code:
-            self.__exit_code = status_code
-            return CmdPass(Status.SUCCESS, all_data)
+        if result_code == Status.SUCCESS:
+            return CmdPass(Status.SUCCESS, result)
 
-        if status_code == Status.SUCCESS:
-            return CmdPass(Status.SUCCESS, all_data)
-
-        return CmdFail(Status.FAIL, all_data)
+        return CmdFail(Status.FAIL, result)
 
     def start_invoke(self):
         if self.channel is None:

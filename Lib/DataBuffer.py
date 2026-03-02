@@ -163,9 +163,7 @@ class StrParser(Parser):
         """
         :return: 原始字符串数据
         """
-        if self.data:
-            return self.data.strip()
-        return MATCH_FAIL
+        return self.data
 
     def filter_value(self, match):
         """
