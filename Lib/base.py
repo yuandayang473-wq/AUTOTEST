@@ -19,7 +19,6 @@ import time
 
 import yaml
 
-from .Constant import SHORT_PCI_ADDR_REGEX, SYSFS_PCI_BUS_DEVICES, LONG_PCI_ADDR_REGEX
 from .Error import OverrideError, SSHSessionError
 from .Login import SshConnect, BmcConnect
 from .DataBuffer import StrParser
@@ -45,8 +44,7 @@ class Base:
         """
         :param cmd: os 系统命令
         :param parser_type:  解析器类型 [str_parser/raw_parser], 默认 str_parser
-        :param kwargs:  Login.SshConnect.run 中的参数 retry_expt=3, ipmi_I=False, i_exit_code=False, i_record_cmd=False,
-                        save_exit_code=False,cmd_timeout=3600,i_timeout_err 参数详解看 Login.SshConnect.run
+        :param kwargs:  Login.SshConnect.run 中的参数 retry_expt=3, ipmi_I=False, i_exit_code=False, i_record_cmd=False,cmd_timeout=3600,i_timeout_err 参数详解看 Login.SshConnect.run
         :return: DataBuffer.StrParser/DataBuffer.RawParser 实例对象
         """
         if self.ssh is None:
@@ -90,7 +88,7 @@ class Base:
         """默认连接bmc 的os"""
         if uut is None:
             uut = self.config["BMC"]
-        with SshConnect(ip=uut["ip_address"], user=uut["username"], password=uut["password"],
+        with SshConnect(ip=uut["ip"], user=uut["username"], password=uut["password"],
                         port=uut.get("port", 22), logger=LOGGER, login_retry=login_retry) as ssh:
             self.ssh = ssh
             yield

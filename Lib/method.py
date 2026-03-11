@@ -2,8 +2,10 @@ import json
 import os
 import re
 import time
+import traceback
 from collections import defaultdict, namedtuple
 
+import paramiko
 import yaml
 
 from Lib.Constant import *
@@ -20,18 +22,18 @@ class Method:
     def get_bdf(self):
         """
         查找所有SW上usp,mep,dma,ntb,ep及dsp信息
-        :return {'0000': [{'usp': '71:00.0', 'eps': [{'dsp': '72:04.0', 'ep': '77:00.0', 'driver': 'nvme', 'name': 'NA'}, {'dsp': '72:05.0', 'ep': '78:00.0', 'driver': 'nvme', 'name': 'EP_SSD_WDAN1500'}], 'mep': {'dsp': '72:1c.0', 'ep': '79:00.0', 'driver': 'nvme', 'name': 'NA'}, 'dma': [{'dsp': '72:1d.0', 'ep': '7a:00.0', 'driver': 'Null', 'name': 'NA'}, {'dsp': '72:1e.0', 'ep': '7b:00.0', 'driver': 'Null', 'name': 'NA'}], 'ntb': {}}]}
+        :return {'0000': [{'usp': '0000:06:00.0', 'eps': [{'dsp': '0000:07:00.0', 'ep': '0000:08:00.0', 'driver': 'nvme', 'name': 'EP_SSD_INTEL900P'}], 'mep': {'dsp': '0000:07:1c.0', 'ep': '0000:0e:00.0', 'driver': 'nvme', 'name': 'NA'}, 'dma': [{'dsp': '0000:07:1d.0', 'ep': '0000:0f:00.0', 'driver': '', 'name': 'NA'}, {'dsp': '0000:07:1e.0', 'ep': '0000:10:00.0', 'driver': '', 'name': 'NA'}], 'ntb': {}}]})
         """
         # 读取vendor.yml
         vendor_file = os.path.abspath(os.path.join(os.path.abspath(__file__), "../")) + "/vendor.yml"
         with open(vendor_file, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
             sw_vd = data["SW_VD"]
-            mep_vd = data["EP_SWITCH_SUDU_MEP"]
+            mep_vd = data["EP_SWITCH_SUDU_MEP_SUB"]
             mep_dsp_vd = data["DSP_MEP_VD"]
-            dma_vd = data["EP_SWITCH_SUDU_DMA"]
+            dma_vd = data["EP_SWITCH_SUDU_DMA_SUB"]
             dma_dsp_vd = data["DSP_DMA_VD"]  # 列表
-            ntb_vd = data["EP_SWITCH_SUDU_NTB"]
+            ntb_vd = data["EP_SWITCH_SUDU_NTB_SUB"]
             ntb_dsp_vd = data["DSP_NTB_VD"]
             eps = data["EPS"]
 
@@ -46,11 +48,11 @@ class Method:
         for key, value in dict_all.items():
             sudu_sw = value
             # 判断是否为合成模式
-            sw_bdf = [i[5:12] for i in sudu_sw]
+            sw_bdf = [i[0:12] for i in sudu_sw]
             usp = []
             sw = []
             for index, bdf in enumerate(sw_bdf):
-                BASE.execute_run(f"lspci -vs {bdf} |grep -w Upstream", save_exit_code=True)
+                BASE.execute_run(f"lspci -vs {bdf} |grep -w Upstream", i_exit_code=True)
                 check_usp = BASE.ssh.get_exit_code()
                 if check_usp == 0:
                     usp.append({"bdf": bdf, "index": index})
@@ -66,8 +68,8 @@ class Method:
 
             # 只考虑基础和合成模式，即最多只有2个switch情况，其它多switch情况暂不考虑
             # 判断哪个switch有mep，即sw0
-            mep_res = BASE.execute_run(f"lspci -Dd {mep_vd}").get_origin_data()
-            if mep_res[5:12] in sw[0]:
+            mep_ep = BASE.execute_run(f'lspci -vvv | grep -B 10 "{mep_vd}" | grep "^[0-9a-f]"').get_origin_data().split()[0]
+            if key + ":"  + mep_ep in sw[0]:
                 pass  # 第一个switch有mep,无需操作
             else:
                 sw[0], sw[1] = sw[1], sw[0]  # 带mep的switch放到首位置
@@ -77,12 +79,12 @@ class Method:
             # 'dma': [{'dsp': xxx, 'ep': xxx, 'driver': xxx},{}...],
             # 'ntb': {'dsp': xxx, 'ep': xxx, 'driver': xxx}, {}]
             all_sudu_sw = defaultdict(list)
-            mep_ep = mep_res[5:12]
-            dma_ep_list = [dma_ep[5:12] for dma_ep in
-                           BASE.execute_run(f"lspci -Dd {dma_vd} |awk -F ' ' '{{print $1}}'").get_origin_data().split()]
-            ntb_ep_list = [ntb_ep[5:12] for ntb_ep in
-                           BASE.execute_run(f"lspci -Dd {ntb_vd} |awk -F ' ' '{{print $1}}'").get_origin_data().split()]
-
+            dma_list = BASE.execute_run(f'lspci -vvv | grep -B 10 "{dma_vd}" | grep "^[0-9a-f]"',
+                             i_exit_code=True).get_origin_data().split("\n")
+            dma_ep_list = [key + ":"  + dma_ep[0:7] for dma_ep in dma_list] if dma_list else []
+            ntb_list = BASE.execute_run(f'lspci -vvv | grep -B 10 "{ntb_vd}" | grep "^[0-9a-f]"',
+                             i_exit_code=True).get_origin_data().split("\n")
+            ntb_ep_list = [key + ":"  + ntb_ep[0:7] for ntb_ep in ntb_list] if ntb_list else []
             for partition in sw:
                 mep_dict = {}  # 构建mep字典
                 dma_arr = []  # 构建dma字典
@@ -96,15 +98,13 @@ class Method:
                     if not res:
                         continue  # iep的情况
                     secondary_bus, subordinate_bus = res[0]
-                    if secondary_bus == "00":
-                        continue
-                    elif secondary_bus == subordinate_bus:
-                        if BASE.execute_run(f"lspci -s {secondary_bus}:00.0").get_origin_data() != "Null":
-                            ep_bdf.append(secondary_bus + ":00.0")
+                    if secondary_bus == subordinate_bus: #单bus号的ep
+                        if BASE.execute_run(f"lspci -s {secondary_bus}:00.0").get_origin_data() != "":
+                            ep_bdf.append(key + ":"  + secondary_bus + ":00.0")
                         else:
                             continue  # dsp下无ep的情况
-                    else:
-                        ep_bdf.append(f"{secondary_bus}:00.0")
+                    else: #多bus号的ep，只取第一个bus号下的ep
+                        ep_bdf.append(key + ":"  + f"{secondary_bus}:00.0")
                     driver_res = BASE.execute_run(
                         f"lspci -vvs {ep_bdf[0]} |grep 'driver in use' |awk -F ' ' '{{print $NF}}'").get_origin_data()
                     ep_vd = BASE.execute_run(f"lspci -ns {ep_bdf[0]} |awk -F ' ' '{{print $3}}'").get_origin_data()
@@ -114,7 +114,7 @@ class Method:
                             break
                         else:
                             name = "NA"
-                    if ep_bdf[0] == mep_ep:
+                    if ep_bdf[0] == key + ":"  + mep_ep:
                         mep_dict["dsp"] = bdf
                         mep_dict["ep"] = ep_bdf[0]
                         mep_dict["driver"] = driver_res
@@ -148,19 +148,20 @@ class Method:
 
 
         devices = []
-        parser = BASE.execute_run(f"lspci -Dnd '205e': | awk '{{if($2==\"0604:\")print $1}}'")
+        parser = BASE.execute_run(f"lspci -Dnd '205e': | awk '{{if($2==\"0604:\")print $1}}'", i_record_cmd=True)
         msg = parser.get_origin_data()
         switchinfo = msg.strip().split('\n')
 
         usplist = []
 
         for dev in switchinfo:
-            BASE.execute_run(f"lspci -vvvs {dev} | grep -i 'Upstream Port'", save_exit_code=True)
+            BASE.execute_run(f"lspci -vvvs {dev} | grep -i 'Upstream Port'", i_exit_code=True, i_record_cmd=True)
             if BASE.ssh.get_exit_code() == 0:
                 usplist.append(dev)
 
         dma_p = []
-        mep_p = ''
+        mep_p = []
+        ntb_p = []
         for usp in usplist:
             uspbdf, dspbdf_list, epbdf_list = self.get_all_device(usp)
             devices.append(self.get_device(usp, 'USP'))
@@ -169,13 +170,17 @@ class Method:
                 if device.type == 'DMA':
                     dma_p.append(device.parent)
                 elif device.type == 'MEP':
-                    mep_p = device.parent
+                    mep_p.append(device.parent)
+                elif device.type == 'NTB':
+                    ntb_p.append(device.parent)
                 devices.append(device)
             for dsp in dspbdf_list:
                 if dsp in dma_p:
                     device = self.get_device(dsp, 'DMA_IDSP')
-                elif dsp == mep_p:
+                elif dsp in mep_p:
                     device = self.get_device(dsp, 'MEP_IDSP')
+                elif dsp in ntb_p:
+                    device = self.get_device(dsp, 'NTB_IDSP')
                 else:
                     device = self.get_device(dsp, 'DSP')
                 devices.append(device)
@@ -189,7 +194,7 @@ class Method:
         """
         parser = BASE.execute_run(
             f"ls -d /sys/bus/pci/devices/{bdf}/*/ | egrep '(([0-9a-f]+:)+[0-9a-f]{{2}}.[0-7]/){{2}}' | awk -F/ '{{print $(("
-            f"NF-1))}}'")
+            f"NF-1))}}'", i_record_cmd=True)
         dsp = parser.get_origin_data()
         if 'No such file or directory' in dsp:
             dsp = []
@@ -198,7 +203,7 @@ class Method:
 
         parser = BASE.execute_run(
             f"ls -d /sys/bus/pci/devices/{bdf}/*/*/ | egrep '(([0-9a-f]+:)+[0-9a-f]{{2}}.[0-7]/){{3}}' | awk -F/ '{{print "
-            f"$((NF-1))}}'")
+            f"$((NF-1))}}'", i_record_cmd=True)
         ep = parser.get_origin_data()
         if 'No such file or directory' in ep:
             ep = []
@@ -212,9 +217,13 @@ class Method:
                                        'cap_speed', 'cap_width', 'current_speed', 'current_width', 'driver', 'slot',
                                        'parent', 'children', "aer_status"])
         bdf_mod = bdf[5:12] if bdf[0:3] == '000' else bdf
-        all_info = BASE.execute_run(f'lspci -vvvns {bdf_mod} | grep -E "({bdf_mod}|LnkCap:|LnkSta:|Kernel driver|Physical Slot)"').get_origin_data()
+        all_info = BASE.execute_run(f'lspci -vvvns {bdf_mod} | grep -E "({bdf_mod}|LnkCap:|LnkSta:|Kernel driver|Physical Slot|Subsystem)"', i_record_cmd=True).get_origin_data()
         class_code, vendor_id, device_id = re.search(f"{bdf_mod}\s+(.+?):\s+(.+?):(\\w+)", all_info).groups()
         cap_speed, cap_width, current_speed, current_width = re.search(r"LnkCap:.*?Speed\s+(.+?),\s+Width\s+x(.+?),.*?LnkSta:\s+Speed\s+(.+?)\s+.*?Width\s+x(.+?)\s+", all_info, flags=re.S).groups()
+        if re.search(r"Subsystem:\s+(.+)", all_info):
+            sub_id = re.search(r"Subsystem:\s+(.+)", all_info).group(1)
+        else:
+            sub_id = "Null"
         if re.search(r"Kernel\s+driver\s+in\s+use:\s+(.+)", all_info):
             driver = re.search(f"Kernel\s+driver\s+in\s+use:\s+(.+)", all_info).group(1)
         else:
@@ -227,51 +236,88 @@ class Method:
         children = self.get_children_device(bdf)
         aer_status = self.get_aer_status_info(bdf)
         if Type == 'EP':
-            if f'{vendor_id}:{device_id}' == '205e:0020':
+            if f'{sub_id}' == '205e:2005':
                 Type = 'DMA'
-            if f'{vendor_id}:{device_id}' == '205e:0030':
+            if f'{sub_id}' == '205e:2006':
                 Type = 'MEP'
+            if f'{sub_id}' == '205e:2004':
+                Type = 'NTB'
         return device(bdf, device_id, vendor_id, Type, class_code, cap_speed,
                       cap_width, current_speed, current_width, driver, slot, parent, children, aer_status)
 
-    def expand_pci_addr(self, pci_addr):
-        """
-        Convert a possibly shortened PCI address to its expanded form, including
-        normalizing the formatting of long addresses
-        """
+    def parse_cesta(self, cesta_hex):
+        if not cesta_hex or not re.match(r'^[0-9A-Fa-f]+$', cesta_hex):
+            return ''
 
-        m1 = LONG_PCI_ADDR_REGEX.match(pci_addr)
-        m2 = SHORT_PCI_ADDR_REGEX.match(pci_addr)
+        v = int(cesta_hex, 16)
+        flags = [
+            ("RxErr", 0),
+            ("BadTLP", 6),
+            ("BadDLLP", 7),
+            ("Rollover", 8),
+            ("Timeout", 12),
+            ("AdvNonFatalErr", 13),
+        ]
+        parts = []
+        for name, bit in flags:
+            parts.append(f"{name}{['-', '+'][(v >> bit) & 1]}")
+        return " ".join(parts)
 
-        if m1:
-            domain, bus, device, function = map(lambda n: int(n, 16), m1.groups())
-            return "{:04x}:{:02x}:{:02x}.{:x}".format(domain, bus, device, function)
-        if m2:
-            bus, device, function = map(lambda n: int(n, 16), m2.groups())
-            return "{:04x}:{:02x}:{:02x}.{:x}".format(0, bus, device, function)
-        return None
+    def parse_devsta(self, devsta_hex):
+        if not devsta_hex or not re.match(r'^[0-9A-Fa-f]+$', devsta_hex):
+            return ''
+        v = int(devsta_hex, 16)
+        flags = [
+            ("CorrErr", 0),
+            ("NonFatalErr", 1),
+            ("FatalErr", 2),
+            ("UnsupReq", 3),
+            ("AuxPwr", 4),
+            ("TransPend", 5),
+        ]
+        parts = []
+        for name, bit in flags:
+            parts.append(f"{name}{['-', '+'][(v >> bit) & 1]}")
+        return " ".join(parts)
+
+    def parse_uesta(self, uesta_hex):
+        if not uesta_hex or not re.match(r'^[0-9A-Fa-f]+$', uesta_hex):
+            return ''
+        v = int(uesta_hex, 16)
+        flags = [
+            ("DLP", 0),
+            ("SDES", 1),
+            ("TLP", 2),
+            ("FCP", 3),
+            ("CmpltTO", 4),
+            ("CmpltAbrt", 5),
+            ("UnxCmplt", 6),
+            ("RxOF", 7),
+            ("MalfTLP", 8),
+            ("ECRC", 9),
+            ("UnsupReq", 10),
+            ("ACSViol", 13),
+        ]
+        parts = []
+        for name, bit in flags:
+            parts.append(f"{name}{['-', '+'][(v >> bit) & 1]}")
+        return " ".join(parts)
 
     def get_aer_status_info(self, bdf):
-        aer_info = {}
-        device_name = self.expand_pci_addr(bdf)
-        if not device_name:
-            return None
-        stat_names = ["aer_dev_correctable", "aer_dev_fatal", "aer_dev_nonfatal"]
-        for stat_name in stat_names:
-            filename = SYSFS_PCI_BUS_DEVICES + device_name + "/" + stat_name
-            res = BASE.execute_run(f"if [ -f {filename} ]; then cat {filename}; fi").get_origin_data()
-            if res == "Null":
-                continue
-            else:
-                stats = {}
-                for line in res.split("\n"):
-                    key, value = line.strip().split()
-                    stats[key] = int(value)
-                aer_info[stat_name] = stats
-
-        if len(aer_info) == 0:
-            return None
-        return aer_info
+        devsta = BASE.execute_run(f"setpci -s {bdf} CAP_EXP+0x0a.w", i_record_cmd=True).get_origin_data()
+        uesta = BASE.execute_run(f"setpci -s {bdf} ECAP_AER+0x04.l", i_exit_code=True, i_record_cmd=True).get_origin_data()
+        ret_ue = BASE.ssh.get_exit_code()
+        cesta = BASE.execute_run(f"setpci -s {bdf} ECAP_AER+0x10.l", i_exit_code=True, i_record_cmd=True).get_origin_data()
+        ret_ce = BASE.ssh.get_exit_code()
+        if ret_ue != 0:
+            uesta = 'aer cap not found'
+        if ret_ce != 0:
+            cesta = 'aer cap not found'
+        return {
+            'DevSta': self.parse_devsta(devsta.strip()),
+            'UESta': self.parse_uesta(uesta.strip()),
+            'CESta': self.parse_cesta(cesta.strip()),
+        }
 
     def get_vendor_deviceid(self, bdf):
         parser = BASE.execute_run(f"lspci -ns {bdf} | awk '{{print $3}}'")
@@ -282,7 +328,7 @@ class Method:
     def get_parent_device(self, bdf):
         msg = BASE.execute_run(
             f"ls -d /sys/bus/pci/devices/*/{bdf}/ | egrep '(([0-9a-f]+:)+[0-9a-f]{{2}}.[0-7]/){{2}}' | awk "
-            f"-F/ '{{print $((NF-2))}}'").get_origin_data()
+            f"-F/ '{{print $((NF-2))}}'", i_record_cmd=True).get_origin_data()
         if 'No such file or directory' in msg:
             msg = ''
         else:
@@ -292,7 +338,7 @@ class Method:
     def get_children_device(self, bdf):
         msg = BASE.execute_run(
             f"ls -d /sys/bus/pci/devices/{bdf}/*/ | egrep '(([0-9a-f]+:)+[0-9a-f]{{2}}.[0-7]/){{2}}' | awk "
-            f"-F/ '{{print $((NF-1))}}'").get_origin_data()
+            f"-F/ '{{print $((NF-1))}}'", i_record_cmd=True).get_origin_data()
         if 'No such file or directory' in msg:
             msg = []
         else:
@@ -334,7 +380,11 @@ class Method:
         LOGGER.info(f"reset {bdf} success")
 
     def read_config_lspci(self, bdf):
-        BASE.execute_run(f"lspci -vvvs {bdf} | grep 'Unknown header type'", cmd_timeout=120, save_exit_code=True)
+        res = BASE.execute_run(f"hexdump /sys/bus/pci/devices/{bdf}/config").get_origin_data()
+        if res.split('\n')[0].split()[1] == "ffff":
+            return False
+        else:
+            return True
 
     def save_data_file(self, data, filename):
         data = [d._asdict() for d in data]
@@ -404,13 +454,30 @@ class Method:
             :param width: 读取宽度，b, h, w
             :return: 读取的值
         """
-        cmd = f"devmem2 {hex(address)} {width}"
+        cmd = f"devmem2 0x{address} {width}"
         output = BASE.execute_run(cmd).get_origin_data()
-        match = re.search(r"Value at address .* \(0x[0-9a-fA-F]+\) is (0x[0-9a-fA-F]+)", output)
+        match = re.search(r"\): (0x[0-9a-fA-F]+)", output)
         if match:
             return match.group(1)
         else:
             raise ValueError("Failed to read memory address")
+    def get_bar_address(self, bdf, bar_num=0):
+        """
+            获取 PCIe 设备的 BAR 地址
+            :param bdf: PCI 设备地址，如 "0000:17:00.0"
+            :param bar_num: BAR编号，0-5
+            :return: BAR地址
+        """
+        if not (0 <= bar_num <= 5):
+            raise ValueError("bar_num must be between 0 and 5")
+        cmd = f"lspci -s {bdf} -vvv | grep 'Region {bar_num}:'"
+        output = BASE.execute_run(cmd).get_origin_data()
+        match = re.search(r"Region {}: Memory at ([0-9a-fA-F]+)".format(bar_num), output)
+        if match:
+            return match.group(1)
+        else:
+            raise ValueError(f"Failed to get BAR{bar_num} address for {bdf}")
+
     def set_power_state(self, bdf, state):
         """
             设置 PCIe 设备的电源状态
@@ -495,3 +562,106 @@ class Method:
         """
         LOGGER.info("杀死所有ib进程")
         BASE.execute_run("killall ib_send_bw ib_send_lat ib_write_bw ib_write_lat ib_read_bw ib_read_lat ib_atomic_bw ib_atomic_lat", i_exit_code=True)
+
+    def upload_file_to_server(self, src_file, des_file, host, username,
+                              password, port="22"):
+        """
+        向远程服务器传送文件
+        :param src_file: 本地文件路径,以data文件夹为开头
+        :param des_file: 远程主机的文件路径
+        :param host: 主机名
+        :param username: 用户名
+        :param password: 密码
+        :param port: 端口
+        :return flag: True|False
+        @Author: wuhao
+        """
+        try:
+            LOGGER.info("【向远程主机{}上位置{}, 传送文件{}】".format(host, des_file, src_file))
+            self.trans_client = paramiko.Transport((host, int(port)))
+            self.trans_client.connect(username=username, password=password)
+            self.sftp = paramiko.SFTPClient.from_transport(self.trans_client)
+            self.sftp.put(src_file, des_file)
+            self.trans_client.close()
+            LOGGER.info("【向远程主机传送文件{}成功】".format(src_file))
+            return True
+        except Exception as e:
+            LOGGER.error("【向远程主机传送文件{}异常】".format(src_file))
+            LOGGER.error(traceback.format_exc())
+            return False
+    def link_enable(self, dsp, enable=True):
+        """
+            启用PCIe设备的链路
+            :param dsp: PCI设备地址，如 "0000:17:00.0"
+        """
+        LOGGER.info(f"启用或关闭{dsp}对应链路")
+        if enable == True:
+            self.setpci_bits(dsp, "CAP_EXP+10", 4, 4, 0)
+        else:
+            self.setpci_bits(dsp, "CAP_EXP+10", 4, 4, 1)
+    def get_pm_state(self, bdf):
+        """
+            获取PCIe设备的电源状态
+            :param bdf: PCI设备地址，如 "0000:17:00.0"
+            :return: 电源状态字符串，如 "D0", "D1", "D2", "D3hot", "D3cold"
+        """
+        res = BASE.execute_run(f"lspci -vvvs {bdf}|grep -A 2 'Power Management'|grep Status|awk '{{print$2}}'").get_origin_data()
+        return res
+    def get_pm_suport_pme_states(self, bdf):
+        """
+            获取PCIe设备能生成PME的电源状态列表
+            :param bdf: PCI设备地址，如 "0000:17:00.0"
+            :return: 能生成PME的电源状态列表，如 ["D0", "D1", "D2", "D3hot", "D3cold"]
+        """
+        res = BASE.execute_run(f"lspci -vvvs {bdf}|grep -A 2 'Power Management'|grep Flags|awk '{{print$7}}'").get_origin_data()
+        cap = re.findall(r"([\d|a-zA-z]+)\+", res)
+        LOGGER.info("能生成PME的电源状态列表有: {}".format(cap))
+        return cap
+
+    def ASPM_enable(self, bdf, L0s=True, L1=True):
+        """
+            启用或禁用PCIe设备的ASPM
+            :param bdf: PCI设备地址，如 "0000:17:00.0"
+            :param True启用，False禁用
+        """
+        LOGGER.info(f"启用或禁用{bdf}对应ASPM")
+        if L0s:
+            self.setpci_bits(bdf, "CAP_EXP+10", 0, 0, 1)
+        else:
+            self.setpci_bits(bdf, "CAP_EXP+10", 0, 0, 0)
+        if L1:
+            self.setpci_bits(bdf, "CAP_EXP+10", 1, 1, 1)
+        else:
+            self.setpci_bits(bdf, "CAP_EXP+10", 1, 1, 0)
+
+    def PME_enable(self, bdf, PME=True):
+        """
+            启用或禁用PCIe设备的PME
+            :param bdf: PCI设备地址，如 "0000:17:00.0"
+            :param True启用，False禁用
+        """
+        LOGGER.info(f"启用或禁用{bdf}对应PME")
+        if PME:
+            self.setpci_bits(bdf, "CAP_PM+4", 8, 8, 1, width="W")
+        else:
+            self.setpci_bits(bdf, "CAP_PM+4", 8, 8, 0, width="W")
+
+    def perform_equalization_enable(self, dsp, perform_eq=True):
+        """
+            PCIe链路均衡使能或禁止
+        """
+        LOGGER.info(f"执行{dsp}对应链路均衡使能或禁止")
+        if perform_eq:
+            self.setpci_bits(dsp, "ECAP_SECPCI+4", 0, 0, 1)
+        else:
+            self.setpci_bits(dsp, "ECAP_SECPCI+4", 0, 0, 0)
+
+    def clear_aer_status(self, bdf):
+        """
+            清除PCIe设备的AER状态
+            :param bdf: PCI设备地址，如 "0000:17:00.0"
+        """
+        LOGGER.info(f"清除{bdf}对应AER状态")
+        self.setpci_bits(bdf, "CAP_EXP+0A", 7, 0, 2**8 - 1, width="B")
+        self.setpci_bits(bdf, "ECAP_AER+04", 31, 0, 2**32 - 1, width="L")
+        self.setpci_bits(bdf, "ECAP_AER+10", 15, 0, 2**16 - 1, width="W")

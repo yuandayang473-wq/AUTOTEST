@@ -49,15 +49,4 @@ class Log:
     normal = "normal"
 
 
-# Long PCI address format is as follows
-# Domain(32bits):Bus(8bits):Device(5bits):Function(3bits)
-# Domain is *not* always 0! (ARM systems have multiple ones)
-LONG_PCI_ADDR_REGEX = re.compile(
-    r"^([0-9a-fA-F]{2,8}):([0-9a-fA-F]{2}):([01][0-9a-fA-F])[:\.]0*([0-7])$"
-)
 
-# Short PCI address format is as follows
-# Bus(8bits):Device(5bits).Function(3bits)
-SHORT_PCI_ADDR_REGEX = re.compile(r"^([0-9a-fA-F]{2}):([01][0-9a-fA-F])\.([0-7])$")
-
-SYSFS_PCI_BUS_DEVICES = "/sys/bus/pci/devices/"

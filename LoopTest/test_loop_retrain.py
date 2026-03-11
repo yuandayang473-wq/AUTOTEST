@@ -22,7 +22,7 @@ from Lib import *
 #
 #
 # load_package(os.path.abspath(__file__))
-class TestD3hotLoop:
+class TestLoopRetrain:
 
     config = CONFIG
     config.config = [
@@ -37,32 +37,25 @@ class TestD3hotLoop:
             LOGGER.info("设备信息:{}".format(request.cls.devices))
             request.cls.dsp_bdf = request.cls.devices["0000"][0]["eps"][0]["dsp"]
             request.cls.ep_bdf = request.cls.devices["0000"][0]["eps"][0]["ep"]
+            METHOD.upload_file_to_server('Lib\\serial_check.py', 'serial_check.py', self.config.config["UUT"]["ip"],
+                                         self.config.config["UUT"]["username"],
+                                         self.config.config["UUT"]["password"])
+            request.cls.aer_info_before = METHOD.get_aer_status_info(request.cls.ep_bdf)
         yield
         # teardown
         LOGGER.sys(f"结束执行测试用例组:{request.cls}".center(100, "-"))
-        with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            LOGGER.info("恢复D0状态")
-            METHOD.set_power_state(self.ep_bdf, "D0")
 
-    def test_D3_hot_loop_001(self):
+    def test_loop_retrain_001(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            METHOD.set_power_state(self.ep_bdf, "D3hot")
-            SLEEP(4)
-            reg_str = BASE.execute_run(f"lspci -vvvs {self.ep_bdf}").get_origin_data()
-            METHOD.set_power_state(self.ep_bdf, "D0")
-            SLEEP(2)
-
-            LOGGER.info("开始执行D3hot循环测试")
-            loop_count = 10
+            LOGGER.info("开始执行Retrain循环测试")
+            loop_count = 100
             for i in range(loop_count):
                 LOGGER.info("第{}次循环".format(i+1))
-                METHOD.set_power_state(self.ep_bdf, "D3hot")
-                SLEEP(4)
-                reg_str_each = BASE.execute_run(f"lspci -vvvs {self.ep_bdf}").get_origin_data()
-                if reg_str_each != reg_str:
-                    LOGGER.error("lspci -vvvs结果有变化，最初为\n{}，\n变为\n{}".format(reg_str, reg_str_each))
-                METHOD.set_power_state(self.ep_bdf, "D0")
-                SLEEP(2)
+                METHOD.link_retrain(self.dsp_bdf)
+                BASE.execute_run('python3 serial_check.py aer')
+                aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
+                assert aer_info_after == self.aer_info_before, "retrain前后ep aer信息不同"
+
 
 if __name__ == '__main__':
-    pytest.main(['-s',"test_D3hot_loop.py"])
+    pytest.main(['-s',""])
