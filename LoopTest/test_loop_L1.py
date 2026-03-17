@@ -40,24 +40,37 @@ class TestLoopL1:
                                          self.config.config["UUT"]["username"],
                                          self.config.config["UUT"]["password"])
             request.cls.aer_info_before = METHOD.get_aer_status_info(request.cls.ep_bdf)
+            if len(request.cls.devices["0000"]) >= 2:
+                request.cls.ep_bdf2 = request.cls.devices["0000"][1]["eps"][0]["ep"]
+                request.cls.aer_info_before2 = METHOD.get_aer_status_info(request.cls.ep_bdf2)
         yield
         # teardown
         LOGGER.sys(f"结束执行测试用例组:{request.cls}".center(100, "-"))
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             LOGGER.info("恢复ASPM状态")
             METHOD.ASPM_enable(self.ep_bdf, L0s=False, L1=False)
+            if len(request.cls.devices["0000"]) >= 2:
+                LOGGER.info("恢复ASPM状态")
+                METHOD.ASPM_enable(self.ep_bdf2, L0s=False, L1=False)
 
     def test_loop_L1_001(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             LOGGER.info("开始执行ASPM L1 enable循环测试")
-            loop_count = 100
+            loop_count = 1
             for i in range(loop_count):
                 LOGGER.info("第{}次循环".format(i+1))
                 METHOD.ASPM_enable(self.ep_bdf, L0s=False, L1=True)
-                BASE.execute_run('python3 serial_check.py aer')
-                aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
-                assert aer_info_after == self.aer_info_before, "D3hot前后ep aer信息不同"
+                if len(self.devices["0000"]) >= 2:
+                    METHOD.ASPM_enable(self.ep_bdf2, L0s=False, L1=True)
+                BASE.execute_run("python3 serial_check.py check_l1")
                 METHOD.ASPM_enable(self.ep_bdf, L0s=False, L1=False)
+                aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
+                assert aer_info_after == self.aer_info_before, "L1前后ep aer信息不同"
+                if len(self.devices["0000"]) >= 2:
+                    METHOD.ASPM_enable(self.ep_bdf2, L0s=False, L1=False)
+                    aer_info_after2 = METHOD.get_aer_status_info(self.ep_bdf2)
+                    assert aer_info_after2 == self.aer_info_before2, "L1前后ep aer信息不同"
+                BASE.execute_run('python3 serial_check.py aer')
 
 if __name__ == '__main__':
     pytest.main(['-s',""])

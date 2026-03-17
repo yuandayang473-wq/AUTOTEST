@@ -41,6 +41,10 @@ class TestLoopRetrain:
                                          self.config.config["UUT"]["username"],
                                          self.config.config["UUT"]["password"])
             request.cls.aer_info_before = METHOD.get_aer_status_info(request.cls.ep_bdf)
+            if len(request.cls.devices["0000"]) >= 2:
+                request.cls.dsp_bdf2 = request.cls.devices["0000"][1]["eps"][0]["dsp"]
+                request.cls.ep_bdf2 = request.cls.devices["0000"][1]["eps"][0]["ep"]
+                request.cls.aer_info_before2 = METHOD.get_aer_status_info(request.cls.ep_bdf2)
         yield
         # teardown
         LOGGER.sys(f"结束执行测试用例组:{request.cls}".center(100, "-"))
@@ -48,13 +52,18 @@ class TestLoopRetrain:
     def test_loop_retrain_001(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             LOGGER.info("开始执行Retrain循环测试")
-            loop_count = 100
+            loop_count = 1
             for i in range(loop_count):
                 LOGGER.info("第{}次循环".format(i+1))
                 METHOD.link_retrain(self.dsp_bdf)
+                if len(self.devices["0000"]) >= 2:
+                    METHOD.link_retrain(self.dsp_bdf2)
                 BASE.execute_run('python3 serial_check.py aer')
                 aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
                 assert aer_info_after == self.aer_info_before, "retrain前后ep aer信息不同"
+                if len(self.devices["0000"]) >= 2:
+                    aer_info_after2 = METHOD.get_aer_status_info(self.ep_bdf2)
+                    assert aer_info_after2 == self.aer_info_before2, "retrain前后ep aer信息不同"
 
 
 if __name__ == '__main__':

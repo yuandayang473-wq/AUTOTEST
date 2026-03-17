@@ -1,2 +1,5 @@
-Protocal_Test/test_link_speed_change_new.py::TestSpeedChange::test_speed_change_001
-Protocal_Test/test_link_speed_change_new.py::TestSpeedChange::test_speed_change_002
+
+LoopTest/
+ProtocalTest/
+
+

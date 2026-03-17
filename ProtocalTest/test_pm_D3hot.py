@@ -34,18 +34,22 @@ class TestPMD3Hot:
         LOGGER.sys(f"开始执行测试用例组:{request.cls}".center(100, "-"))
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             request.cls.devices = METHOD.get_switch_info()
-            for device in request.cls.devices:
-                if device.type == 'DSP' and len(device.children) != 0:
-                    request.cls.dsp_bdf = device.device_bdf
-                if device.type == 'EP':
-                    request.cls.ep_bdf = device.device_bdf
-                if device.type == 'USP':
-                    request.cls.usp_bdf = device.device_bdf
             LOGGER.info("设备信息:{}".format(request.cls.devices))
             METHOD.save_data_file(request.cls.devices, 'pcie_tree_before.json')
             METHOD.upload_file_to_server('pcie_tree_before.json', 'pcie_tree_before.json',
                                      self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
                                      self.config.config["UUT"]["password"])
+
+            request.cls.devices = METHOD.get_bdf()
+            LOGGER.info("设备信息:{}".format(request.cls.devices))
+            request.cls.dsp_bdf = request.cls.devices["0000"][0]["eps"][0]["dsp"]
+            request.cls.ep_bdf = request.cls.devices["0000"][0]["eps"][0]["ep"]
+            request.cls.usp_bdf = request.cls.devices["0000"][0]["usp"]
+            if len(request.cls.devices["0000"]) >= 2:
+                request.cls.dsp_bdf2 = request.cls.devices["0000"][1]["eps"][0]["dsp"]
+                request.cls.ep_bdf2 = request.cls.devices["0000"][1]["eps"][0]["ep"]
+                request.cls.usp_bdf2 = request.cls.devices["0000"][1]["usp"]
+
             METHOD.upload_file_to_server('Lib\\serial_check.py', 'serial_check.py', self.config.config["UUT"]["ip"],
                                      self.config.config["UUT"]["username"],
                                      self.config.config["UUT"]["password"])
@@ -57,7 +61,11 @@ class TestPMD3Hot:
             METHOD.set_power_state(self.usp_bdf, "D0")
             METHOD.set_power_state(self.dsp_bdf, "D0")
             METHOD.set_power_state(self.ep_bdf, "D0")
-
+            if len(request.cls.devices["0000"]) >= 2:
+                LOGGER.info("恢复D0状态")
+                METHOD.set_power_state(self.usp_bdf2, "D0")
+                METHOD.set_power_state(self.dsp_bdf2, "D0")
+                METHOD.set_power_state(self.ep_bdf2, "D0")
 
     def test_sys_pm_001(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
@@ -82,6 +90,10 @@ class TestPMD3Hot:
             METHOD.set_power_state(self.ep_bdf, "D0")
             SLEEP(2)
             assert METHOD.get_pm_state(self.ep_bdf) == "D0", "EP设备应该处于D0状态"
+            if len(self.devices["0000"]) >= 2:
+                METHOD.set_power_state(self.ep_bdf2, "D0")
+                SLEEP(2)
+                assert METHOD.get_pm_state(self.ep_bdf2) == "D0", "EP设备应该处于D0状态"
             BASE.execute_run('python3 serial_check.py aer')
             self.devices_after = METHOD.get_switch_info()
             METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
@@ -92,11 +104,8 @@ class TestPMD3Hot:
 
     def test_sys_pm_013(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            list_ep = []
-            for device in self.devices:
-                if device.type == 'EP':
-                    list_ep.append(device)
-            assert len(list_ep) == 1, "本用例自动化执行必须有且仅有一个EP设备"
+            assert len(self.devices["0000"][0]["eps"]) == 1, "本用例自动化执行每个SW必须有且仅有一个EP设备"
+            assert len(self.devices["0000"])  == 1, "本用例自动化只支持单SW场景"
             cap = METHOD.get_pm_suport_pme_states(self.ep_bdf)
             METHOD.set_power_state(self.ep_bdf, "D1")
             SLEEP(2)
@@ -124,14 +133,16 @@ class TestPMD3Hot:
 
     def test_sys_pm_014(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            list_ep = []
-            for device in self.devices:
-                if device.type == 'EP':
-                    list_ep.append(device)
-            assert len(list_ep) == 1, "本用例自动化执行必须有且仅有一个EP设备"
+            assert len(self.devices["0000"][0]["eps"]) == 1, "本用例自动化执行每个SW必须有且仅有一个EP设备"
+            if len(self.devices["0000"]) >= 2:
+                assert len(self.devices["0000"][1]["eps"]) == 1, "本用例自动化执行每个SW必须有且仅有一个EP设备"
             METHOD.set_power_state(self.ep_bdf, "D3hot")
+            if len(self.devices["0000"]) >= 2:
+                METHOD.set_power_state(self.ep_bdf2, "D3hot")
             BASE.execute_run('python3 serial_check.py check_l1')
             METHOD.set_power_state(self.ep_bdf, "D0")
+            if len(self.devices["0000"]) >= 2:
+                METHOD.set_power_state(self.ep_bdf2, "D0")
             BASE.execute_run('python3 serial_check.py aer')
             self.devices_after = METHOD.get_switch_info()
             METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
@@ -148,14 +159,25 @@ class TestPMD3Hot:
             res = METHOD.devmem2_read(bar)
             assert res == "0xFF", "EP设备BAR地址应该不可访问，读出值为0xFF"
             METHOD.set_power_state(self.ep_bdf, "D0")
+            if len(self.devices["0000"]) >= 2:
+                METHOD.set_power_state(self.ep_bdf2, "D3hot")
+                SLEEP(2)
+                bar = METHOD.get_bar_address(self.ep_bdf2)
+                res = METHOD.devmem2_read(bar)
+                assert res == "0xFF", "EP设备BAR地址应该不可访问，读出值为0xFF"
+                METHOD.set_power_state(self.ep_bdf2, "D0")
             BASE.execute_run('python3 serial_check.py aer')
             self.devices_after = METHOD.get_switch_info()
             for device in self.devices_after:
                 if device.device_bdf == self.ep_bdf:
                     aer_status = device.aer_status["DevSta"]
                     assert "UnsupReq+" in aer_status, "EP设备在D3hot状态下应该产生Unsupported Request错误"
+                if device.device_bdf == self.ep_bdf2:
+                    aer_status = device.aer_status["DevSta"]
+                    assert "UnsupReq+" in aer_status, "EP设备在D3hot状态下应该产生Unsupported Request错误"
             METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
             METHOD.clear_aer_status(self.ep_bdf)
+            METHOD.clear_aer_status(self.ep_bdf2)
 
     def test_sys_pm_016(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
@@ -168,7 +190,16 @@ class TestPMD3Hot:
             SLEEP(4)
             assert METHOD.read_config_lspci(self.usp_bdf) is True, "USP设备配置空间应该可读"
             METHOD.set_power_state(self.usp_bdf, "D0")
-            SLEEP(2)
+            if len(self.devices["0000"]) >= 2:
+                METHOD.set_power_state(self.dsp_bdf2, "D3hot")
+                SLEEP(4)
+                assert METHOD.read_config_lspci(self.dsp_bdf2) is True, "DSP设备配置空间应该可读"
+                METHOD.set_power_state(self.dsp_bdf2, "D0")
+                SLEEP(2)
+                METHOD.set_power_state(self.usp_bdf2, "D3hot")
+                SLEEP(4)
+                assert METHOD.read_config_lspci(self.usp_bdf2) is True, "USP设备配置空间应该可读"
+                METHOD.set_power_state(self.usp_bdf2, "D0")
             BASE.execute_run('python3 serial_check.py aer')
             self.devices_after = METHOD.get_switch_info()
             METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
@@ -183,7 +214,11 @@ class TestPMD3Hot:
             SLEEP(4)
             assert METHOD.read_config_lspci(self.dsp_bdf) is False, "DSP设备配置空间应该不可读"
             METHOD.set_power_state(self.usp_bdf, "D0")
-            SLEEP(2)
+            if len(self.devices["0000"]) >= 2:
+                METHOD.set_power_state(self.usp_bdf2, "D3hot")
+                SLEEP(4)
+                assert METHOD.read_config_lspci(self.dsp_bdf2) is False, "DSP设备配置空间应该不可读"
+                METHOD.set_power_state(self.usp_bdf2, "D0")
             BASE.execute_run('python3 serial_check.py aer')
             self.devices_after = METHOD.get_switch_info()
             METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
@@ -198,7 +233,11 @@ class TestPMD3Hot:
             SLEEP(4)
             assert METHOD.read_config_lspci(self.ep_bdf) is True, "EP设备配置空间应该可读"
             METHOD.set_power_state(self.ep_bdf, "D0")
-            SLEEP(2)
+            if len(self.devices["0000"]) >= 2:
+                METHOD.set_power_state(self.ep_bdf2, "D3hot")
+                SLEEP(4)
+                assert METHOD.read_config_lspci(self.ep_bdf2) is True, "EP设备配置空间应该可读"
+                METHOD.set_power_state(self.ep_bdf2, "D0")
             BASE.execute_run('python3 serial_check.py aer')
             self.devices_after = METHOD.get_switch_info()
             METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')

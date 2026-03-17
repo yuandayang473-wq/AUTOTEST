@@ -38,7 +38,7 @@ class Method:
             eps = data["EPS"]
 
         # 根据vendor id找到所有属于数渡sw的设备以及bridge
-        sudu_sw = BASE.execute_run("lspci -Dd 205e:").get_origin_data()
+        sudu_sw = BASE.execute_run("lspci -Dd 205e:", i_record_cmd=True).get_origin_data()
         assert sudu_sw, "Not find any switch in system!"
         # 按照domain进行分类
         dict_all = defaultdict(list)
@@ -52,7 +52,7 @@ class Method:
             usp = []
             sw = []
             for index, bdf in enumerate(sw_bdf):
-                BASE.execute_run(f"lspci -vs {bdf} |grep -w Upstream", i_exit_code=True)
+                BASE.execute_run(f"lspci -vs {bdf} |grep 'Upstream Port'", i_exit_code=True, i_record_cmd=True)
                 check_usp = BASE.ssh.get_exit_code()
                 if check_usp == 0:
                     usp.append({"bdf": bdf, "index": index})
@@ -68,22 +68,19 @@ class Method:
 
             # 只考虑基础和合成模式，即最多只有2个switch情况，其它多switch情况暂不考虑
             # 判断哪个switch有mep，即sw0
-            mep_ep = BASE.execute_run(f'lspci -vvv | grep -B 10 "{mep_vd}" | grep "^[0-9a-f]"').get_origin_data().split()[0]
-            if key + ":"  + mep_ep in sw[0]:
-                pass  # 第一个switch有mep,无需操作
-            else:
-                sw[0], sw[1] = sw[1], sw[0]  # 带mep的switch放到首位置
+            mep_list = BASE.execute_run(f'lspci -vvv | grep -B 10 -E "{mep_vd}|SDTECH Device 2006" | grep "^[0-9a-f]"', i_record_cmd=True).get_origin_data().split("\n")
+            mep_ep_list = [key + ":"  + mep_ep[0:7] for mep_ep in mep_list]
             # sw_bdf = [{'usp': xxx,
             # 'eps': [{'dsp': xxx,'ep': xxx,'driver': xxx,'name': xxx},{}...],
             # 'mep': {'dsp': xxx, 'ep': xxx, 'driver': xxx},
             # 'dma': [{'dsp': xxx, 'ep': xxx, 'driver': xxx},{}...],
             # 'ntb': {'dsp': xxx, 'ep': xxx, 'driver': xxx}, {}]
             all_sudu_sw = defaultdict(list)
-            dma_list = BASE.execute_run(f'lspci -vvv | grep -B 10 "{dma_vd}" | grep "^[0-9a-f]"',
-                             i_exit_code=True).get_origin_data().split("\n")
+            dma_list = BASE.execute_run(f'lspci -vvv | grep -B 10 -E "{dma_vd}|SDTECH Device 2005" | grep "^[0-9a-f]"',
+                             i_exit_code=True, i_record_cmd=True).get_origin_data().split("\n")
             dma_ep_list = [key + ":"  + dma_ep[0:7] for dma_ep in dma_list] if dma_list else []
-            ntb_list = BASE.execute_run(f'lspci -vvv | grep -B 10 "{ntb_vd}" | grep "^[0-9a-f]"',
-                             i_exit_code=True).get_origin_data().split("\n")
+            ntb_list = BASE.execute_run(f'lspci -vvv | grep -B 10 -E "{ntb_vd}|SDTECH Device 2004" | grep "^[0-9a-f]"',
+                             i_exit_code=True, i_record_cmd=True).get_origin_data().split("\n")
             ntb_ep_list = [key + ":"  + ntb_ep[0:7] for ntb_ep in ntb_list] if ntb_list else []
             for partition in sw:
                 mep_dict = {}  # 构建mep字典
@@ -92,29 +89,29 @@ class Method:
                 ep_list = []  # 构建ep列表
                 for bdf in partition[1:]:
                     ep_bdf = []
-                    bus_text = BASE.execute_run(f"lspci -vs {bdf} |grep Bus", i_exit_code=True).get_origin_data()
+                    bus_text = BASE.execute_run(f"lspci -vs {bdf} |grep Bus", i_exit_code=True, i_record_cmd=True).get_origin_data()
                     pattern = r'.*secondary=(.*),.*subordinate=(.*),.*'
                     res = re.findall(pattern, bus_text)
                     if not res:
                         continue  # iep的情况
                     secondary_bus, subordinate_bus = res[0]
                     if secondary_bus == subordinate_bus: #单bus号的ep
-                        if BASE.execute_run(f"lspci -s {secondary_bus}:00.0").get_origin_data() != "":
+                        if BASE.execute_run(f"lspci -s {secondary_bus}:00.0", i_record_cmd=True).get_origin_data() != "":
                             ep_bdf.append(key + ":"  + secondary_bus + ":00.0")
                         else:
                             continue  # dsp下无ep的情况
                     else: #多bus号的ep，只取第一个bus号下的ep
                         ep_bdf.append(key + ":"  + f"{secondary_bus}:00.0")
                     driver_res = BASE.execute_run(
-                        f"lspci -vvs {ep_bdf[0]} |grep 'driver in use' |awk -F ' ' '{{print $NF}}'").get_origin_data()
-                    ep_vd = BASE.execute_run(f"lspci -ns {ep_bdf[0]} |awk -F ' ' '{{print $3}}'").get_origin_data()
+                        f"lspci -vvs {ep_bdf[0]} |grep 'driver in use' |awk -F ' ' '{{print $NF}}'", i_record_cmd=True).get_origin_data()
+                    ep_vd = BASE.execute_run(f"lspci -ns {ep_bdf[0]} |awk -F ' ' '{{print $3}}'", i_record_cmd=True).get_origin_data()
                     for key_, value_ in eps.items():
                         if ep_vd == value_:
                             name = key_
                             break
                         else:
                             name = "NA"
-                    if ep_bdf[0] == key + ":"  + mep_ep:
+                    if ep_bdf[0] in mep_ep_list:
                         mep_dict["dsp"] = bdf
                         mep_dict["ep"] = ep_bdf[0]
                         mep_dict["driver"] = driver_res
@@ -219,7 +216,10 @@ class Method:
         bdf_mod = bdf[5:12] if bdf[0:3] == '000' else bdf
         all_info = BASE.execute_run(f'lspci -vvvns {bdf_mod} | grep -E "({bdf_mod}|LnkCap:|LnkSta:|Kernel driver|Physical Slot|Subsystem)"', i_record_cmd=True).get_origin_data()
         class_code, vendor_id, device_id = re.search(f"{bdf_mod}\s+(.+?):\s+(.+?):(\\w+)", all_info).groups()
-        cap_speed, cap_width, current_speed, current_width = re.search(r"LnkCap:.*?Speed\s+(.+?),\s+Width\s+x(.+?),.*?LnkSta:\s+Speed\s+(.+?)\s+.*?Width\s+x(.+?)\s+", all_info, flags=re.S).groups()
+        if re.search(r"LnkCap:.*?Speed\s+(.+?),\s+Width\s+x(.+?),.*?LnkSta:\s+Speed\s+(.+?)\s+.*?Width\s+x(.+?)\s+", all_info, flags=re.S):
+            cap_speed, cap_width, current_speed, current_width = re.search(r"LnkCap:.*?Speed\s+(.+?),\s+Width\s+x(.+?),.*?LnkSta:\s+Speed\s+(.+?)\s+.*?Width\s+x(.+?)\s+", all_info, flags=re.S).groups()
+        else:
+            cap_speed, cap_width, current_speed, current_width = "Null", "Null", "Null", "Null"
         if re.search(r"Subsystem:\s+(.+)", all_info):
             sub_id = re.search(r"Subsystem:\s+(.+)", all_info).group(1)
         else:
@@ -665,3 +665,10 @@ class Method:
         self.setpci_bits(bdf, "CAP_EXP+0A", 7, 0, 2**8 - 1, width="B")
         self.setpci_bits(bdf, "ECAP_AER+04", 31, 0, 2**32 - 1, width="L")
         self.setpci_bits(bdf, "ECAP_AER+10", 15, 0, 2**16 - 1, width="W")
+
+    def pci_rescan(self):
+        """
+            触发PCI总线重新扫描
+        """
+        LOGGER.info("触发PCI总线重新扫描")
+        BASE.execute_run("echo 1 > /sys/bus/pci/rescan")

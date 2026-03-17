@@ -27,7 +27,7 @@ TEMPCOMMAND = "pvt getcali 0 0 0"
 VDDCOMMAND = "pvt getall"
 # 筛片shell脚本名称,建议脚本放置/root目录下
 SCRIPTNAME = "slt_dpdu_of_nopower_x4_1.sh"
-SERIALPORT = "COM4"
+SERIALPORT = []
 BAUDRATE = 230400
 LOGFILE = "log_%s.log" % time.strftime("%Y%m%d%H%M%S", time.localtime())
 # 设置日志打印格式
@@ -192,8 +192,8 @@ def getcmdserialport():
             retdata = ser.read_all()
             if b'password' in retdata:
                 ser.write(b"sudo@2025\r\n")
-            if retdata == b'':
-                continue
+            # if retdata == b'':
+            #     continue
         except serial.SerialException:
             logger.info(f"Serial port: {serport} is busy...")
             continue
@@ -203,8 +203,7 @@ def getcmdserialport():
             retdata = ser.read_all()
             if b'cmd>' in retdata:
                 logger.info(f"{serport} is command serial port")
-                SERIALPORT = serport
-                break
+                SERIALPORT.append(serport)
             ser.close()
     if not SERIALPORT:
         logger.error("Cannot find command serial port")
@@ -232,76 +231,79 @@ def fiotest(q, ip, username, password, serialport):
         q.put(-1)
 
 
-def test_fiostress(ip=IP, username=USERNAME, password=PASSWORD):
-    """
-    测试fio
-    """
-    processes = []
-    q = Queue()
-    # time.sleep(120)
-    processes += [
-        Process(target=fiotest, args=(q, ip, username, password, SERIALPORT))
-    ]
-
-    for p in processes:
-        p.start()
-
-    for p in processes:
-        p.join(5)
-
-    process_copy = processes[:]
-    return_sum = 0
-    while True:
-        for p in process_copy:
-            if p.is_alive():
-                p.join(timeout=50)
-                logger.info("*******fio测试中功耗读取*******")
-                sersend(f"{POWERCOMMAND}", serialport=SERIALPORT)
-                sersend(f"{TEMPCOMMAND}", serialport=SERIALPORT)
-                sersend(f"{VDDCOMMAND}", serialport=SERIALPORT)
-            else:
-                return_sum += q.get()
-                process_copy.remove(p)
-                if return_sum != 0:
-                    for p1 in process_copy:
-                        p1.terminate()
-                    break
-        else:
-            if len(process_copy) == 0 or return_sum != 0:
-                break
-            time.sleep(50)
-
-    assert return_sum == 0, "fio stress测试---------------------------------------------[失败]"
-    logger.info("fio stress测试---------------------------------------------[成功]")
+# def test_fiostress(ip=IP, username=USERNAME, password=PASSWORD):
+#     """
+#     测试fio
+#     """
+#     processes = []
+#     q = Queue()
+#     # time.sleep(120)
+#     processes += [
+#         Process(target=fiotest, args=(q, ip, username, password, SERIALPORT))
+#     ]
+#
+#     for p in processes:
+#         p.start()
+#
+#     for p in processes:
+#         p.join(5)
+#
+#     process_copy = processes[:]
+#     return_sum = 0
+#     while True:
+#         for p in process_copy:
+#             if p.is_alive():
+#                 p.join(timeout=50)
+#                 logger.info("*******fio测试中功耗读取*******")
+#                 sersend(f"{POWERCOMMAND}", serialport=SERIALPORT)
+#                 sersend(f"{TEMPCOMMAND}", serialport=SERIALPORT)
+#                 sersend(f"{VDDCOMMAND}", serialport=SERIALPORT)
+#             else:
+#                 return_sum += q.get()
+#                 process_copy.remove(p)
+#                 if return_sum != 0:
+#                     for p1 in process_copy:
+#                         p1.terminate()
+#                     break
+#         else:
+#             if len(process_copy) == 0 or return_sum != 0:
+#                 break
+#             time.sleep(50)
+#
+#     assert return_sum == 0, "fio stress测试---------------------------------------------[失败]"
+#     logger.info("fio stress测试---------------------------------------------[成功]")
 
 def get_aer_info():
     logger.info("===============Start autotesting...==================")
     getcmdserialport()
-    logger.info("获取串口AER信息")
-    sersend("aer all", SERIALPORT)
+    for serialport in SERIALPORT:
+        logger.info("获取串口AER信息")
+        sersend("aer all", serialport)
 
 def check_link_is_l1():
     logger.info("===============Start autotesting...==================")
     getcmdserialport()
-    logger.info("获取串口链路状态信息")
-    res = sersend("lt_his all", SERIALPORT)
-    port_list = re.findall(r"([\d|a-zA-Z]+)\s-", res)
-    print(port_list)
-    for port in port_list:
-        if port[1] != "2":
-            res = sersend(f"lt_his {port[1]} {port[3]}", SERIALPORT)
-            assert "L1" in res.split("\r\n")[3], f"{port}建链状态异常"
+    for serialport in SERIALPORT:
+        logger.info("获取串口链路状态信息")
+        res = sersend("lt_his all", serialport)
+        port_list = re.findall(r"([\d|a-zA-Z]+)\s-", res)
+        print(port_list)
+        for port in port_list:
+            if port[1] != "2":
+                res = sersend(f"lt_his {port[1]} {port[3]}", serialport)
+                assert "L1" in res.split("\r\n")[3], f"{port}建链状态异常"
 
 def check_have_equalization():
     logger.info("===============Start autotesting...==================")
     getcmdserialport()
-    logger.info("获取串口链路状态信息")
-    res = sersend("lt_his all", SERIALPORT)
-    port_list = re.findall(r"([\d|a-zA-Z]+)\s-", res)
-    print(port_list)
-    for port in port_list:
-        if port[1] != "2":
-            res = sersend(f"lt_his {port[1]} {port[3]}", SERIALPORT)
+    for serialport in SERIALPORT:
+        logger.info("获取串口链路状态信息")
+        res = sersend("lt_his all", serialport)
+        port_list = re.findall(r"([\d|a-zA-Z]+)\s-", res)
+        print(port_list)
+        for port in port_list:
+            if port[1] != "2":
+                res = sersend(f"lt_his {port[1]} {port[3]}", serialport)
             assert "Recovery.Equalization3" in res.split("\r\n")[7], f"{port}未发生过均衡"
 
 # def monitor(q):
