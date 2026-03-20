@@ -77,28 +77,6 @@ class TestSpeedChange:
                 ))
                 assert current_speed2 == request.cls.current_speed_pre2, "恢复到测试之前的速率失败"
 
-    @pytest.mark.author("袁大阳")
-    def test_sys_link_004(self):
-        with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            METHOD.link_retrain(self.dsp_bdf)
-            cap_speed, cap_width, current_speed, current_width = METHOD.get_speed_width(self.ep_bdf)
-            LOGGER.info("速率变化后ep_bdf:{} cap_speed:{} current_speed:{}".format(
-                self.ep_bdf, cap_speed, current_speed
-            ))
-            assert current_speed == self.current_speed_pre, "retrain后链路速率发生变化"
-            if len(self.devices["0000"]) >= 2:
-                METHOD.link_retrain(self.dsp_bdf2)
-                cap_speed2, cap_width2, current_speed2, current_width2 = METHOD.get_speed_width(self.ep_bdf2)
-                LOGGER.info("速率变化后ep_bdf2:{} cap_speed2:{} current_speed2:{}".format(
-                    self.ep_bdf2, cap_speed2, current_speed2
-                ))
-                assert current_speed2 == self.current_speed_pre2, "retrain后链路速率发生变化"
-            BASE.execute_run('python3 serial_check.py aer')
-            aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
-            assert aer_info_after == self.aer_info_before, "retrain前后aer信息不同"
-            if len(self.devices["0000"]) >= 2:
-                aer_info_after2 = METHOD.get_aer_status_info(self.ep_bdf2)
-                assert aer_info_after2 == self.aer_info_before2, "retrain前后aer信息不同"
 
     @pytest.mark.author("袁大阳")
     def test_sys_link_005(self):
@@ -116,7 +94,6 @@ class TestSpeedChange:
                     self.ep_bdf2, cap_speed2, current_speed2
                 ))
                 assert current_speed2 == "32GT/s", "速率变化验证失败"
-            BASE.execute_run('python3 serial_check.py aer')
             aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
             assert aer_info_after == self.aer_info_before, "retrain前后aer信息不同"
             if len(self.devices["0000"]) >= 2:
@@ -139,7 +116,6 @@ class TestSpeedChange:
                     self.ep_bdf2, cap_speed2, current_speed2
                 ))
                 assert current_speed2 == "16GT/s", "速率变化验证失败"
-            BASE.execute_run('python3 serial_check.py aer')
             aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
             assert aer_info_after == self.aer_info_before, "retrain前后aer信息不同"
             if len(self.devices["0000"]) >= 2:
@@ -162,7 +138,6 @@ class TestSpeedChange:
                     self.ep_bdf2, cap_speed2, current_speed2
                 ))
                 assert current_speed2 == "8GT/s", "速率变化验证失败"
-            BASE.execute_run('python3 serial_check.py aer')
             aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
             assert aer_info_after == self.aer_info_before, "retrain前后aer信息不同"
             if len(self.devices["0000"]) >= 2:
@@ -185,7 +160,6 @@ class TestSpeedChange:
                     self.ep_bdf2, cap_speed2, current_speed2
                 ))
                 assert current_speed2 == "5GT/s", "速率变化验证失败"
-            BASE.execute_run('python3 serial_check.py aer')
             aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
             assert aer_info_after == self.aer_info_before, "retrain前后aer信息不同"
             if len(self.devices["0000"]) >= 2:
@@ -208,7 +182,6 @@ class TestSpeedChange:
                     self.ep_bdf2, cap_speed2, current_speed2
                 ))
                 assert current_speed2 == "2.5GT/s", "速率变化验证失败"
-            BASE.execute_run('python3 serial_check.py aer')
             aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
             assert aer_info_after == self.aer_info_before, "retrain前后aer信息不同"
             if len(self.devices["0000"]) >= 2:

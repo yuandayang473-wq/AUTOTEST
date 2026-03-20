@@ -55,8 +55,8 @@ class TestRstSbr:
                 request.cls.dsp_bdf2 = request.cls.devices["0000"][1]["eps"][0]["dsp"]
                 request.cls.ep_bdf2 = request.cls.devices["0000"][1]["eps"][0]["ep"]
                 request.cls.usp_bdf2 = request.cls.devices["0000"][1]["usp"]
-                # request.cls.dma_idsp_bdf2 = request.cls.devices["0000"][1]["dma"][0]["dsp"]
-                # request.cls.mep_idsp_bdf2 = request.cls.devices["0000"][1]["mep"]["dsp"]
+                request.cls.dma_idsp_bdf2 = request.cls.devices["0000"][1]["dma"][0]["dsp"]
+                request.cls.mep_idsp_bdf2 = request.cls.devices["0000"][1]["mep"]["dsp"]
 
         yield
         # teardown
@@ -79,7 +79,6 @@ class TestRstSbr:
             METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
                                          self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
                                          self.config.config["UUT"]["password"])
-            BASE.execute_run('python3 serial_check.py aer')
             BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
     def test_pcie_sys_rst_004(self):
@@ -96,7 +95,6 @@ class TestRstSbr:
             METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
                                          self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
                                          self.config.config["UUT"]["password"])
-            BASE.execute_run('python3 serial_check.py aer')
             BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
     def test_pcie_sys_rst_005(self):
@@ -113,7 +111,6 @@ class TestRstSbr:
             METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
                                          self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
                                          self.config.config["UUT"]["password"])
-            BASE.execute_run('python3 serial_check.py aer')
             BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
     def test_pcie_sys_rst_006(self):
@@ -131,5 +128,4 @@ class TestRstSbr:
             METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
                                          self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
                                          self.config.config["UUT"]["password"])
-            BASE.execute_run('python3 serial_check.py aer')
             BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')

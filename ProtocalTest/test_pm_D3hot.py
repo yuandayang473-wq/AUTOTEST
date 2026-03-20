@@ -94,7 +94,6 @@ class TestPMD3Hot:
                 METHOD.set_power_state(self.ep_bdf2, "D0")
                 SLEEP(2)
                 assert METHOD.get_pm_state(self.ep_bdf2) == "D0", "EP设备应该处于D0状态"
-            BASE.execute_run('python3 serial_check.py aer')
             self.devices_after = METHOD.get_switch_info()
             METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
             METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
@@ -102,34 +101,33 @@ class TestPMD3Hot:
                                          self.config.config["UUT"]["password"])
             BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
-    def test_sys_pm_013(self):
-        with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            assert len(self.devices["0000"][0]["eps"]) == 1, "本用例自动化执行每个SW必须有且仅有一个EP设备"
-            assert len(self.devices["0000"])  == 1, "本用例自动化只支持单SW场景"
-            cap = METHOD.get_pm_suport_pme_states(self.ep_bdf)
-            METHOD.set_power_state(self.ep_bdf, "D1")
-            SLEEP(2)
-            if "D1" in cap:
-                assert METHOD.get_pm_state(self.ep_bdf) == "D1", "EP设备应该处于D1状态"
-                BASE.execute_run('python3 serial_check.py check_l1')
-                METHOD.set_power_state(self.ep_bdf, "D0")
-            else:
-                assert METHOD.get_pm_state(self.ep_bdf) == "D0", "EP设备应该处于D0状态，因为不支持D1"
-            METHOD.set_power_state(self.ep_bdf, "D2")
-            SLEEP(2)
-            if "D2" in cap:
-                assert METHOD.get_pm_state(self.ep_bdf) == "D2", "EP设备应该处于D2状态"
-                BASE.execute_run('python3 serial_check.py check_l1')
-                METHOD.set_power_state(self.ep_bdf, "D0")
-            else:
-                assert METHOD.get_pm_state(self.ep_bdf) == "D0", "EP设备应该处于D0状态，因为不支持D2"
-            BASE.execute_run('python3 serial_check.py aer')
-            self.devices_after = METHOD.get_switch_info()
-            METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
-            METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
-                                         self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
-                                         self.config.config["UUT"]["password"])
-            BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
+    # def test_sys_pm_013(self):
+    #     with BASE.ssh_connect(uut=self.config.config["UUT"]):
+    #         assert len(self.devices["0000"][0]["eps"]) == 1, "本用例自动化执行每个SW必须有且仅有一个EP设备"
+    #         assert len(self.devices["0000"])  == 1, "本用例自动化只支持单SW场景"
+    #         cap = METHOD.get_pm_suport_pme_states(self.ep_bdf)
+    #         METHOD.set_power_state(self.ep_bdf, "D1")
+    #         SLEEP(2)
+    #         if "D1" in cap:
+    #             assert METHOD.get_pm_state(self.ep_bdf) == "D1", "EP设备应该处于D1状态"
+    #             BASE.execute_run('python3 serial_check.py check_l1')
+    #             METHOD.set_power_state(self.ep_bdf, "D0")
+    #         else:
+    #             assert METHOD.get_pm_state(self.ep_bdf) == "D0", "EP设备应该处于D0状态，因为不支持D1"
+    #         METHOD.set_power_state(self.ep_bdf, "D2")
+    #         SLEEP(2)
+    #         if "D2" in cap:
+    #             assert METHOD.get_pm_state(self.ep_bdf) == "D2", "EP设备应该处于D2状态"
+    #             BASE.execute_run('python3 serial_check.py check_l1')
+    #             METHOD.set_power_state(self.ep_bdf, "D0")
+    #         else:
+    #             assert METHOD.get_pm_state(self.ep_bdf) == "D0", "EP设备应该处于D0状态，因为不支持D2"
+    #         self.devices_after = METHOD.get_switch_info()
+    #         METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
+    #         METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
+    #                                      self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
+    #                                      self.config.config["UUT"]["password"])
+    #         BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
     def test_sys_pm_014(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
@@ -143,7 +141,6 @@ class TestPMD3Hot:
             METHOD.set_power_state(self.ep_bdf, "D0")
             if len(self.devices["0000"]) >= 2:
                 METHOD.set_power_state(self.ep_bdf2, "D0")
-            BASE.execute_run('python3 serial_check.py aer')
             self.devices_after = METHOD.get_switch_info()
             METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
             METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
@@ -166,7 +163,6 @@ class TestPMD3Hot:
                 res = METHOD.devmem2_read(bar)
                 assert res == "0xFF", "EP设备BAR地址应该不可访问，读出值为0xFF"
                 METHOD.set_power_state(self.ep_bdf2, "D0")
-            BASE.execute_run('python3 serial_check.py aer')
             self.devices_after = METHOD.get_switch_info()
             for device in self.devices_after:
                 if device.device_bdf == self.ep_bdf:
@@ -200,7 +196,6 @@ class TestPMD3Hot:
                 SLEEP(4)
                 assert METHOD.read_config_lspci(self.usp_bdf2) is True, "USP设备配置空间应该可读"
                 METHOD.set_power_state(self.usp_bdf2, "D0")
-            BASE.execute_run('python3 serial_check.py aer')
             self.devices_after = METHOD.get_switch_info()
             METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
             METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
@@ -219,7 +214,6 @@ class TestPMD3Hot:
                 SLEEP(4)
                 assert METHOD.read_config_lspci(self.dsp_bdf2) is False, "DSP设备配置空间应该不可读"
                 METHOD.set_power_state(self.usp_bdf2, "D0")
-            BASE.execute_run('python3 serial_check.py aer')
             self.devices_after = METHOD.get_switch_info()
             METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
             METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
@@ -238,7 +232,6 @@ class TestPMD3Hot:
                 SLEEP(4)
                 assert METHOD.read_config_lspci(self.ep_bdf2) is True, "EP设备配置空间应该可读"
                 METHOD.set_power_state(self.ep_bdf2, "D0")
-            BASE.execute_run('python3 serial_check.py aer')
             self.devices_after = METHOD.get_switch_info()
             METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
             METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',

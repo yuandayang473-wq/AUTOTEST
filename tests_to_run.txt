@@ -1,5 +1,5 @@
 
-LoopTest/
-ProtocalTest/
+LoopTest/test_loop_retrain.py
+
 
 

@@ -86,44 +86,40 @@ class TestLoopTxeqRetrain:
                 list_ep2 = self.devices["0000"][1]["eps"]
                 assert len(list_ep2) == 1, "本用例自动化执行必须有且仅有一个EP设备"
             LOGGER.info("开始执行Txeq Retrain循环测试")
-            loop_count = 1
-            for i in range(loop_count):
-                LOGGER.info("第{}次循环".format(i+1))
-                METHOD.speed_change(self.dsp_bdf, 1)
-                cap_speed, cap_width, current_speed, current_width = METHOD.get_speed_width(self.ep_bdf)
-                LOGGER.info("速率变化后ep_bdf:{} cap_speed:{} current_speed:{}".format(
-                    self.ep_bdf, cap_speed, current_speed
+            METHOD.speed_change(self.dsp_bdf, 1)
+            cap_speed, cap_width, current_speed, current_width = METHOD.get_speed_width(self.ep_bdf)
+            LOGGER.info("速率变化后ep_bdf:{} cap_speed:{} current_speed:{}".format(
+                self.ep_bdf, cap_speed, current_speed
+            ))
+            assert current_speed == "2.5GT/s", "速率变化验证失败"
+            METHOD.perform_equalization_enable(self.dsp_bdf)
+            METHOD.speed_change(self.dsp_bdf, 3)
+            cap_speed, cap_width, current_speed, current_width = METHOD.get_speed_width(self.ep_bdf)
+            LOGGER.info("速率变化后ep_bdf:{} cap_speed:{} current_speed:{}".format(
+                self.ep_bdf, cap_speed, current_speed
+            ))
+            assert current_speed == "8GT/s", "速率变化验证失败"
+            if len(self.devices["0000"]) >= 2:
+                LOGGER.info("开始执行Txeq Retrain循环测试")
+                METHOD.speed_change(self.dsp_bdf2, 1)
+                cap_speed2, cap_width2, current_speed2, current_width2 = METHOD.get_speed_width(self.ep_bdf2)
+                LOGGER.info("速率变化后ep_bdf2:{} cap_speed2:{} current_speed2:{}".format(
+                    self.ep_bdf2, cap_speed2, current_speed2
                 ))
-                assert current_speed == "2.5GT/s", "速率变化验证失败"
-                METHOD.perform_equalization_enable(self.dsp_bdf)
-                METHOD.speed_change(self.dsp_bdf, 3)
-                cap_speed, cap_width, current_speed, current_width = METHOD.get_speed_width(self.ep_bdf)
-                LOGGER.info("速率变化后ep_bdf:{} cap_speed:{} current_speed:{}".format(
-                    self.ep_bdf, cap_speed, current_speed
+                assert current_speed2 == "2.5GT/s", "速率变化验证失败"
+                METHOD.perform_equalization_enable(self.dsp_bdf2)
+                METHOD.speed_change(self.dsp_bdf2, 3)
+                cap_speed2, cap_width2, current_speed2, current_width2 = METHOD.get_speed_width(self.ep_bdf2)
+                LOGGER.info("速率变化后ep_bdf2:{} cap_speed2:{} current_speed2:{}".format(
+                    self.ep_bdf2, cap_speed2, current_speed2
                 ))
-                assert current_speed == "8GT/s", "速率变化验证失败"
-                if len(self.devices["0000"]) >= 2:
-                    LOGGER.info("第{}次循环".format(i + 1))
-                    METHOD.speed_change(self.dsp_bdf2, 1)
-                    cap_speed2, cap_width2, current_speed2, current_width2 = METHOD.get_speed_width(self.ep_bdf2)
-                    LOGGER.info("速率变化后ep_bdf2:{} cap_speed2:{} current_speed2:{}".format(
-                        self.ep_bdf2, cap_speed2, current_speed2
-                    ))
-                    assert current_speed2 == "2.5GT/s", "速率变化验证失败"
-                    METHOD.perform_equalization_enable(self.dsp_bdf2)
-                    METHOD.speed_change(self.dsp_bdf2, 3)
-                    cap_speed2, cap_width2, current_speed2, current_width2 = METHOD.get_speed_width(self.ep_bdf2)
-                    LOGGER.info("速率变化后ep_bdf2:{} cap_speed2:{} current_speed2:{}".format(
-                        self.ep_bdf2, cap_speed2, current_speed2
-                    ))
-                    assert current_speed2 == "8GT/s", "速率变化验证失败"
-                BASE.execute_run('python3 serial_check.py aer')
-                BASE.execute_run('python3 serial_check.py check_eq')
-                aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
-                assert aer_info_after == self.aer_info_before, "txeq retrain前后ep aer信息不同"
-                if len(self.devices["0000"]) >= 2:
-                    aer_info_after2 = METHOD.get_aer_status_info(self.ep_bdf2)
-                    assert aer_info_after2 == self.aer_info_before2, "txeq retrain前后ep aer信息不同"
+                assert current_speed2 == "8GT/s", "速率变化验证失败"
+            BASE.execute_run('python3 serial_check.py check_eq')
+            aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
+            assert aer_info_after == self.aer_info_before, "txeq retrain前后ep aer信息不同"
+            if len(self.devices["0000"]) >= 2:
+                aer_info_after2 = METHOD.get_aer_status_info(self.ep_bdf2)
+                assert aer_info_after2 == self.aer_info_before2, "txeq retrain前后ep aer信息不同"
 
 
 if __name__ == '__main__':

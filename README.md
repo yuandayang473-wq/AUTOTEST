@@ -1,6 +1,8 @@
 # AUTOTEST
-执行方式
-项目根目录下终端执行pytest '@tests_to_run.txt'
+本项目测试case执行方式
+项目根目录下终端执行pytest '@tests_to_run.txt',可选参数如下：
+--aer-access-check=True/False          是否执行aer准入检查，默认值为True
+--uart-aer-check=True/False            是否执行uart aer检查，默认值为True
 
 tests_to_run.txt文件用来配置执行测试用例的范围，内容示例如下：
 tests/test_file.py                                 测试py文件下所有测试用例

@@ -56,21 +56,17 @@ class TestLoopL1:
     def test_loop_L1_001(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             LOGGER.info("开始执行ASPM L1 enable循环测试")
-            loop_count = 1
-            for i in range(loop_count):
-                LOGGER.info("第{}次循环".format(i+1))
-                METHOD.ASPM_enable(self.ep_bdf, L0s=False, L1=True)
-                if len(self.devices["0000"]) >= 2:
-                    METHOD.ASPM_enable(self.ep_bdf2, L0s=False, L1=True)
-                BASE.execute_run("python3 serial_check.py check_l1")
-                METHOD.ASPM_enable(self.ep_bdf, L0s=False, L1=False)
-                aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
-                assert aer_info_after == self.aer_info_before, "L1前后ep aer信息不同"
-                if len(self.devices["0000"]) >= 2:
-                    METHOD.ASPM_enable(self.ep_bdf2, L0s=False, L1=False)
-                    aer_info_after2 = METHOD.get_aer_status_info(self.ep_bdf2)
-                    assert aer_info_after2 == self.aer_info_before2, "L1前后ep aer信息不同"
-                BASE.execute_run('python3 serial_check.py aer')
+            METHOD.ASPM_enable(self.ep_bdf, L0s=False, L1=True)
+            if len(self.devices["0000"]) >= 2:
+                METHOD.ASPM_enable(self.ep_bdf2, L0s=False, L1=True)
+            BASE.execute_run("python3 serial_check.py check_l1")
+            METHOD.ASPM_enable(self.ep_bdf, L0s=False, L1=False)
+            aer_info_after = METHOD.get_aer_status_info(self.ep_bdf)
+            assert aer_info_after == self.aer_info_before, "L1前后ep aer信息不同"
+            if len(self.devices["0000"]) >= 2:
+                METHOD.ASPM_enable(self.ep_bdf2, L0s=False, L1=False)
+                aer_info_after2 = METHOD.get_aer_status_info(self.ep_bdf2)
+                assert aer_info_after2 == self.aer_info_before2, "L1前后ep aer信息不同"
 
 if __name__ == '__main__':
     pytest.main(['-s',""])

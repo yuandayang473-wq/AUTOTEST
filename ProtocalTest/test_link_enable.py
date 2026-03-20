@@ -67,7 +67,6 @@ class TestLinkEnable:
                 METHOD.link_enable(self.dsp_bdf2, enable=False)
                 assert METHOD.read_config_lspci(self.ep_bdf2) == False, "链路disable后lspci -vvvs显示设备状态为正常"
                 METHOD.link_enable(self.dsp_bdf2, enable=True)
-            BASE.execute_run('python3 serial_check.py aer')
             aer_info_after1 = METHOD.get_aer_status_info(self.ep_bdf1)
             assert aer_info_after1 == self.aer_info_before1, "disable前后ep aer信息不同"
             if len(self.devices["0000"]) >= 2:
@@ -82,7 +81,6 @@ class TestLinkEnable:
             if len(self.devices["0000"]) >= 2:
                 METHOD.link_enable(self.dsp_bdf2, enable=True)
                 assert METHOD.read_config_lspci(self.ep_bdf2) == True, "链路enable后lspci -vvvs显示设备状态为异常"
-            BASE.execute_run('python3 serial_check.py aer')
             aer_info_after1 = METHOD.get_aer_status_info(self.ep_bdf1)
             assert aer_info_after1 == self.aer_info_before1, "enable前后ep aer信息不同"
             if len(self.devices["0000"]) >= 2:

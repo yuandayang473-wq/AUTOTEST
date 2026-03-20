@@ -160,10 +160,13 @@ class Method:
         mep_p = []
         ntb_p = []
         for usp in usplist:
+            sw_id = usplist.index(usp)
             uspbdf, dspbdf_list, epbdf_list = self.get_all_device(usp)
-            devices.append(self.get_device(usp, 'USP'))
+            rpbdf = self.get_parent_device(uspbdf)
+            devices.append(self.get_device(rpbdf, 'RP', sw_id))
+            devices.append(self.get_device(usp, 'USP', sw_id))
             for ep in epbdf_list:
-                device = self.get_device(ep, 'EP')
+                device = self.get_device(ep, 'EP', sw_id)
                 if device.type == 'DMA':
                     dma_p.append(device.parent)
                 elif device.type == 'MEP':
@@ -173,13 +176,13 @@ class Method:
                 devices.append(device)
             for dsp in dspbdf_list:
                 if dsp in dma_p:
-                    device = self.get_device(dsp, 'DMA_IDSP')
+                    device = self.get_device(dsp, 'DMA_IDSP', sw_id)
                 elif dsp in mep_p:
-                    device = self.get_device(dsp, 'MEP_IDSP')
+                    device = self.get_device(dsp, 'MEP_IDSP', sw_id)
                 elif dsp in ntb_p:
-                    device = self.get_device(dsp, 'NTB_IDSP')
+                    device = self.get_device(dsp, 'NTB_IDSP', sw_id)
                 else:
-                    device = self.get_device(dsp, 'DSP')
+                    device = self.get_device(dsp, 'DSP', sw_id)
                 devices.append(device)
 
         return devices
@@ -209,10 +212,10 @@ class Method:
 
         return [bdf, dsp, ep]
 
-    def get_device(self, bdf, Type):
+    def get_device(self, bdf, Type, switch_id):
         device = namedtuple('device', ['device_bdf', 'device_id', 'vendor_id', 'type', 'class_code',
                                        'cap_speed', 'cap_width', 'current_speed', 'current_width', 'driver', 'slot',
-                                       'parent', 'children', "aer_status"])
+                                       'parent', 'children', "aer_status", "switch_id"])
         bdf_mod = bdf[5:12] if bdf[0:3] == '000' else bdf
         all_info = BASE.execute_run(f'lspci -vvvns {bdf_mod} | grep -E "({bdf_mod}|LnkCap:|LnkSta:|Kernel driver|Physical Slot|Subsystem)"', i_record_cmd=True).get_origin_data()
         class_code, vendor_id, device_id = re.search(f"{bdf_mod}\s+(.+?):\s+(.+?):(\\w+)", all_info).groups()
@@ -243,7 +246,7 @@ class Method:
             if f'{sub_id}' == '205e:2004':
                 Type = 'NTB'
         return device(bdf, device_id, vendor_id, Type, class_code, cap_speed,
-                      cap_width, current_speed, current_width, driver, slot, parent, children, aer_status)
+                      cap_width, current_speed, current_width, driver, slot, parent, children, aer_status, switch_id)
 
     def parse_cesta(self, cesta_hex):
         if not cesta_hex or not re.match(r'^[0-9A-Fa-f]+$', cesta_hex):

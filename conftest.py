@@ -8,6 +8,21 @@ from Lib import *
 # LOGGER = Logger()
 
 
+# 添加自定义命令行参数
+def pytest_addoption(parser):
+    """添加自定义命令行参数"""
+    parser.addoption(
+        "--aer-access-check",
+        action="store",
+        default="True",
+        help="是否在测试前检查AER状态，有任何错误均不能测试，默认为True",
+    )
+    parser.addoption(
+        "--uart-aer-check",
+        action="store",
+        default="True",
+        help="是否在每个测试用例后检查uart AER状态，默认为True",
+    )
 
 # def pytest_exception_interact(node, call, report):
 #     """
@@ -40,16 +55,29 @@ def show_test_case(request):
     time_use = round(t2 - t1)
     LOGGER.sys(f"用例{request.node.name}测试完成，总用时{time_use}s".center(100, "-"))
 
-# @pytest.fixture(scope="class", autouse=True)
-# def aer_checker(request):
-#     config = CONFIG
-#     config.config = [
-#         {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
-#     ]
-#     with BASE.ssh_connect(uut=config.config["UUT"]):
-#         devices = METHOD.get_switch_info()
-#         for device in devices:
-#             assert "+" not in device.aer_status["CESta"], f"设备{device.device_bdf}存在Correctable Error"
-#             assert "+" not in device.aer_status["DevSta"], f"设备{device.device_bdf}存在Device Status Error"
-#             assert "+" not in device.aer_status["UESta"], f"设备{device.device_bdf}存在Uncorrectable Error"
-#     yield
+@pytest.fixture(scope="function", autouse=True)
+def uart_aer_checker(request):
+    yield
+    if request.config.getoption("--uart-aer-check") == "True":
+        config = CONFIG
+        config.config = [
+            {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
+        ]
+        with BASE.ssh_connect(uut=config.config["UUT"]):
+            BASE.execute_run('python3 serial_check.py aer')
+
+
+@pytest.fixture(scope="session", autouse=True)
+def aer_access_checker(request):
+    if request.config.getoption("--aer-access-check") == "True":
+        config = CONFIG
+        config.config = [
+            {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
+        ]
+        with BASE.ssh_connect(uut=config.config["UUT"]):
+            devices = METHOD.get_switch_info()
+            for device in devices:
+                assert "+" not in device.aer_status["CESta"], f"设备{device.device_bdf}存在Correctable Error"
+                assert "+" not in device.aer_status["DevSta"], f"设备{device.device_bdf}存在Device Status Error"
+                assert "+" not in device.aer_status["UESta"], f"设备{device.device_bdf}存在Uncorrectable Error"
+    yield
