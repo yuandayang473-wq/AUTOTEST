@@ -287,9 +287,12 @@ def check_link_is_l1():
         logger.info("获取串口链路状态信息")
         res = sersend("lt_his all", serialport)
         port_list = re.findall(r"([\d|a-zA-Z]+)\s-", res)
-        print(port_list)
+        logger.info(port_list)
+        res = sersend("sw_topo", serialport)
+        usp_list = re.findall(r"USP\s([\d|a-zA-Z]{4})", res)
+        logger.info(usp_list)
         for port in port_list:
-            if port[1] != "2":
+            if port not in usp_list:
                 res = sersend(f"lt_his {port[1]} {port[3]}", serialport)
                 assert "L1" in res.split("\r\n")[3], f"{port}建链状态异常"
 
@@ -300,11 +303,14 @@ def check_have_equalization():
         logger.info("获取串口链路状态信息")
         res = sersend("lt_his all", serialport)
         port_list = re.findall(r"([\d|a-zA-Z]+)\s-", res)
-        print(port_list)
+        logger.info(port_list)
+        res = sersend("sw_topo", serialport)
+        usp_list = re.findall(r"USP\s([\d|a-zA-Z]{4})", res)
+        logger.info(usp_list)
         for port in port_list:
-            if port[1] != "2":
+            if port not in usp_list:
                 res = sersend(f"lt_his {port[1]} {port[3]}", serialport)
-            assert "Recovery.Equalization3" in res.split("\r\n")[7], f"{port}未发生过均衡"
+                assert "Recovery.Equalization3" in res.split("\r\n")[7], f"{port}未发生过均衡"
 
 # def monitor(q):
 #     while True:

@@ -79,7 +79,7 @@ class TestSpeedChange:
 
 
     @pytest.mark.author("袁大阳")
-    def test_sys_link_005(self):
+    def test_pcie_sys_link_005(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.speed_change(self.dsp_bdf, 5)
             cap_speed, cap_width, current_speed, current_width = METHOD.get_speed_width(self.ep_bdf)
@@ -101,7 +101,7 @@ class TestSpeedChange:
                 assert aer_info_after2 == self.aer_info_before2, "retrain前后aer信息不同"
 
     @pytest.mark.author("袁大阳")
-    def test_sys_link_006(self):
+    def test_pcie_sys_link_006(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.speed_change(self.dsp_bdf, 4)
             cap_speed, cap_width, current_speed, current_width = METHOD.get_speed_width(self.ep_bdf)
@@ -123,7 +123,7 @@ class TestSpeedChange:
                 assert aer_info_after2 == self.aer_info_before2, "retrain前后aer信息不同"
 
     @pytest.mark.author("袁大阳")
-    def test_sys_link_007(self):
+    def test_pcie_sys_link_007(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.speed_change(self.dsp_bdf, 3)
             cap_speed, cap_width, current_speed, current_width = METHOD.get_speed_width(self.ep_bdf)
@@ -145,7 +145,7 @@ class TestSpeedChange:
                 assert aer_info_after2 == self.aer_info_before2, "retrain前后aer信息不同"
 
     @pytest.mark.author("袁大阳")
-    def test_sys_link_008(self):
+    def test_pcie_sys_link_008(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.speed_change(self.dsp_bdf, 2)
             cap_speed, cap_width, current_speed, current_width = METHOD.get_speed_width(self.ep_bdf)
@@ -167,7 +167,7 @@ class TestSpeedChange:
                 assert aer_info_after2 == self.aer_info_before2, "retrain前后aer信息不同"
 
     @pytest.mark.author("袁大阳")
-    def test_sys_link_009(self):
+    def test_pcie_sys_link_009(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.speed_change(self.dsp_bdf, 1)
             cap_speed, cap_width, current_speed, current_width = METHOD.get_speed_width(self.ep_bdf)

@@ -597,10 +597,11 @@ class Method:
             启用PCIe设备的链路
             :param dsp: PCI设备地址，如 "0000:17:00.0"
         """
-        LOGGER.info(f"启用或关闭{dsp}对应链路")
         if enable == True:
+            LOGGER.info(f"启用{dsp}对应链路")
             self.setpci_bits(dsp, "CAP_EXP+10", 4, 4, 0)
         else:
+            LOGGER.info(f"关闭{dsp}对应链路")
             self.setpci_bits(dsp, "CAP_EXP+10", 4, 4, 1)
     def get_pm_state(self, bdf):
         """
@@ -675,3 +676,60 @@ class Method:
         """
         LOGGER.info("触发PCI总线重新扫描")
         BASE.execute_run("echo 1 > /sys/bus/pci/rescan")
+
+    def npem_enable(self, bdf, enable=True):
+        """
+            启用或禁用PCIe设备的NPEM
+            :param bdf: PCI设备地址，如 "0000:17:00.0"
+            :param enable: True启用，False禁用
+        """
+        action = "启用" if enable else "禁用"
+        LOGGER.info(f"{action}{bdf}对应NPEM")
+        if enable:
+            self.setpci_bits(bdf, "ECAP_NPEM+8", 0, 0, 1)
+        else:
+            self.setpci_bits(bdf, "ECAP_NPEM+8", 0, 0, 0)
+
+    def ini_npem_reset(self, bdf):
+        """
+            触发PCIe设备的NPEM复位
+            :param bdf: PCI设备地址，如 "0000:17:00.0"
+        """
+        LOGGER.info(f"触发{bdf}对应NPEM复位")
+        self.setpci_bits(bdf, "ECAP_NPEM+8", 1, 1, 1)
+
+    def npem_control(self, bdf, type):
+        """
+            控制PCIe设备的NPEM功能
+            :param bdf: PCI设备地址，如 "0000:17:00.0"
+            :param type: 操作类型，如下
+        """
+        if type == "OK":
+            BASE.execute_run(f"setpci -s {bdf} ECAP_NPEM+8.W=0005")
+        elif type == "Locate":
+            BASE.execute_run(f"setpci -s {bdf} ECAP_NPEM+8.W=0009")
+        elif type == "Fail":
+            BASE.execute_run(f"setpci -s {bdf} ECAP_NPEM+8.W=0011")
+        elif type == "Rebuild":
+            BASE.execute_run(f"setpci -s {bdf} ECAP_NPEM+8.W=0021")
+        elif type == "PFA":
+            BASE.execute_run(f"setpci -s {bdf} ECAP_NPEM+8.W=0041")
+        elif type == "Hot Spare":
+            BASE.execute_run(f"setpci -s {bdf} ECAP_NPEM+8.W=0081")
+        elif type == "A Critical Array":
+            BASE.execute_run(f"setpci -s {bdf} ECAP_NPEM+8.W=0101")
+        elif type == "A Failed Array":
+            BASE.execute_run(f"setpci -s {bdf} ECAP_NPEM+8.W=0201")
+        else:
+            raise ValueError("Invalid NPEM control type")
+
+    def get_nvme_symbolic_name(self, bdf):
+        """
+            获取nvme设备对应的磁盘符号链接名称
+            :param bdf: PCI设备地址，如 "0000:17:00.0"
+            :return: 磁盘符号链接名称，如 "/dev/nvme0n1"
+        """
+        ret = BASE.execute_run(f"ls /sys/bus/pci/devices/{bdf}/nvme").get_origin_data().strip()
+        nvme_name = f"/dev/{ret}n1"
+        LOGGER.info(f"获取到的盘符为：{nvme_name}")
+        return nvme_name

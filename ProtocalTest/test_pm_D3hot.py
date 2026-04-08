@@ -67,7 +67,7 @@ class TestPMD3Hot:
                 METHOD.set_power_state(self.dsp_bdf2, "D0")
                 METHOD.set_power_state(self.ep_bdf2, "D0")
 
-    def test_sys_pm_001(self):
+    def test_pcie_sys_pm_001(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             cap = METHOD.get_pm_suport_pme_states(self.usp_bdf)
             assert cap == ["D0", "D3hot"], "USP设备PME支持的电源状态应该是D0和D3hot"
@@ -76,7 +76,7 @@ class TestPMD3Hot:
             BASE.execute_run('lspci -s {} -vvv | grep " D1- "'.format(self.usp_bdf))
             BASE.execute_run('lspci -s {} -vvv | grep " D2- "'.format(self.dsp_bdf))
 
-    def test_sys_pm_002(self):
+    def test_pcie_sys_pm_002(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.PME_enable(self.usp_bdf)
             METHOD.PME_enable(self.dsp_bdf)
@@ -85,7 +85,7 @@ class TestPMD3Hot:
             METHOD.PME_enable(self.usp_bdf, PME=False)
             METHOD.PME_enable(self.dsp_bdf, PME=False)
 
-    def test_sys_pm_012(self):
+    def test_pcie_sys_pm_012(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.set_power_state(self.ep_bdf, "D0")
             SLEEP(2)
@@ -101,7 +101,7 @@ class TestPMD3Hot:
                                          self.config.config["UUT"]["password"])
             BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
-    # def test_sys_pm_013(self):
+    # def test_pcie_sys_pm_013(self):
     #     with BASE.ssh_connect(uut=self.config.config["UUT"]):
     #         assert len(self.devices["0000"][0]["eps"]) == 1, "本用例自动化执行每个SW必须有且仅有一个EP设备"
     #         assert len(self.devices["0000"])  == 1, "本用例自动化只支持单SW场景"
@@ -129,7 +129,7 @@ class TestPMD3Hot:
     #                                      self.config.config["UUT"]["password"])
     #         BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
-    def test_sys_pm_014(self):
+    def test_pcie_sys_pm_014(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             assert len(self.devices["0000"][0]["eps"]) == 1, "本用例自动化执行每个SW必须有且仅有一个EP设备"
             if len(self.devices["0000"]) >= 2:
@@ -148,7 +148,7 @@ class TestPMD3Hot:
                                          self.config.config["UUT"]["password"])
             BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
-    def test_sys_pm_015(self):
+    def test_pcie_sys_pm_015(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.set_power_state(self.ep_bdf, "D3hot")
             SLEEP(2)
@@ -175,7 +175,7 @@ class TestPMD3Hot:
             METHOD.clear_aer_status(self.ep_bdf)
             METHOD.clear_aer_status(self.ep_bdf2)
 
-    def test_sys_pm_016(self):
+    def test_pcie_sys_pm_016(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.set_power_state(self.dsp_bdf, "D3hot")
             SLEEP(4)
@@ -203,7 +203,7 @@ class TestPMD3Hot:
                                          self.config.config["UUT"]["password"])
             BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
-    def test_sys_pm_017(self):
+    def test_pcie_sys_pm_017(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.set_power_state(self.usp_bdf, "D3hot")
             SLEEP(4)
@@ -221,7 +221,7 @@ class TestPMD3Hot:
                                          self.config.config["UUT"]["password"])
             BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
-    def test_sys_pm_018(self):
+    def test_pcie_sys_pm_018(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.set_power_state(self.ep_bdf, "D3hot")
             SLEEP(4)

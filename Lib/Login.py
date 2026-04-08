@@ -371,7 +371,6 @@ class SshConnect(Connection):
         # success
         return OutData(result.get_out_rst())
 
-    @cmd_retry
     def _run(self, command, ignore_exit_code, cmd_timeout):
         # # opne a transport
         # channel = self.trans.open_session()

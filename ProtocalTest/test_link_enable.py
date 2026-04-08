@@ -58,7 +58,7 @@ class TestLinkEnable:
                 METHOD.link_enable(self.dsp_bdf2, enable=True)
 
     @pytest.mark.author("袁大阳")
-    def test_sys_link_002(self):
+    def test_pcie_sys_link_002(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.link_enable(self.dsp_bdf1, enable=False)
             assert METHOD.read_config_lspci(self.ep_bdf1) == False, "链路disable后lspci -vvvs显示设备状态为正常"
@@ -74,7 +74,7 @@ class TestLinkEnable:
                 assert aer_info_after2 == self.aer_info_before2, "disable前后ep aer信息不同"
 
     @pytest.mark.author("袁大阳")
-    def test_sys_link_003(self):
+    def test_pcie_sys_link_003(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             METHOD.link_enable(self.dsp_bdf1, enable=True)
             assert METHOD.read_config_lspci(self.ep_bdf1) == True, "链路enable后lspci -vvvs显示设备状态为异常"
