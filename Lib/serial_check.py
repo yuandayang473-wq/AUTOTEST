@@ -38,15 +38,15 @@ logger.setLevel(logging.DEBUG)  # 设置日志级别
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 # 创建file handler
-fh = logging.FileHandler(LOGFILE)
-fh.setLevel(logging.INFO)
+# fh = logging.FileHandler(LOGFILE)
+# fh.setLevel(logging.INFO)
 # 创建格式器并绑定到处理器
 # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(lineno)s - %(message)s')
 # ch.setFormatter(formatter)
 # fh.setFormatter(formatter)
 # 将处理器添加到logger
 logger.addHandler(ch)
-logger.addHandler(fh)
+# logger.addHandler(fh)
 
 
 def serread(address, serialport=SERIALPORT):
@@ -274,14 +274,14 @@ def fiotest(q, ip, username, password, serialport):
 #     logger.info("fio stress测试---------------------------------------------[成功]")
 
 def get_aer_info():
-    logger.info("===============Start autotesting...==================")
+    logger.info("===============Start serial check...==================")
     getcmdserialport()
     for serialport in SERIALPORT:
         logger.info("获取串口AER信息")
         sersend("aer all", serialport)
 
 def check_link_is_l1():
-    logger.info("===============Start autotesting...==================")
+    logger.info("===============Start serial check...==================")
     getcmdserialport()
     for serialport in SERIALPORT:
         logger.info("获取串口链路状态信息")
@@ -297,7 +297,7 @@ def check_link_is_l1():
                 assert "L1" in res.split("\r\n")[3], f"{port}建链状态异常"
 
 def check_have_equalization():
-    logger.info("===============Start autotesting...==================")
+    logger.info("===============Start serial check...==================")
     getcmdserialport()
     for serialport in SERIALPORT:
         logger.info("获取串口链路状态信息")

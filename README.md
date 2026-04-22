@@ -9,6 +9,7 @@ tests/test_file.py                                 测试py文件下所有测试
 tests/test_file.py::test_func1                     测试py文件下的test_func1测试用例
 tests/test_file.py::TestClass                      测试py文件下的TestClass测试类下的所有测试用例
 -m slow                                            执行标记为slow的测试用例
+-m interaction                                     执行标记为interaction的测试用例，即交互式半自动化用例
 tests/                                             测试目录下的所有测试用例
 
 循环执行测试脚本

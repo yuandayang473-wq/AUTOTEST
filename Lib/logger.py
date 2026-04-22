@@ -52,7 +52,7 @@ class Logger:
         if not os.path.exists(log_path):
             os.makedirs(log_path)
         t = time.strftime("%Y%m%d_%H-%M-%S", time.localtime())
-        self.log_name = log_path + "\\antotest{}.log".format(t)
+        self.log_name = log_path + "\\autotest{}.log".format(t)
         sh = logging.StreamHandler()  # for print out
         fh = logging.FileHandler(self.log_name, encoding="utf-8")  # for file out
         self.logger.addHandler(sh)

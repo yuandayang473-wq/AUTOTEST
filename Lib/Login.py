@@ -10,7 +10,7 @@
 @License :   Copyright ©ins  2022 . All Rights Reserved.
 @Desc    :   None
 """
-
+from Lib.decorate import singleton
 import time
 import paramiko
 import re
@@ -50,18 +50,11 @@ def cmd_retry(origin_func):
 
     return wrapper
 
-
+@singleton
 class OsRunCmd:
-    _instance = None
-
-    def __new__(cls, *args, **kw):
-        if cls._instance is None:
-            cls._instance = object.__new__(cls)
-        return cls._instance
 
     def __init__(self, logger=None):
         self.logger = logger
-        self._exit_code = 0
         self._cmd_count = 3
 
     def get_logger(self):
@@ -113,9 +106,7 @@ class OsRunCmd:
         self.logger.info("os Execute command ok, Output below: \n%s" % parser.get_origin_data())
         return parser
 
-    @cmd_retry
     def _run(self, command, ignore_exit_code, save_exit_code, cmd_timeout, i_timeout_err):
-        returncode = Status.SUCCESS
         if not isinstance(command, str):
             raise TypeError(f'command MUST be _cmd string type, {command} is _cmd {type(command)} type')
         try:

@@ -145,16 +145,9 @@ class Method:
 
 
         devices = []
-        parser = BASE.execute_run(f"lspci -Dnd '205e': | awk '{{if($2==\"0604:\")print $1}}'", i_record_cmd=True)
+        parser = BASE.execute_run(f"lspci -Dvvvnnd 205e:5104| grep 'Upstream Port' -B 30 | egrep '..:..\.0' | cut -d ' ' -f 1", i_record_cmd=True)
         msg = parser.get_origin_data()
-        switchinfo = msg.strip().split('\n')
-
-        usplist = []
-
-        for dev in switchinfo:
-            BASE.execute_run(f"lspci -vvvs {dev} | grep -i 'Upstream Port'", i_exit_code=True, i_record_cmd=True)
-            if BASE.ssh.get_exit_code() == 0:
-                usplist.append(dev)
+        usplist = msg.strip().split('\n')
 
         dma_p = []
         mep_p = []
@@ -570,7 +563,7 @@ class Method:
                               password, port="22"):
         """
         向远程服务器传送文件
-        :param src_file: 本地文件路径,以data文件夹为开头
+        :param src_file: 本地文件路径
         :param des_file: 远程主机的文件路径
         :param host: 主机名
         :param username: 用户名

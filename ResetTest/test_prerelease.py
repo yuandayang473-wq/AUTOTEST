@@ -40,7 +40,7 @@ class TestCoolSoftReboot():
         LOGGER.sys(f"结束执行测试用例组:{request.cls}".center(100, "-"))
 
     def test_cool_soft_reboot_001(self):
-        ip = self.config.config["UUT"]["ip_address"]
+        ip = self.config.config["UUT"]["ip"]
 
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             base_log_name = "{}_pretest0.log".format(time.strftime("%Y%m%d_%H%M%S"))
@@ -53,8 +53,8 @@ class TestCoolSoftReboot():
                     "ipmitool power cycle", i_exit_code=True)
             for j in range(20):
                 SLEEP(25)
-                BASE.os_run.run("ping -c 1 -w 1 {}".format(ip), i_exit_code=True)
-                if BASE.os_run.get_exit_code() == 1:
+                BASE.os_run.run("ping -n 4 {}".format(ip), i_exit_code=True)
+                if BASE.os_run.get_exit_code() == 0:
                     break
             else:
                 raise Exception("500S仍未连接")
@@ -72,8 +72,8 @@ class TestCoolSoftReboot():
                     "reboot", i_exit_code=True)
             for j in range(20):
                 SLEEP(25)
-                BASE.os_run.run("ping -c 1 -w 1 {}".format(ip), i_exit_code=True)
-                if BASE.os_run.get_exit_code() == 1:
+                BASE.os_run.run("ping -n 4 {}".format(ip), i_exit_code=True)
+                if BASE.os_run.get_exit_code() == 0:
                     break
             else:
                 raise Exception("500S仍未连接")

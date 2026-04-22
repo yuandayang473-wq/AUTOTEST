@@ -20,7 +20,7 @@ import time
 import yaml
 
 from .Error import OverrideError, SSHSessionError
-from .Login import SshConnect, BmcConnect
+from .Login import SshConnect, BmcConnect, OsRunCmd
 from .DataBuffer import StrParser
 from collections import namedtuple, defaultdict
 
@@ -106,4 +106,7 @@ class Base:
             self.ssh = ssh
             yield
 
+    @property
+    def os_run(self):
+        return OsRunCmd(logger=LOGGER)
 

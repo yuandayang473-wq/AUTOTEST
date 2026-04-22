@@ -1,12 +1,9 @@
 # !/usr/bin/python3
 # -*- encoding: utf-8 -*-
-import sys
-import subprocess
-
 import pytest
 
-
 from Lib import *
+
 
 
 # load_list = ["LuxScript"]
@@ -31,6 +28,9 @@ class TestLinkEnable:
     config.config = [
         {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
     ]
+    ep_dsp_pairs = []
+    aer_info_before = {}
+
     @pytest.fixture(scope="class", autouse=True)
     def setup_teardown(self, request):
         # setup
@@ -38,54 +38,52 @@ class TestLinkEnable:
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             request.cls.devices = METHOD.get_bdf()
             LOGGER.info("设备信息:{}".format(request.cls.devices))
-            request.cls.dsp_bdf1 = request.cls.devices["0000"][0]["eps"][0]["dsp"]
-            request.cls.ep_bdf1 = request.cls.devices["0000"][0]["eps"][0]["ep"]
+            request.cls.ep_dsp_pairs = []
+            for sw_info in request.cls.devices.get("0000", []):
+                for ep_info in sw_info.get("eps", []):
+                    ep_bdf = ep_info.get("ep")
+                    dsp_bdf = ep_info.get("dsp")
+                    if ep_bdf and dsp_bdf:
+                        request.cls.ep_dsp_pairs.append((ep_bdf, dsp_bdf))
+
+            assert request.cls.ep_dsp_pairs, "未获取到可用EP/DSP设备"
+
             METHOD.upload_file_to_server('Lib\\serial_check.py', 'serial_check.py', self.config.config["UUT"]["ip"],
                                          self.config.config["UUT"]["username"],
                                          self.config.config["UUT"]["password"])
-            request.cls.aer_info_before1 = METHOD.get_aer_status_info(request.cls.ep_bdf1)
-            if len(request.cls.devices["0000"]) >= 2:
-                request.cls.dsp_bdf2 = request.cls.devices["0000"][1]["eps"][0]["dsp"]
-                request.cls.ep_bdf2 = request.cls.devices["0000"][1]["eps"][0]["ep"]
-                request.cls.aer_info_before2 = METHOD.get_aer_status_info(request.cls.ep_bdf2)
+            request.cls.aer_info_before = {}
+            for ep_bdf, _ in request.cls.ep_dsp_pairs:
+                request.cls.aer_info_before[ep_bdf] = METHOD.get_aer_status_info(ep_bdf)
 
         yield
         # teardown
         LOGGER.sys(f"结束执行测试用例组:{request.cls}".center(100, "-"))
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            METHOD.link_enable(self.dsp_bdf1, enable=True)
-            if len(self.devices["0000"]) >= 2:
-                METHOD.link_enable(self.dsp_bdf2, enable=True)
+            for _, dsp_bdf in self.ep_dsp_pairs:
+                METHOD.link_enable(dsp_bdf, enable=True)
 
     @pytest.mark.author("袁大阳")
     def test_pcie_sys_link_002(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            METHOD.link_enable(self.dsp_bdf1, enable=False)
-            assert METHOD.read_config_lspci(self.ep_bdf1) == False, "链路disable后lspci -vvvs显示设备状态为正常"
-            METHOD.link_enable(self.dsp_bdf1, enable=True)
-            if len(self.devices["0000"]) >= 2:
-                METHOD.link_enable(self.dsp_bdf2, enable=False)
-                assert METHOD.read_config_lspci(self.ep_bdf2) == False, "链路disable后lspci -vvvs显示设备状态为正常"
-                METHOD.link_enable(self.dsp_bdf2, enable=True)
-            aer_info_after1 = METHOD.get_aer_status_info(self.ep_bdf1)
-            assert aer_info_after1 == self.aer_info_before1, "disable前后ep aer信息不同"
-            if len(self.devices["0000"]) >= 2:
-                aer_info_after2 = METHOD.get_aer_status_info(self.ep_bdf2)
-                assert aer_info_after2 == self.aer_info_before2, "disable前后ep aer信息不同"
+            for ep_bdf, dsp_bdf in self.ep_dsp_pairs:
+                METHOD.link_enable(dsp_bdf, enable=False)
+                assert METHOD.read_config_lspci(ep_bdf) is False, f"链路disable后lspci -vvvs显示设备状态为正常: {ep_bdf}"
+                METHOD.link_enable(dsp_bdf, enable=True)
+
+            for ep_bdf, _ in self.ep_dsp_pairs:
+                aer_info_after = METHOD.get_aer_status_info(ep_bdf)
+                assert aer_info_after == self.aer_info_before[ep_bdf], f"disable前后ep aer信息不同: {ep_bdf}"
 
     @pytest.mark.author("袁大阳")
     def test_pcie_sys_link_003(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            METHOD.link_enable(self.dsp_bdf1, enable=True)
-            assert METHOD.read_config_lspci(self.ep_bdf1) == True, "链路enable后lspci -vvvs显示设备状态为异常"
-            if len(self.devices["0000"]) >= 2:
-                METHOD.link_enable(self.dsp_bdf2, enable=True)
-                assert METHOD.read_config_lspci(self.ep_bdf2) == True, "链路enable后lspci -vvvs显示设备状态为异常"
-            aer_info_after1 = METHOD.get_aer_status_info(self.ep_bdf1)
-            assert aer_info_after1 == self.aer_info_before1, "enable前后ep aer信息不同"
-            if len(self.devices["0000"]) >= 2:
-                aer_info_after2 = METHOD.get_aer_status_info(self.ep_bdf2)
-                assert aer_info_after2 == self.aer_info_before2, "enable前后ep aer信息不同"
+            for ep_bdf, dsp_bdf in self.ep_dsp_pairs:
+                METHOD.link_enable(dsp_bdf, enable=True)
+                assert METHOD.read_config_lspci(ep_bdf) is True, f"链路enable后lspci -vvvs显示设备状态为异常: {ep_bdf}"
+
+            for ep_bdf, _ in self.ep_dsp_pairs:
+                aer_info_after = METHOD.get_aer_status_info(ep_bdf)
+                assert aer_info_after == self.aer_info_before[ep_bdf], f"enable前后ep aer信息不同: {ep_bdf}"
 
 
 if __name__ == '__main__':
