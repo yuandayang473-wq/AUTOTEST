@@ -491,7 +491,7 @@ class Method:
             获取系统中所有CX7设备的信息
             :return: 包含CX7设备信息的列表
         """
-        devices = BASE.execute_run("ibdev2netdev").get_origin_data().split("\n")
+        devices = BASE.execute_run("ibdev2netdev").get_origin_data().strip().split("\n")
         rdmalink_devices = [line.split()[0] for line in devices]
         ip_devices = [line.split()[4] for line in devices]
         return {"rdmalink": rdmalink_devices, "ip": ip_devices}

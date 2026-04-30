@@ -30,6 +30,24 @@ def pytest_addoption(parser):
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 
+def _format_duration(seconds: float) -> str:
+    """将秒数格式化为更易读的时长字符串。"""
+    total = int(round(seconds))
+    days, rem = divmod(total, 24 * 3600)
+    hours, rem = divmod(rem, 3600)
+    minutes, secs = divmod(rem, 60)
+
+    parts = []
+    if days:
+        parts.append(f"{days}d")
+    if hours or days:
+        parts.append(f"{hours}h")
+    if minutes or hours or days:
+        parts.append(f"{minutes}m")
+    parts.append(f"{secs}s")
+    return " ".join(parts)
+
+
 def _compact_tb(excinfo):
     """只保留项目内栈帧，过滤 pytest/pluggy 框架噪音。"""
     tb = excinfo.tb
@@ -60,45 +78,71 @@ def _compact_tb(excinfo):
     return "".join(lines).rstrip()
 
 
-def pytest_exception_interact(node, call, report):
-    # 只记录失败；并可选只记录 call 阶段，避免 teardown 噪音
+def _build_phase_failure_block(phase, nodeid, excinfo, report):
+    if excinfo is None:
+        return "\n".join(
+            [
+                f"测试失败[{phase}]: {nodeid}",
+                f"异常信息: {getattr(report, 'longreprtext', '未知错误')}",
+            ]
+        )
+
+    return "\n".join(
+        [
+            f"测试失败[{phase}]: {nodeid}",
+            f"异常类型: {excinfo.type.__name__}",
+            f"异常信息: {excinfo.value}",
+            "Traceback:",
+            _compact_tb(excinfo),
+        ]
+    )
+
+
+def _log_failure_block_file_only(block: str):
+    t = time.strftime("[%Y-%m-%d %H:%M:%S]", time.localtime())
+    with open(LOGGER.log_name, "a", encoding="utf-8") as f:
+        for row in block.split("\n"):
+            f.write(f"{t}\tERROR\t{row}\n")
+
+
+@pytest.hookimpl(hookwrapper=True, tryfirst=True)
+def pytest_runtest_makereport(item, call):
+    """统一在 report 阶段输出失败日志，避免 exception hook 与控制台输出抢顺序。"""
+    outcome = yield
+    report = outcome.get_result()
+    setattr(item, f"rep_{report.when}", report)
+
     if not report.failed:
         return
-    # 如果你不想记录 teardown 异常，保留这一行；想保留就删掉
-    # if getattr(report, "when", "") != "call":
-    #     return
 
-    excinfo = call.excinfo
-    if excinfo is None:
-        LOGGER.error("测试失败: %s\n失败信息: %s", node.nodeid, getattr(report, "longreprtext", "未知错误"))
-        return
-
-    LOGGER.error("测试失败: %s", node.nodeid)
-    LOGGER.error("异常类型: %s", excinfo.type.__name__)
-    LOGGER.error("异常信息: %s", excinfo.value)
-    LOGGER.error("Traceback:\n%s", _compact_tb(excinfo))
+    phase = report.when
+    block = _build_phase_failure_block(phase, item.nodeid, call.excinfo, report)
+    # 失败详情仅写日志文件，避免控制台在 TeamCity 节点间交叉重排
+    _log_failure_block_file_only(block)
 
 @pytest.fixture(scope="function", autouse=True)
 def show_test_case(request):
     m = request.node.get_closest_marker("author")
     name = m.args[0] if m and m.args else "unknown"
     LOGGER.sys(f"开始测试用例{request.node.name}，用例作者：{name}".center(100, "-"))
-    t1 =  time.time()
+    t1 = time.time()
     yield
     t2 = time.time()
-    time_use = round(t2 - t1)
-    LOGGER.sys(f"用例{request.node.name}测试完成，总用时{time_use}s".center(100, "-"))
+    time_use = _format_duration(t2 - t1)
+    LOGGER.sys(f"用例{request.node.name}测试完成，总用时{time_use}".center(100, "-"))
 
-# @pytest.fixture(scope="function", autouse=True)
-# def uart_aer_checker(request):
-#     yield
-#     if request.config.getoption("--uart-aer-check") == "True":
-#         config = CONFIG
-#         config.config = [
-#             {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
-#         ]
-#         with BASE.ssh_connect(uut=config.config["UUT"]):
-#             BASE.execute_run('python3 serial_check.py aer')
+@pytest.fixture(scope="function", autouse=True)
+def uart_aer_checker(request, show_test_case):
+    LOGGER.info("uart_aer_checker start")
+    yield
+    LOGGER.info("uart_aer_checker end")
+    # if request.config.getoption("--uart-aer-check") == "True":
+    #     config = CONFIG
+    #     config.config = [
+    #         {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
+    #     ]
+    #     with BASE.ssh_connect(uut=config.config["UUT"]):
+    #         BASE.execute_run('python3 serial_check.py aer')
 
 
 # @pytest.fixture(scope="session", autouse=True)
@@ -115,3 +159,4 @@ def show_test_case(request):
 #                 assert "+" not in device.aer_status["DevSta"], f"设备{device.device_bdf}存在Device Status Error"
 #                 assert "+" not in device.aer_status["UESta"], f"设备{device.device_bdf}存在Uncorrectable Error"
 #     yield
+

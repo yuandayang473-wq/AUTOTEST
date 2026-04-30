@@ -21,7 +21,6 @@ from Lib.Error import BmcSessionError, SshConnectionError, AuthenticationError, 
 from Lib.Constant import Status
 from Lib.DataBuffer import OutData
 from Lib.Result import CmdFail, CmdPass
-from SSHLibrary import SSHLibrary
 
 def cmd_retry(origin_func):
     def wrapper(self, command, ignore_exit_code, cmd_timeout):
@@ -109,6 +108,7 @@ class OsRunCmd:
     def _run(self, command, ignore_exit_code, save_exit_code, cmd_timeout, i_timeout_err):
         if not isinstance(command, str):
             raise TypeError(f'command MUST be _cmd string type, {command} is _cmd {type(command)} type')
+        returncode = Status.FAIL
         try:
             p = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=cmd_timeout, shell=True,
                                encoding='utf-8', check=bool(1 - ignore_exit_code), errors="ignore")
@@ -234,13 +234,13 @@ class SshConnect(Connection):
         # self.__timeout = timeout
         self.__cmd_count = 3
         self._bmc_con = bmc_con
-        self.ssh_library = None
-        # self.trans = None
+        self.ssh_client = None
+        self.trans = None
         self.__exit_code = Status.SUCCESS
-        # self.channel = None
-        # self.invoke_buff = []
-        # self.first_invoke = True
-        # self.s_invoke = True
+        self.channel = None
+        self.invoke_buff = []
+        self.first_invoke = True
+        self.s_invoke = True
         self.__port = port
 
     def __enter__(self):
@@ -249,19 +249,20 @@ class SshConnect(Connection):
         log = self.get_logger()
         while init_val <= count:
             try:
-                #  instance a sshclient
-                if self.ssh_library is None:
-                    self.ssh_library = SSHLibrary(30)
-                self.ssh_library.open_connection(host=self.get_host(), alias='vps', port=int(self.__port), timeout=30)
-                self.ssh_library.login(username=self.get_username(), password=self.get_password())
+                if self.ssh_client is None:
+                    self.ssh_client = paramiko.SSHClient()
+                    self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-                # trans = paramiko.Transport((self.get_host(), self.__port))  # 如果你使用 paramiko.SSHClient() cd后会回到连接的初始状态
-                # trans.start_client()
-                # trans.set_keepalive(60)
-                # # username and password
-                # trans.auth_password(username=self.get_username(), password=self.get_password())
-                # self.trans = trans
-                # # get a terminal
+                self.ssh_client.connect(
+                    hostname=self.get_host(),
+                    port=int(self.__port),
+                    username=self.get_username(),
+                    password=self.get_password(),
+                    timeout=30,
+                )
+                self.trans = self.ssh_client.get_transport()
+                if self.trans is not None:
+                    self.trans.set_keepalive(60)
                 log.info("ssh connect success, ip: {os_ip}".format(os_ip=self.get_host()))
                 return self
 
@@ -281,14 +282,25 @@ class SshConnect(Connection):
                 if init_val == count:
                     raise SshConnectionError("Unable to connect to %s" % self.get_host())
 
+            except Exception as err:
+                msg = f"SSH Connect to {self.get_host()} Fail,start retry {init_val}, error: {err}"
+                self.get_logger().info(msg)
+                if init_val == count:
+                    raise SshConnectionError("Unable to connect to %s" % self.get_host())
+
             init_val += 1
             time.sleep(60)
 
     def __exit__(self, exc_type, exc_value, exc_tb):
         log = self.get_logger()
         log.info("ssh Disconnect, ip: {os_ip}".format(os_ip=self.get_host()))
-        if self.ssh_library is not None:
-            self.ssh_library.close_connection()
+        if self.channel is not None:
+            self.channel.close()
+            self.channel = None
+        if self.ssh_client is not None:
+            self.ssh_client.close()
+            self.ssh_client = None
+        self.trans = None
         if exc_type is not None:
             raise exc_value
 
@@ -363,40 +375,18 @@ class SshConnect(Connection):
         return OutData(result.get_out_rst())
 
     def _run(self, command, ignore_exit_code, cmd_timeout):
-        # # opne a transport
-        # channel = self.trans.open_session()
-        # # channel.settimeout(self.get_timeout())
-        # channel.settimeout(cmd_timeout)
-        # channel.get_pty()
-        # # try:
-        # channel.exec_command(command)
-        #
-        # # if i_timeout_err:
-        # #     return CmdPass(Status.SUCCESS, f'timeout: {cmd_timeout},auto stop cmd {command}')
-        # all_data = ""
-        # start_time = time.time()  # 命令开始时间
-        try:
-            # data = channel.recv(1024).decode("utf-8")
-            # while data:
-            #     all_data += data
-            #     data = channel.recv(1024).decode("utf-8")
-            #     end_time = time.time()
-            #     t = int(end_time - start_time)
-            #     if t > cmd_timeout and i_timeout_err:
-            #         self.get_logger().info(f'timeout: {cmd_timeout},auto stop cmd {command}')
-            #         return CmdPass(Status.SUCCESS, all_data)
-            #     time.sleep(1)
-            stdout, stderr, result_code = self.ssh_library.execute_command(command, return_rc=True, return_stderr=True,
-                                                                           timeout=cmd_timeout)
-            result = stdout + stderr
+        if not isinstance(command, str):
+            raise TypeError(f'command MUST be _cmd string type, {command} is _cmd {type(command)} type')
+        if self.ssh_client is None:
+            return CmdFail(Status.FAIL, "ssh client is not connected")
 
+        try:
+            stdin, stdout, stderr = self.ssh_client.exec_command(command, timeout=cmd_timeout)
+            result = stdout.read().decode("utf-8", errors="ignore") + stderr.read().decode("utf-8", errors="ignore")
+            result_code = stdout.channel.recv_exit_status()
         except Exception as err:
-            # if i_timeout_err:
-            #     self.get_logger().info(f'timeout: {cmd_timeout},auto stop cmd {command}')
-            #     return CmdPass(Status.SUCCESS, all_data)
-        # status_code = channel.recv_exit_status()
-        # channel.close()
-            pass
+            return CmdFail(Status.FAIL, err)
+
         self.__exit_code = result_code
 
         if ignore_exit_code:
@@ -490,7 +480,9 @@ class SshConnect(Connection):
         :return: None
         """
         self.get_logger().info(f"SFTP remote file:{src}, local file: {des}")
-        stfp = paramiko.SFTPClient.from_transport(self.trans)
+        if self.ssh_client is None:
+            raise SshConnectionError("ssh connection is not established")
+        stfp = self.ssh_client.open_sftp()
         stfp.get(src, des)
         stfp.close()
 
@@ -501,7 +493,9 @@ class SshConnect(Connection):
         :return:
         """
         self.get_logger().info(f"SFTP local file:{src}, remote file: {des}")
-        stfp = paramiko.SFTPClient.from_transport(self.trans)
+        if self.ssh_client is None:
+            raise SshConnectionError("ssh connection is not established")
+        stfp = self.ssh_client.open_sftp()
         stfp.put(src, des)
         stfp.close()
 

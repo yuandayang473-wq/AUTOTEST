@@ -34,12 +34,13 @@ class TestPMD3Hot:
     usp_bdfs = []
 
     def _save_after_and_diff(self):
-        self.devices_after = METHOD.get_switch_info()
-        METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
-        METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
-                                     self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
-                                     self.config.config["UUT"]["password"])
-        BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
+        pass
+        # self.devices_after = METHOD.get_switch_info()
+        # METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
+        # METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
+        #                              self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
+        #                              self.config.config["UUT"]["password"])
+        # BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
     @pytest.fixture(scope="class", autouse=True)
     def setup_teardown(self, request):

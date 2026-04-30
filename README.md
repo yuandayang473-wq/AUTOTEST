@@ -1,6 +1,9 @@
 # AUTOTEST
 本项目测试case执行方式
-项目根目录下终端执行pytest '@tests_to_run.txt',可选参数如下：
+
+DUT配置信息：Config/Device.yaml
+
+项目根目录下终端执行pytest '@tests_to_run.txt'(linux下执行需前面添加python -m),可选参数如下：
 --aer-access-check=True/False          是否执行aer准入检查，默认值为True
 --uart-aer-check=True/False            是否执行uart aer检查，默认值为True
 

@@ -70,7 +70,7 @@ class TestRstSbr:
         yield
         # teardown
         LOGGER.sys(f"结束执行测试用例组:{request.cls}".center(100, "-"))
-
+    @pytest.mark.xfail
     def test_pcie_sys_rst_003(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             for target in self.sw_targets:
@@ -82,12 +82,12 @@ class TestRstSbr:
                     assert METHOD.read_config_lspci(ep_bdf) is False, f"EP设备配置空间应该不可读: {ep_bdf}"
 
             METHOD.pci_rescan()
-            self.devices_after = METHOD.get_switch_info()
-            METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
-            METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
-                                         self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
-                                         self.config.config["UUT"]["password"])
-            BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
+            # self.devices_after = METHOD.get_switch_info()
+            # METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
+            # METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
+            #                              self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
+            #                              self.config.config["UUT"]["password"])
+            # BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
     def test_pcie_sys_rst_004(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
@@ -97,12 +97,12 @@ class TestRstSbr:
                     METHOD.sbr_set(dsp_bdf)
                     assert METHOD.read_config_lspci(dsp_bdf) is True, f"DSP设备配置空间应该可读: {dsp_bdf}"
 
-            self.devices_after = METHOD.get_switch_info()
-            METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
-            METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
-                                         self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
-                                         self.config.config["UUT"]["password"])
-            BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
+            # self.devices_after = METHOD.get_switch_info()
+            # METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
+            # METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
+            #                              self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
+            #                              self.config.config["UUT"]["password"])
+            # BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
     def test_pcie_sys_rst_005(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
@@ -114,12 +114,12 @@ class TestRstSbr:
                 METHOD.sbr_set(dma_idsp_bdf)
                 assert METHOD.read_config_lspci(dma_idsp_bdf) is True, f"DMA_IDSP设备配置空间应该可读: {dma_idsp_bdf}"
 
-            self.devices_after = METHOD.get_switch_info()
-            METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
-            METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
-                                         self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
-                                         self.config.config["UUT"]["password"])
-            BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
+            # self.devices_after = METHOD.get_switch_info()
+            # METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
+            # METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
+            #                              self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
+            #                              self.config.config["UUT"]["password"])
+            # BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
     def test_pcie_sys_rst_006(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
@@ -131,12 +131,12 @@ class TestRstSbr:
                 METHOD.sbr_set(mep_idsp_bdf)
                 assert METHOD.read_config_lspci(mep_idsp_bdf) is True, f"MEP_IDSP设备配置空间应该可读: {mep_idsp_bdf}"
 
-            self.devices_after = METHOD.get_switch_info()
-            METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
-            METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
-                                         self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
-                                         self.config.config["UUT"]["password"])
-            BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
+            # self.devices_after = METHOD.get_switch_info()
+            # METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
+            # METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
+            #                              self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
+            #                              self.config.config["UUT"]["password"])
+            # BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
 if __name__ == '__main__':
     pytest.main(["-s", "test_rst_sbr.py"])

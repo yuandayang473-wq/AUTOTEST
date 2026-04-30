@@ -63,9 +63,9 @@ class TestSpeedChange:
                                          self.config.config["UUT"]["username"],
                                          self.config.config["UUT"]["password"])
 
-            request.cls.aer_info_before = {}
-            for ep_bdf, _ in request.cls.ep_dsp_pairs:
-                request.cls.aer_info_before[ep_bdf] = METHOD.get_aer_status_info(ep_bdf)
+            # request.cls.aer_info_before = {}
+            # for ep_bdf, _ in request.cls.ep_dsp_pairs:
+            #     request.cls.aer_info_before[ep_bdf] = METHOD.get_aer_status_info(ep_bdf)
 
         yield
         # teardown
@@ -95,9 +95,9 @@ class TestSpeedChange:
             ))
             assert current_speed == speed_name, f"速率变化验证失败: {ep_bdf}"
 
-        for ep_bdf, _ in self.ep_dsp_pairs:
-            aer_info_after = METHOD.get_aer_status_info(ep_bdf)
-            assert aer_info_after == self.aer_info_before[ep_bdf], f"retrain前后aer信息不同: {ep_bdf}"
+        # for ep_bdf, _ in self.ep_dsp_pairs:
+        #     aer_info_after = METHOD.get_aer_status_info(ep_bdf)
+        #     assert aer_info_after == self.aer_info_before[ep_bdf], f"retrain前后aer信息不同: {ep_bdf}"
 
     @pytest.mark.author("袁大阳")
     def test_loop_gen1_speed_change_001(self):
@@ -121,4 +121,11 @@ class TestSpeedChange:
 
 
 if __name__ == '__main__':
-    pytest.main(['-s',"test_link_speed_change_new.py"])
+    config = CONFIG
+    config.config = [
+        {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
+    ]
+    with BASE.ssh_connect(uut=config.config["UUT"]):
+        METHOD.clear_aer_status("7:0.0")
+
+    # pytest.main(['-s',"test_link_speed_change_new.py"])

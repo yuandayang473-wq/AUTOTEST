@@ -1,8 +1,4 @@
 UUT_01:
-  ip: 192.168.172.65
-  password: '1'
-  username: root
-UUT_02:
-  ip: 192.168.172.62
+  ip: 192.168.10.97
   password: '1'
   username: root

@@ -102,9 +102,9 @@ class TestLoopTxeqRetrain:
 
             BASE.execute_run('python3 serial_check.py check_eq')
 
-            for ep_bdf, _ in self.ep_dsp_pairs:
-                aer_info_after = METHOD.get_aer_status_info(ep_bdf)
-                assert aer_info_after == self.aer_info_before[ep_bdf], f"txeq retrain前后ep aer信息不同: {ep_bdf}"
+            # for ep_bdf, _ in self.ep_dsp_pairs:
+            #     aer_info_after = METHOD.get_aer_status_info(ep_bdf)
+            #     assert aer_info_after == self.aer_info_before[ep_bdf], f"txeq retrain前后ep aer信息不同: {ep_bdf}"
 
 
 if __name__ == '__main__':

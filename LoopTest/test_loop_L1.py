@@ -29,6 +29,7 @@ class TestLoopL1:
         {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
     ]
     ep_bdfs = []
+    dsp_bdfs = []
     aer_info_before = {}
 
     @pytest.fixture(scope="class", autouse=True)
@@ -43,11 +44,15 @@ class TestLoopL1:
                                          self.config.config["UUT"]["password"])
 
             request.cls.ep_bdfs = []
+            request.cls.dsp_bdfs = []
             for sw_info in request.cls.devices.get("0000", []):
                 for ep_info in sw_info.get("eps", []):
                     ep_bdf = ep_info.get("ep")
+                    dsp_bdf = ep_info.get("dsp")
                     if ep_bdf:
                         request.cls.ep_bdfs.append(ep_bdf)
+                    if dsp_bdf:
+                        request.cls.dsp_bdfs.append(dsp_bdf)
 
             assert request.cls.ep_bdfs, "未获取到可用EP设备"
 
@@ -58,13 +63,17 @@ class TestLoopL1:
         # teardown
         LOGGER.sys(f"结束执行测试用例组:{request.cls}".center(100, "-"))
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
+            LOGGER.info(f"恢复ASPM状态: {ep_bdf}")
             for ep_bdf in self.ep_bdfs:
-                LOGGER.info(f"恢复ASPM状态: {ep_bdf}")
                 METHOD.ASPM_enable(ep_bdf, L0s=False, L1=False)
+            for dsp_bdf in self.dsp_bdfs:
+                METHOD.ASPM_enable(dsp_bdf, L0s=False, L1=False)
 
     def test_loop_L1_001(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             LOGGER.info("开始执行ASPM L1 enable循环测试")
+            for dsp_bdf in self.dsp_bdfs:
+                METHOD.ASPM_enable(dsp_bdf, L0s=False, L1=True)
             for ep_bdf in self.ep_bdfs:
                 METHOD.ASPM_enable(ep_bdf, L0s=False, L1=True)
 
@@ -76,4 +85,4 @@ class TestLoopL1:
                 assert aer_info_after == self.aer_info_before[ep_bdf], f"L1前后ep aer信息不同: {ep_bdf}"
 
 if __name__ == '__main__':
-    pytest.main(['-s',""])
+    pytest.main()

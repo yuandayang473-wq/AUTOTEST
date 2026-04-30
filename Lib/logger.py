@@ -16,6 +16,8 @@ import threading
 import time
 import os
 import shutil
+
+import sys
 from colorama import Fore, Style
 import re  # 新增导入，用于移除颜色代码
 
@@ -53,7 +55,7 @@ class Logger:
             os.makedirs(log_path)
         t = time.strftime("%Y%m%d_%H-%M-%S", time.localtime())
         self.log_name = log_path + "\\autotest{}.log".format(t)
-        sh = logging.StreamHandler()  # for print out
+        sh = logging.StreamHandler()  # for console out
         fh = logging.FileHandler(self.log_name, encoding="utf-8")  # for file out
         self.logger.addHandler(sh)
         fh.addFilter(self._remove_color_filter())  # 添加过滤器移除颜色代码

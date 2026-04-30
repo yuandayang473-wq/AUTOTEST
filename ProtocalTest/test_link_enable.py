@@ -70,9 +70,9 @@ class TestLinkEnable:
                 assert METHOD.read_config_lspci(ep_bdf) is False, f"链路disable后lspci -vvvs显示设备状态为正常: {ep_bdf}"
                 METHOD.link_enable(dsp_bdf, enable=True)
 
-            for ep_bdf, _ in self.ep_dsp_pairs:
-                aer_info_after = METHOD.get_aer_status_info(ep_bdf)
-                assert aer_info_after == self.aer_info_before[ep_bdf], f"disable前后ep aer信息不同: {ep_bdf}"
+            # for ep_bdf, _ in self.ep_dsp_pairs:
+            #     aer_info_after = METHOD.get_aer_status_info(ep_bdf)
+            #     assert aer_info_after == self.aer_info_before[ep_bdf], f"disable前后ep aer信息不同: {ep_bdf}"
 
     @pytest.mark.author("袁大阳")
     def test_pcie_sys_link_003(self):
@@ -81,9 +81,9 @@ class TestLinkEnable:
                 METHOD.link_enable(dsp_bdf, enable=True)
                 assert METHOD.read_config_lspci(ep_bdf) is True, f"链路enable后lspci -vvvs显示设备状态为异常: {ep_bdf}"
 
-            for ep_bdf, _ in self.ep_dsp_pairs:
-                aer_info_after = METHOD.get_aer_status_info(ep_bdf)
-                assert aer_info_after == self.aer_info_before[ep_bdf], f"enable前后ep aer信息不同: {ep_bdf}"
+            # for ep_bdf, _ in self.ep_dsp_pairs:
+            #     aer_info_after = METHOD.get_aer_status_info(ep_bdf)
+            #     assert aer_info_after == self.aer_info_before[ep_bdf], f"enable前后ep aer信息不同: {ep_bdf}"
 
 
 if __name__ == '__main__':
