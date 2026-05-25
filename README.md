@@ -21,3 +21,53 @@ for ($i = 1; $i -le 10; $i++) {
     Write-Host "第 $i 次执行"
     pytest '@tests_to_run.txt'
 }
+
+## Environment setup
+
+### Windows (PowerShell)
+
+From project root run:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\setup.ps1
+```
+
+Optional parameters:
+
+```powershell
+.\setup.ps1 -SkipPythonInstall
+.\setup.ps1 -ForceRecreateVenv
+.\setup.ps1 -DryRun
+```
+
+After setup:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+pytest '@tests_to_run.txt'
+```
+
+### Linux (Bash)
+
+From project root run:
+
+```bash
+chmod +x ./setup.sh
+./setup.sh
+```
+
+Optional parameters:
+
+```bash
+./setup.sh --skip-python-install
+./setup.sh --force-recreate-venv
+./setup.sh --dry-run
+```
+
+After setup:
+
+```bash
+source .venv/bin/activate
+pytest '@tests_to_run.txt'
+```

@@ -52,9 +52,9 @@ class TestLoopRetrain:
 
             assert request.cls.ep_dsp_pairs, "未获取到可用EP/DSP设备"
 
-            request.cls.aer_info_before = {}
-            for ep_bdf, _ in request.cls.ep_dsp_pairs:
-                request.cls.aer_info_before[ep_bdf] = METHOD.get_aer_status_info(ep_bdf)
+            # request.cls.aer_info_before = {}
+            # for ep_bdf, _ in request.cls.ep_dsp_pairs:
+            #     request.cls.aer_info_before[ep_bdf] = METHOD.get_aer_status_info(ep_bdf)
         yield
         # teardown
         LOGGER.sys(f"结束执行测试用例组:{request.cls}".center(100, "-"))

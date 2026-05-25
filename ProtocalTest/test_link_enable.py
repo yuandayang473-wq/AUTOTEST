@@ -86,5 +86,3 @@ class TestLinkEnable:
             #     assert aer_info_after == self.aer_info_before[ep_bdf], f"enable前后ep aer信息不同: {ep_bdf}"
 
 
-if __name__ == '__main__':
-    pytest.main(['-s'])

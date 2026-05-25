@@ -1,0 +1,13 @@
+# Core test runner and reporting
+pytest>=8.4.2
+pytest-html>=4.1.1
+allure-pytest>=2.13.5
+
+# Project runtime dependencies
+PyYAML>=6.0.2
+paramiko>=3.5.0
+colorama>=0.4.6
+pyserial>=3.5
+fabric>=3.2.2
+keyboard>=0.13.5
+

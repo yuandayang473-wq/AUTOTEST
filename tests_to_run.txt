@@ -1,7 +1,6 @@
 
 
-ProtocalTest/test_rst_sbr.py
-LoopTest/test_loop_gen1_speed_change.py
-LoopTest/test_loop_speed_change.py
+
+LoopTest/test_loop_L1.py
 
 

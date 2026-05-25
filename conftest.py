@@ -107,7 +107,6 @@ def _log_failure_block_file_only(block: str):
 
 @pytest.hookimpl(hookwrapper=True, tryfirst=True)
 def pytest_runtest_makereport(item, call):
-    """统一在 report 阶段输出失败日志，避免 exception hook 与控制台输出抢顺序。"""
     outcome = yield
     report = outcome.get_result()
     setattr(item, f"rep_{report.when}", report)

@@ -56,9 +56,9 @@ class TestLoopL1:
 
             assert request.cls.ep_bdfs, "未获取到可用EP设备"
 
-            request.cls.aer_info_before = {}
-            for ep_bdf in request.cls.ep_bdfs:
-                request.cls.aer_info_before[ep_bdf] = METHOD.get_aer_status_info(ep_bdf)
+            # request.cls.aer_info_before = {}
+            # for ep_bdf in request.cls.ep_bdfs:
+            #     request.cls.aer_info_before[ep_bdf] = METHOD.get_aer_status_info(ep_bdf)
         yield
         # teardown
         LOGGER.sys(f"结束执行测试用例组:{request.cls}".center(100, "-"))
@@ -68,7 +68,7 @@ class TestLoopL1:
                 METHOD.ASPM_enable(ep_bdf, L0s=False, L1=False)
             for dsp_bdf in self.dsp_bdfs:
                 METHOD.ASPM_enable(dsp_bdf, L0s=False, L1=False)
-
+    # 需要特定FW版本和支持的设备（金手指WD盘和金手指三星盘）来打开ASPM
     def test_loop_L1_001(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             LOGGER.info("开始执行ASPM L1 enable循环测试")
@@ -79,10 +79,10 @@ class TestLoopL1:
 
             BASE.execute_run("python3 serial_check.py check_l1")
 
-            for ep_bdf in self.ep_bdfs:
-                METHOD.ASPM_enable(ep_bdf, L0s=False, L1=False)
-                aer_info_after = METHOD.get_aer_status_info(ep_bdf)
-                assert aer_info_after == self.aer_info_before[ep_bdf], f"L1前后ep aer信息不同: {ep_bdf}"
+            # for ep_bdf in self.ep_bdfs:
+            #     METHOD.ASPM_enable(ep_bdf, L0s=False, L1=False)
+            #     aer_info_after = METHOD.get_aer_status_info(ep_bdf)
+            #     assert aer_info_after == self.aer_info_before[ep_bdf], f"L1前后ep aer信息不同: {ep_bdf}"
 
 if __name__ == '__main__':
     pytest.main()

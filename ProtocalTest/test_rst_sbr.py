@@ -70,7 +70,7 @@ class TestRstSbr:
         yield
         # teardown
         LOGGER.sys(f"结束执行测试用例组:{request.cls}".center(100, "-"))
-    @pytest.mark.xfail
+    # @pytest.mark.xfail
     def test_pcie_sys_rst_003(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             for target in self.sw_targets:

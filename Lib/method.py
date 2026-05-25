@@ -212,8 +212,8 @@ class Method:
         bdf_mod = bdf[5:12] if bdf[0:3] == '000' else bdf
         all_info = BASE.execute_run(f'lspci -vvvns {bdf_mod} | grep -E "({bdf_mod}|LnkCap:|LnkSta:|Kernel driver|Physical Slot|Subsystem)"', i_record_cmd=True).get_origin_data()
         class_code, vendor_id, device_id = re.search(f"{bdf_mod}\s+(.+?):\s+(.+?):(\\w+)", all_info).groups()
-        if re.search(r"LnkCap:.*?Speed\s+(.+?),\s+Width\s+x(.+?),.*?LnkSta:\s+Speed\s+(.+?)\s+.*?Width\s+x(.+?)\s+", all_info, flags=re.S):
-            cap_speed, cap_width, current_speed, current_width = re.search(r"LnkCap:.*?Speed\s+(.+?),\s+Width\s+x(.+?),.*?LnkSta:\s+Speed\s+(.+?)\s+.*?Width\s+x(.+?)\s+", all_info, flags=re.S).groups()
+        if re.search(r"LnkCap:.*?Speed\s+(.+?/s).*?Width\s+x(\d+).*?LnkSta:\s+Speed\s+(.+?/s).*?Width\s+x(\d+)", all_info, flags=re.S):
+            cap_speed, cap_width, current_speed, current_width = re.search(r"LnkCap:.*?Speed\s+(.+?/s).*?Width\s+x(\d+).*?LnkSta:\s+Speed\s+(.+?/s).*?Width\s+x(\d+)", all_info, flags=re.S).groups()
         else:
             cap_speed, cap_width, current_speed, current_width = "Null", "Null", "Null", "Null"
         if re.search(r"Subsystem:\s+(.+)", all_info):
@@ -346,10 +346,13 @@ class Method:
         return class_code
 
     def get_speed_width(self, bdf):
-        current = BASE.execute_run(f"lspci -vvvs {bdf} | grep LnkSta: | awk '{{print $3\" \"$6}}'").get_origin_data()
-        current = current.strip().split()
-        cap = BASE.execute_run(f"lspci -vvvs {bdf} | grep LnkCap: | awk '{{print $5\" \"$7}}'").get_origin_data()
-        cap = cap.strip().replace(',', ' ').split()
+        all_info = BASE.execute_run(f'lspci -vvvns {bdf} | grep -E "(LnkCap:|LnkSta:)"').get_origin_data()
+        if re.search(r"LnkCap:.*?Speed\s+(.+?/s).*?Width\s+x(\d+).*?LnkSta:\s+Speed\s+(.+?/s).*?Width\s+x(\d+)", all_info, flags=re.S):
+            cap_speed, cap_width, current_speed, current_width = re.search(r"LnkCap:.*?Speed\s+(.+?/s).*?Width\s+x(\d+).*?LnkSta:\s+Speed\s+(.+?/s).*?Width\s+x(\d+)", all_info, flags=re.S).groups()
+        else:
+            cap_speed, cap_width, current_speed, current_width = "Null", "Null", "Null", "Null"
+        cap = [cap_speed, cap_width]
+        current = [current_speed, current_width]
         return cap + current
 
     def get_driver(self, bdf):
@@ -406,7 +409,6 @@ class Method:
         hex_val = f"{new_val:0{bytes_map[width] * 2}x}"
         write_cmd = f"setpci -s {bdf} {offset}.{width}={hex_val}"
         BASE.execute_run(write_cmd)
-        print(f"[OK] {bdf} {offset}.{width}: {orig_val:#x} -> {new_val:#x}")
 
     def speed_change(self, dsp, gen):
         """
@@ -570,21 +572,82 @@ class Method:
         :param password: 密码
         :param port: 端口
         :return flag: True|False
-        @Author: wuhao
         """
+        self.trans_client = None
+        self.sftp = None
+
+        def _norm_remote_path(path):
+            return path.replace("\\", "/")
+
+        def _ensure_remote_dir(remote_dir):
+            remote_dir = _norm_remote_path(remote_dir).rstrip("/")
+            if not remote_dir:
+                return
+
+            parts = [p for p in remote_dir.split("/") if p]
+            current = "/" if remote_dir.startswith("/") else ""
+            for part in parts:
+                if current in ("", "/"):
+                    current = f"{current}{part}" if current == "/" else part
+                else:
+                    current = f"{current}/{part}"
+                try:
+                    self.sftp.stat(current)
+                except Exception:
+                    self.sftp.mkdir(current)
+
         try:
-            LOGGER.info("【向远程主机{}上位置{}, 传送文件{}】".format(host, des_file, src_file))
+            src_abs = os.path.abspath(src_file)
+            if not os.path.exists(src_abs):
+                raise FileNotFoundError(f"本地路径不存在: {src_abs}")
+
+            LOGGER.info("【向远程主机{}上位置{}, 传送{}】".format(host, des_file, src_abs))
             self.trans_client = paramiko.Transport((host, int(port)))
             self.trans_client.connect(username=username, password=password)
             self.sftp = paramiko.SFTPClient.from_transport(self.trans_client)
-            self.sftp.put(src_file, des_file)
-            self.trans_client.close()
-            LOGGER.info("【向远程主机传送文件{}成功】".format(src_file))
+
+            if os.path.isfile(src_abs):
+                remote_file = _norm_remote_path(des_file)
+                remote_parent = os.path.dirname(remote_file)
+                if remote_parent:
+                    _ensure_remote_dir(remote_parent)
+                self.sftp.put(src_abs, remote_file)
+                LOGGER.info("【向远程主机传送文件{}成功】".format(src_abs))
+            elif os.path.isdir(src_abs):
+                remote_root = _norm_remote_path(des_file).rstrip("/")
+                _ensure_remote_dir(remote_root)
+                file_count = 0
+                for local_root, _, files in os.walk(src_abs):
+                    rel_dir = os.path.relpath(local_root, src_abs)
+                    if rel_dir == ".":
+                        remote_dir = remote_root
+                    else:
+                        remote_dir = f"{remote_root}/{rel_dir.replace(os.sep, '/')}"
+                    _ensure_remote_dir(remote_dir)
+                    for file_name in files:
+                        local_path = os.path.join(local_root, file_name)
+                        remote_path = f"{remote_dir}/{file_name}"
+                        self.sftp.put(local_path, remote_path)
+                        file_count += 1
+                LOGGER.info("【向远程主机传送目录{}成功, 共{}个文件】".format(src_abs, file_count))
+            else:
+                raise ValueError(f"不支持的本地路径类型: {src_abs}")
             return True
-        except Exception as e:
-            LOGGER.error("【向远程主机传送文件{}异常】".format(src_file))
+        except Exception:
+            LOGGER.error("【向远程主机传送{}异常】".format(src_file))
             LOGGER.error(traceback.format_exc())
             return False
+        finally:
+            if self.sftp is not None:
+                try:
+                    self.sftp.close()
+                except Exception:
+                    pass
+            if self.trans_client is not None:
+                try:
+                    self.trans_client.close()
+                except Exception:
+                    pass
     def link_enable(self, dsp, enable=True):
         """
             启用PCIe设备的链路
@@ -602,7 +665,7 @@ class Method:
             :param bdf: PCI设备地址，如 "0000:17:00.0"
             :return: 电源状态字符串，如 "D0", "D1", "D2", "D3hot", "D3cold"
         """
-        res = BASE.execute_run(f"lspci -vvvs {bdf}|grep -A 2 'Power Management'|grep Status|awk '{{print$2}}'").get_origin_data()
+        res = BASE.execute_run(f"lspci -vvvs {bdf}|grep -A 2 'Power Management'|grep Status|awk '{{print$2}}'").get_origin_data().strip()
         return res
     def get_pm_suport_pme_states(self, bdf):
         """
@@ -726,3 +789,4 @@ class Method:
         nvme_name = f"/dev/{ret}n1"
         LOGGER.info(f"获取到的盘符为：{nvme_name}")
         return nvme_name
+
