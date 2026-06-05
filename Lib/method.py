@@ -445,20 +445,77 @@ class Method:
         LOGGER.info(f"{action}{bdf}对应总线主控")
         self.setpci_bits(bdf, "COMMAND", 2, 2, int(enable))
 
-    def devmem2_read(self, address, width="b"):
+    def set_memory_enable(self, bdf, enable=True):
         """
-            使用 devmem2 工具读取物理内存地址
-            :param address: 物理内存地址，如 0xFEDC0000
-            :param width: 读取宽度，b, h, w
-            :return: 读取的值
+            启用或禁用 PCIe Memory Space Enable (MSE)
+            :param bdf: PCI 设备地址，如 "0000:17:00.0"
+            :param enable: True 启用，False 禁用
         """
-        cmd = f"devmem2 0x{address} {width}"
-        output = BASE.execute_run(cmd).get_origin_data()
-        match = re.search(r"\): (0x[0-9a-fA-F]+)", output)
+        action = "启用" if enable else "禁用"
+        LOGGER.info(f"{action}{bdf}对应Memory Space")
+        self.setpci_bits(bdf, "COMMAND", 1, 1, int(enable), width="W")
+
+    def get_command_enable_status(self, bdf):
+        """
+            读取 COMMAND 寄存器中 Memory/BME 使能状态
+        """
+        command_reg = int(BASE.execute_run(f"setpci -s {bdf} COMMAND.w").get_origin_data(), 16)
+        return {
+            "memory_enable": bool((command_reg >> 1) & 1),
+            "bus_master_enable": bool((command_reg >> 2) & 1),
+            "command_reg": command_reg,
+        }
+
+    def get_devices_by_types(self, devices, target_types):
+        """
+            从设备列表中筛选指定type的设备
+        """
+        target_set = set(target_types)
+        return [device for device in devices if device.type in target_set]
+
+
+    def devmem2_read(self, address, width="b", write_value=None, return_detail=False):
+        """
+            使用 devmem2 读写物理内存地址。
+            :param address: 物理内存地址，如 0xFEDC0000 或 FEDC0000
+            :param width: 访问宽度，b/h/w
+            :param write_value: 传入整数时先写后读；None 时仅读
+            :param return_detail: True 返回结构化结果，False 返回读值十六进制字符串
+            :return: 默认返回读值(如 0x1234abcd)；return_detail=True 时返回详细字典
+        """
+        addr = str(address)
+        addr = addr if addr.startswith("0x") else f"0x{addr}"
+
+        detail = {
+            "write_exit_code": None,
+            "read_exit_code": None,
+            "read_value_hex": None,
+            "read_value_int": None,
+            "output": "",
+        }
+
+        if write_value is not None:
+            write_cmd = f"devmem2 {addr} {width} 0x{int(write_value):x}"
+            write_out = BASE.execute_run(write_cmd, i_exit_code=True).get_origin_data()
+            detail["write_exit_code"] = BASE.ssh.get_exit_code()
+            detail["output"] += write_out
+
+        read_cmd = f"devmem2 {addr} {width}"
+        read_out = BASE.execute_run(read_cmd, i_exit_code=True).get_origin_data()
+        detail["read_exit_code"] = BASE.ssh.get_exit_code()
+        detail["output"] += read_out
+
+        match = re.search(r"\):\s*(0x[0-9a-fA-F]+)", read_out)
         if match:
-            return match.group(1)
-        else:
-            raise ValueError("Failed to read memory address")
+            detail["read_value_hex"] = match.group(1)
+            detail["read_value_int"] = int(match.group(1), 16)
+
+        if return_detail:
+            return detail
+
+        if detail["read_value_hex"] is None:
+            raise ValueError(f"Failed to read memory address: {addr}")
+        return detail["read_value_hex"]
     def get_bar_address(self, bdf, bar_num=0):
         """
             获取 PCIe 设备的 BAR 地址
@@ -789,4 +846,3 @@ class Method:
         nvme_name = f"/dev/{ret}n1"
         LOGGER.info(f"获取到的盘符为：{nvme_name}")
         return nvme_name
-

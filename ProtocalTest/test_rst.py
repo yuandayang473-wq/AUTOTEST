@@ -22,7 +22,7 @@ import pytest
 from Lib import *
 
 
-class TestRstSbr:
+class TestRst:
     config = CONFIG
     config.config = [
         {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
@@ -138,5 +138,3 @@ class TestRstSbr:
             #                              self.config.config["UUT"]["password"])
             # BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
 
-if __name__ == '__main__':
-    pytest.main(["-s", "test_rst_sbr.py"])

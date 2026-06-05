@@ -22,7 +22,7 @@ from Lib import *
 #
 #
 # load_package(os.path.abspath(__file__))
-class TestPMD3Hot:
+class TestLoopD3Hot:
 
     config = CONFIG
     config.config = [
@@ -90,35 +90,6 @@ class TestPMD3Hot:
             for ep_bdf in self.ep_bdfs:
                 METHOD.set_power_state(ep_bdf, "D0")
 
-    def test_pcie_sys_pm_001(self):
-        with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            for usp_bdf in self.usp_bdfs:
-                cap = METHOD.get_pm_suport_pme_states(usp_bdf)
-                assert cap == ["D0", "D3hot"], "USP设备PME支持的电源状态应该是D0和D3hot"
-                BASE.execute_run('lspci -s {} -vvv | grep " D1- "'.format(usp_bdf))
-            for dsp_bdf in self.dsp_bdfs:
-                cap = METHOD.get_pm_suport_pme_states(dsp_bdf)
-                assert cap == ["D0", "D3hot"], "DSP设备PME支持的电源状态应该是D0和D3hot"
-                BASE.execute_run('lspci -s {} -vvv | grep " D2- "'.format(dsp_bdf))
-
-    def test_pcie_sys_pm_002(self):
-        with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            for usp_bdf in self.usp_bdfs:
-                METHOD.PME_enable(usp_bdf)
-                BASE.execute_run('lspci -s {} -vvv | grep "PME-Enable+"'.format(usp_bdf))
-                METHOD.PME_enable(usp_bdf, PME=False)
-            for dsp_bdf in self.dsp_bdfs:
-                METHOD.PME_enable(dsp_bdf)
-                BASE.execute_run('lspci -s {} -vvv | grep "PME-Enable+"'.format(dsp_bdf))
-                METHOD.PME_enable(dsp_bdf, PME=False)
-
-    def test_pcie_sys_pm_012(self):
-        with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            for ep_bdf in self.ep_bdfs:
-                METHOD.set_power_state(ep_bdf, "D0")
-                SLEEP(2)
-                assert METHOD.get_pm_state(ep_bdf) == "D0", f"EP设备应该处于D0状态: {ep_bdf}"
-            self._save_after_and_diff()
 
     def test_pcie_sys_pm_014(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
@@ -135,7 +106,7 @@ class TestPMD3Hot:
                 METHOD.set_power_state(ep_bdf, "D3hot")
                 SLEEP(2)
                 bar = METHOD.get_bar_address(ep_bdf)
-                res = METHOD.devmem2_read(bar)
+                res = METHOD.devmem2_read(bar, width="b", return_detail=True)["read_value_hex"]
                 assert res == "0xFF", f"EP设备BAR地址应该不可访问，读出值为0xFF: {ep_bdf}"
                 METHOD.set_power_state(ep_bdf, "D0")
 
@@ -186,6 +157,3 @@ class TestPMD3Hot:
                 METHOD.set_power_state(ep_bdf, "D0")
             self._save_after_and_diff()
 
-
-if __name__ == '__main__':
-    pytest.main(['-s',"test_D3hot_loop.py"])

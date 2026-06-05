@@ -22,7 +22,7 @@ from Lib import *
 #
 #
 # load_package(os.path.abspath(__file__))
-class TestLinkEnable:
+class TestLoopLinkEnable:
 
     config = CONFIG
     config.config = [
