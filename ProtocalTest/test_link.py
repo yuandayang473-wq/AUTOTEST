@@ -98,6 +98,7 @@ class TestLink:
             with BASE.ssh_connect(uut=self.config.config["UUT"]):
                 for ep_bdf, dsp_bdf in self.ep_dsp_pairs:
                     METHOD.link_enable(dsp_bdf, enable=False)
+                    SLEEP(3)
                     assert METHOD.read_config_lspci(ep_bdf) is False, f"链路disable后lspci -vvvs显示设备状态为正常: {ep_bdf}"
 
                 # for ep_bdf, _ in self.ep_dsp_pairs:
@@ -105,13 +106,16 @@ class TestLink:
                 #     assert aer_info_after == self.aer_info_before[ep_bdf], f"disable前后ep aer信息不同: {ep_bdf}"
         finally:
             with BASE.ssh_connect(uut=self.config.config["UUT"]):
-                METHOD.link_enable(dsp_bdf, enable=True)
+                for ep_bdf, dsp_bdf in self.ep_dsp_pairs:
+                    METHOD.link_enable(dsp_bdf, enable=True)
 
     @pytest.mark.author("袁大阳")
     def test_pcie_sys_link_003(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             for ep_bdf, dsp_bdf in self.ep_dsp_pairs:
                 METHOD.link_enable(dsp_bdf, enable=True)
+                # 5090的测试经验sleep3s才能通过
+                SLEEP(3)
                 assert METHOD.read_config_lspci(ep_bdf) is True, f"链路enable后lspci -vvvs显示设备状态为异常: {ep_bdf}"
 
             # for ep_bdf, _ in self.ep_dsp_pairs:

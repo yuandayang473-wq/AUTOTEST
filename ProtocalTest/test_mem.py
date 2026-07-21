@@ -82,81 +82,106 @@ class TestMEM:
     def _get_memory_bars(self, bdf):
         bars = []
         for bar_num in range(6):
-            try:
-                bar_addr = METHOD.get_bar_address(bdf, bar_num)
+            bar_addr = METHOD.get_bar_address(bdf, bar_num, i_exit_code=True)
+            if bar_addr:
                 bars.append((bar_num, bar_addr))
-            except Exception:
-                continue
         return bars
 
     def test_pcie_sys_mem_006(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
+            METHOD.insmod_dma_driver(self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
+                                         self.config.config["UUT"]["password"])
             mep_devices = [d for d in self.devices if d.type == "MEP"]
             dma_devices = [d for d in self.devices if d.type == "DMA"]
             assert mep_devices, "未发现MEP设备，无法执行PCIe_SYS_MEM_006"
             assert dma_devices, "未发现DMA设备，无法执行PCIe_SYS_MEM_006"
 
-            for kind, targets in (("MEP", mep_devices), ("DMA", dma_devices)):
-                for device in targets:
-                    BASE.execute_run(f"lspci -s {device.device_bdf}")
-                    bars = self._get_memory_bars(device.device_bdf)
-                    assert bars, f"{kind}设备{device.device_bdf}未发现可访问Memory BAR"
-                    for bar_num, bar_addr in bars:
-                        write_value = 0x5A5A0000 | bar_num
-                        rw_detail = METHOD.devmem2_read(
-                            bar_addr,
-                            width="w",
-                            write_value=write_value,
-                            return_detail=True,
-                        )
-                        write_code = rw_detail["write_exit_code"]
-                        read_code = rw_detail["read_exit_code"]
-                        read_value = rw_detail["read_value_int"]
-                        assert write_code == 0 and read_code == 0, (
-                            f"{kind}设备{device.device_bdf} BAR{bar_num} devmem访问失败"
-                        )
-                        assert read_value == write_value, (
-                            f"{kind}设备{device.device_bdf} BAR{bar_num}数据不一致: "
-                            f"write=0x{write_value:08x}, read={read_value}"
-                        )
+            for device in mep_devices:
+                BASE.execute_run(f"lspci -s {device.device_bdf}")
+                bars = self._get_memory_bars(device.device_bdf)
+                assert bars, f"mep设备{device.device_bdf}未发现可访问Memory BAR"
+                for bar_num, bar_addr in bars:
+                    write_value = 0x5A5A0000 | bar_num
+                    rw_detail = METHOD.devmem2_read(
+                        hex(int(bar_addr, 16)),
+                        width="w",
+                        write_value=write_value,
+                        return_detail=True,
+                    )
+                    write_code = rw_detail["write_exit_code"]
+                    read_code = rw_detail["read_exit_code"]
+                    read_value = rw_detail["read_value_int"]
+                    assert write_code == 0 and read_code == 0, (
+                        f"mep设备{device.device_bdf} BAR{bar_num} devmem访问失败"
+                    )
+                    assert read_value == write_value, (
+                        f"mep设备{device.device_bdf} BAR{bar_num}数据不一致: "
+                        f"write=0x{write_value:08x}, read={read_value}"
+                    )
+            for device in dma_devices:
+                BASE.execute_run(f"lspci -s {device.device_bdf}")
+                bars = self._get_memory_bars(device.device_bdf)
+                assert bars, f"dma设备{device.device_bdf}未发现可访问Memory BAR"
+                bar_num, bar_addr = bars[0]
+                write_value = 0x5A | bar_num
+                rw_detail = METHOD.devmem2_read(
+                    hex(int(bar_addr, 16) + 0x120),
+                    width="b",
+                    write_value=write_value,
+                    return_detail=True,
+                )
+                write_code = rw_detail["write_exit_code"]
+                read_code = rw_detail["read_exit_code"]
+                read_value = rw_detail["read_value_int"]
+                assert write_code == 0 and read_code == 0, (
+                    f"dma设备{device.device_bdf} BAR{bar_num} devmem访问失败"
+                )
+                assert read_value == write_value, (
+                    f"dma设备{device.device_bdf} BAR{bar_num}数据不一致: "
+                    f"write=0x{write_value:08x}, read={read_value}"
+                )
 
     def test_pcie_sys_mem_011(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            target_types = ["USP", "DSP", "DMA_IDSP", "DMA", "MEP_IDSP", "MEP"]
-            targets = []
-            for target_type in target_types:
-                device = next((d for d in self.devices if d.type == target_type), None)
-                assert device is not None, f"未发现{target_type}设备，无法执行PCIe_SYS_MEM_011"
-                targets.append((target_type, device.device_bdf))
-
-            for target_type, bdf in targets:
-                bars = self._get_memory_bars(bdf)
-                assert bars, f"{target_type}设备{bdf}未发现可访问Memory BAR"
+            METHOD.insmod_dma_driver(self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
+                                         self.config.config["UUT"]["password"])
+            dsp_bdf = next((d.device_bdf for d in self.devices if d.type == "DSP" and d.children is not None), None)
+            usp_bdf = next((d.device_bdf for d in self.devices if dsp_bdf in d.children), None)
+            ep_bdf = next((d.device_bdf for d in self.devices if d.parent == dsp_bdf), None)
+            dma_bdf = next((d.device_bdf for d in self.devices if d.type == "DMA"), None)
+            dma_idsp_bdf = next((d.device_bdf for d in self.devices if dma_bdf in d.children), None)
+            mep_bdf = next((d.device_bdf for d in self.devices if d.type == "MEP"), None)
+            mep_idsp_bdf = next((d.device_bdf for d in self.devices if mep_bdf in d.children), None)
+            test_list = [(dsp_bdf, ep_bdf), (usp_bdf, ep_bdf), (dma_idsp_bdf, dma_bdf), (mep_idsp_bdf, mep_bdf), (dma_bdf, dma_bdf), (mep_bdf, mep_bdf)]
+            LOGGER.info(f"测试列表: {test_list}")
+            for access_bdf, target_bdf in test_list:
+                assert access_bdf is not None, f"未发现访问设备，无法执行PCIe_SYS_MEM_011"
+                assert target_bdf is not None, f"未发现目标设备，无法执行PCIe_SYS_MEM_011"
+                bars = self._get_memory_bars(target_bdf)
+                assert bars, f"目标设备{target_bdf}未发现可访问Memory BAR"
                 bar_num, bar_addr = bars[0]
-                METHOD.clear_aer_status(bdf)
+                METHOD.clear_error_status(access_bdf)
                 try:
-                    METHOD.set_memory_enable(bdf, enable=False)
-                    METHOD.set_bme(bdf, enable=False)
-                    command_status = METHOD.get_command_enable_status(bdf)
-                    assert command_status["memory_enable"] is False, f"{target_type}设备{bdf} Memory Enable位未关闭"
-                    assert command_status["bus_master_enable"] is False, f"{target_type}设备{bdf} Bus Master Enable位未关闭"
+                    METHOD.set_memory_enable(access_bdf, enable=False)
+                    command_status = METHOD.get_command_enable_status(access_bdf)
+                    assert command_status["memory_enable"] is False, f"访问设备{access_bdf} Memory Enable位未关闭"
 
                     # 只选取单个 BAR 空间执行读取校验
                     read_detail = METHOD.devmem2_read(bar_addr, width="w", return_detail=True)
                     read_code = read_detail["read_exit_code"]
                     read_hex = (read_detail["read_value_hex"] or "").lower()
-                    read_blocked = read_code != 0 or read_hex in ("0xff", "0xffff", "0xffffffff")
+                    read_blocked = read_code == 0 and read_hex in ("0xff", "0xffff", "0xffffffff")
                     assert read_blocked, (
-                        f"{target_type}设备{bdf}关闭使能后，BAR{bar_num}仍可读: "
+                        f"访问设备{access_bdf}关闭使能后，目标设备{target_bdf} BAR{bar_num}读不符合预期: "
                         f"exit={read_code}, value={read_detail['read_value_hex']}"
                     )
 
-                    aer_status = METHOD.get_aer_status_info(bdf)
-                    has_ur = "UnsupReq+" in aer_status.get("DevSta", "") or "UnsupReq+" in aer_status.get("UESta", "")
-                    assert has_ur, f"{target_type}设备{bdf}未检测到UR错误，当前AER={aer_status}"
+                    error_status = METHOD.get_error_status_info(access_bdf)
+                    has_ur = "UnsupReq+" in error_status.get("DevSta", "") or "UnsupReq+" in error_status.get("UESta", "")
+                    assert has_ur, f"设备{access_bdf}未检测到UR错误，当前AER={error_status}"
                 finally:
-                    METHOD.set_memory_enable(bdf, enable=True)
-                    METHOD.set_bme(bdf, enable=True)
+                    METHOD.set_memory_enable(access_bdf, enable=True)
+                    METHOD.clear_error_status(access_bdf)
 
     def _assert_single_bar_rw_failed(self, access_bdf, case_name):
         bars = self._get_memory_bars(access_bdf)
@@ -177,11 +202,13 @@ class TestMEM:
             f"{case_name}: 读写未失败，BAR{bar_num}仍可正常访问: "
             f"write_code={write_code}, read_code={read_code}, read={rw_detail['read_value_hex']}"
         )
-
+    @pytest.mark.env_hint("需要SW带有NTB")
     def test_pcie_sys_mem_012(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             ntb_device = next((d for d in self.devices if d.type == "NTB"), None)
             assert ntb_device is not None, "未发现NTB设备，无法执行PCIe_SYS_MEM_012"
+            METHOD.insmod_ntb_driver(self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
+                                         self.config.config["UUT"]["password"])
             ntb_bdf = ntb_device.device_bdf
 
             try:
@@ -191,11 +218,13 @@ class TestMEM:
                 self._assert_single_bar_rw_failed(ntb_bdf, "PCIe_SYS_MEM_012")
             finally:
                 METHOD.set_memory_enable(ntb_bdf, enable=True)
-
+    @pytest.mark.env_hint("需要SW带有NTB")
     def test_pcie_sys_mem_013(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             ntb_device = next((d for d in self.devices if d.type == "NTB"), None)
             assert ntb_device is not None, "未发现NTB设备，无法执行PCIe_SYS_MEM_013"
+            METHOD.insmod_ntb_driver(self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
+                                         self.config.config["UUT"]["password"])
 
             ntb_idsp_bdf = ntb_device.parent
             ntb_idsp_device = next((d for d in self.devices if d.device_bdf == ntb_idsp_bdf and d.type == "NTB_IDSP"), None)

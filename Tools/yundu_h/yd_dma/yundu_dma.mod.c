@@ -1,0 +1,153 @@
+#include <linux/module.h>
+#define INCLUDE_VERMAGIC
+#include <linux/build-salt.h>
+#include <linux/elfnote-lto.h>
+#include <linux/export-internal.h>
+#include <linux/vermagic.h>
+#include <linux/compiler.h>
+
+#ifdef CONFIG_UNWINDER_ORC
+#include <asm/orc_header.h>
+ORC_HEADER;
+#endif
+
+BUILD_SALT;
+BUILD_LTO_INFO;
+
+MODULE_INFO(vermagic, VERMAGIC_STRING);
+MODULE_INFO(name, KBUILD_MODNAME);
+
+__visible struct module __this_module
+__section(".gnu.linkonce.this_module") = {
+	.name = KBUILD_MODNAME,
+	.init = init_module,
+#ifdef CONFIG_MODULE_UNLOAD
+	.exit = cleanup_module,
+#endif
+	.arch = MODULE_ARCH_INIT,
+};
+
+#ifdef CONFIG_MITIGATION_RETPOLINE
+MODULE_INFO(retpoline, "Y");
+#endif
+
+
+
+static const char ____versions[]
+__used __section("__versions") =
+	"\x18\x00\x00\x00\x6f\x23\xfc\x29"
+	"pci_save_state\0\0"
+	"\x14\x00\x00\x00\x3b\x4a\x51\xc1"
+	"free_irq\0\0\0\0"
+	"\x18\x00\x00\x00\xe7\x57\x16\x38"
+	"devm_kmalloc\0\0\0\0"
+	"\x24\x00\x00\x00\xdc\xd1\x43\x48"
+	"dma_async_device_unregister\0"
+	"\x20\x00\x00\x00\x34\x83\x0e\x92"
+	"pci_alloc_irq_vectors\0\0\0"
+	"\x18\x00\x00\x00\x36\xf2\xb6\xc5"
+	"queue_work_on\0\0\0"
+	"\x20\x00\x00\x00\x49\x4c\x5f\x35"
+	"__pci_register_driver\0\0\0"
+	"\x18\x00\x00\x00\xeb\x9d\x47\xe2"
+	"devm_ioremap\0\0\0\0"
+	"\x1c\x00\x00\x00\xe8\x78\x1a\x3e"
+	"pci_msi_vec_count\0\0\0"
+	"\x10\x00\x00\x00\xba\x0c\x7a\x03"
+	"kfree\0\0\0"
+	"\x18\x00\x00\x00\xa8\x95\xed\x10"
+	"pci_irq_vector\0\0"
+	"\x14\x00\x00\x00\x46\x0f\x44\xa9"
+	"get_device\0\0"
+	"\x1c\x00\x00\x00\xbd\x3f\x2a\x7c"
+	"__dynamic_dev_dbg\0\0\0"
+	"\x18\x00\x00\x00\x64\xbd\x8f\xba"
+	"_raw_spin_lock\0\0"
+	"\x20\x00\x00\x00\x22\x2c\x87\xe0"
+	"pci_unregister_driver\0\0\0"
+	"\x14\x00\x00\x00\xbb\x6d\xfb\xbd"
+	"__fentry__\0\0"
+	"\x20\x00\x00\x00\xad\x17\xb5\x04"
+	"pci_read_config_dword\0\0\0"
+	"\x20\x00\x00\x00\x71\x12\x20\x7c"
+	"__devm_request_region\0\0\0"
+	"\x10\x00\x00\x00\x7e\x3a\x2c\x12"
+	"_printk\0"
+	"\x1c\x00\x00\x00\xcb\xf6\xfd\xf0"
+	"__stack_chk_fail\0\0\0\0"
+	"\x1c\x00\x00\x00\xca\x21\x60\xe4"
+	"_raw_spin_unlock_bh\0"
+	"\x14\x00\x00\x00\xd4\xab\x06\x7f"
+	"put_device\0\0"
+	"\x24\x00\x00\x00\x7c\xb2\x83\x63"
+	"__x86_indirect_thunk_rdx\0\0\0\0"
+	"\x14\x00\x00\x00\x0f\x39\x85\x49"
+	"_dev_info\0\0\0"
+	"\x28\x00\x00\x00\xb3\x1c\xa2\x87"
+	"__ubsan_handle_out_of_bounds\0\0\0\0"
+	"\x18\x00\x00\x00\x4e\xc7\xa3\x0e"
+	"tasklet_kill\0\0\0\0"
+	"\x1c\x00\x00\x00\x0a\x05\x23\x43"
+	"pci_find_capability\0"
+	"\x1c\x00\x00\x00\x57\xe6\x95\xf6"
+	"pci_clear_master\0\0\0\0"
+	"\x14\x00\x00\x00\x10\xf7\x5d\x4a"
+	"devm_kfree\0\0"
+	"\x14\x00\x00\x00\x3e\x9f\xb1\xce"
+	"_dev_err\0\0\0\0"
+	"\x20\x00\x00\x00\x8e\x83\xd5\x92"
+	"request_threaded_irq\0\0\0\0"
+	"\x18\x00\x00\x00\x5a\xc8\x64\x23"
+	"tasklet_init\0\0\0\0"
+	"\x1c\x00\x00\x00\x63\xa5\x03\x4c"
+	"random_kmalloc_seed\0"
+	"\x14\x00\x00\x00\xc4\xbe\xfc\x51"
+	"pcie_flr\0\0\0\0"
+	"\x1c\x00\x00\x00\xac\xb8\x2a\x9d"
+	"__tasklet_schedule\0\0"
+	"\x18\x00\x00\x00\x20\x2e\xd1\x9e"
+	"kmalloc_large\0\0\0"
+	"\x1c\x00\x00\x00\xa0\x2a\x60\x7c"
+	"pci_restore_state\0\0\0"
+	"\x18\x00\x00\x00\xf6\xde\x94\x67"
+	"pci_set_master\0\0"
+	"\x1c\x00\x00\x00\xca\x39\x82\x5b"
+	"__x86_return_thunk\0\0"
+	"\x24\x00\x00\x00\x82\x2a\x2e\x9d"
+	"dma_async_device_register\0\0\0"
+	"\x10\x00\x00\x00\x5a\x25\xd5\xe2"
+	"strcmp\0\0"
+	"\x28\x00\x00\x00\x5f\xff\x8f\x66"
+	"dma_async_tx_descriptor_init\0\0\0\0"
+	"\x24\x00\x00\x00\xf9\xa4\xcc\x66"
+	"__x86_indirect_thunk_rcx\0\0\0\0"
+	"\x1c\x00\x00\x00\xfe\x2d\xc1\x03"
+	"cancel_work_sync\0\0\0\0"
+	"\x24\x00\x00\x00\x99\x24\x33\x29"
+	"__x86_indirect_thunk_rsi\0\0\0\0"
+	"\x1c\x00\x00\x00\xfc\x90\x36\x0c"
+	"_raw_spin_lock_bh\0\0\0"
+	"\x18\x00\x00\x00\x04\xf1\x55\xbf"
+	"kmalloc_trace\0\0\0"
+	"\x18\x00\x00\x00\x55\x88\x35\x77"
+	"iomem_resource\0\0"
+	"\x1c\x00\x00\x00\x4a\xcc\x9b\x69"
+	"pcim_enable_device\0\0"
+	"\x1c\x00\x00\x00\x34\x4b\xb5\xb5"
+	"_raw_spin_unlock\0\0\0\0"
+	"\x20\x00\x00\x00\x8e\xbd\x03\x45"
+	"pci_free_irq_vectors\0\0\0\0"
+	"\x18\x00\x00\x00\x46\xe9\x04\x10"
+	"kmalloc_caches\0\0"
+	"\x14\x00\x00\x00\xd3\x85\x33\x2d"
+	"system_wq\0\0\0"
+	"\x18\x00\x00\x00\x2e\x9f\xe7\xf6"
+	"module_layout\0\0\0"
+	"\x00\x00\x00\x00\x00\x00\x00\x00";
+
+MODULE_INFO(depends, "");
+
+MODULE_ALIAS("pci:v0000205Ed00000000sv0000205Esd00002005bc*sc*i*");
+MODULE_ALIAS("pci:v0000205Ed00000000sv0000205Esd00002005bc*sc*i*");
+
+MODULE_INFO(srcversion, "02131D3C2F9F670BBA6645F");

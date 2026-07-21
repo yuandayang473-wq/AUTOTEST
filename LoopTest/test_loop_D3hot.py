@@ -113,12 +113,12 @@ class TestLoopD3Hot:
             self.devices_after = METHOD.get_switch_info()
             for device in self.devices_after:
                 if device.device_bdf in self.ep_bdfs:
-                    aer_status = device.aer_status["DevSta"]
-                    assert "UnsupReq+" in aer_status, f"EP设备在D3hot状态下应该产生Unsupported Request错误: {device.device_bdf}"
+                    error_status = device.error_status["DevSta"]
+                    assert "UnsupReq+" in error_status, f"EP设备在D3hot状态下应该产生Unsupported Request错误: {device.device_bdf}"
 
             METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
             for ep_bdf in self.ep_bdfs:
-                METHOD.clear_aer_status(ep_bdf)
+                METHOD.clear_error_status(ep_bdf)
 
     def test_pcie_sys_pm_016(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):

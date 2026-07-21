@@ -53,7 +53,7 @@ class TestLoopLinkEnable:
                                          self.config.config["UUT"]["password"])
             request.cls.aer_info_before = {}
             for ep_bdf, _ in request.cls.ep_dsp_pairs:
-                request.cls.aer_info_before[ep_bdf] = METHOD.get_aer_status_info(ep_bdf)
+                request.cls.aer_info_before[ep_bdf] = METHOD.get_error_status_info(ep_bdf)
 
         yield
         # teardown

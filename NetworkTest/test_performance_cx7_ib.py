@@ -36,6 +36,11 @@ class TestPerformanceCx7Ib:
         # setup
         LOGGER.sys(f"开始执行测试用例组:{request.cls}".center(100, "-"))
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
+            all_devices = METHOD.get_switch_info()
+            cx7_list = METHOD.get_special_device(all_devices, "EP_NETWORK_CX7")
+            cx7_bdf_list = [device.device_bdf for device in cx7_list]
+            # request.cls.numa_node = METHOD.get_device_numa_node(cx7_bdf_list[0])
+            request.cls.numa_node = "0"
             devices = METHOD.get_cx7_devices()
             request.cls.rdma_devices = devices["rdmalink"]
             request.cls.ip_devices = devices["ip"]
@@ -50,18 +55,18 @@ class TestPerformanceCx7Ib:
             METHOD.kill_ib_process()
             METHOD.clear_netns()
 
-    # @pytest.mark.author("袁大阳")
+    @pytest.mark.author("袁大阳")
     def test_performance_one_cx7_001(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            METHOD.cx7_start_server(self.rdma_devices[0:2])
-            METHOD.cx7_start_client(self.rdma_devices[0:2])
+            METHOD.cx7_start_server(self.rdma_devices[0:2], self.numa_node)
+            METHOD.cx7_start_client(self.rdma_devices[0:2], self.numa_node)
 
-    # @pytest.mark.author("袁大阳")
+    @pytest.mark.author("袁大阳")
     def test_performance_two_cx7_002(self):
         assert len(self.rdma_devices) >= 4, "RDMA设备数量不足，无法执行测试用例"
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            METHOD.cx7_start_server(self.rdma_devices[0:4])
-            METHOD.cx7_start_client(self.rdma_devices[0:4])
+            METHOD.cx7_start_server(self.rdma_devices[0:4], self.numa_node)
+            METHOD.cx7_start_client(self.rdma_devices[0:4], self.numa_node)
 
 
 if __name__ == '__main__':

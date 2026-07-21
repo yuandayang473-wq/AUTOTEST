@@ -58,11 +58,11 @@ def get_bdf():
     with open(vendor_file, "r") as f:
         data = yaml.safe_load(f)
         sw_vd = data["SW_VD"]
-        mep_vd = data["EP_SWITCH_SUDU_MEP"]
+        mep_vd = data["EP_SWITCH_SUDU_MEP_SUB"]
         mep_dsp_vd = data["DSP_MEP_VD"]
-        dma_vd = data["EP_SWITCH_SUDU_DMA"]
+        dma_vd = data["EP_SWITCH_SUDU_DMA_SUB"]
         dma_dsp_vd = data["DSP_DMA_VD"]  # 列表
-        ntb_vd = data["EP_SWITCH_SUDU_NTB"]
+        ntb_vd = data["EP_SWITCH_SUDU_NTB_SUB"]
         ntb_dsp_vd = data["DSP_NTB_VD"]
         eps = data["EPS"]
 
@@ -93,7 +93,7 @@ def get_bdf():
 
         # 只考虑基础和合成模式，即最多只有2个switch情况，其它多switch情况暂不考虑
         # 判断哪个switch有mep，即sw0
-        mep_res = execute_command(f"lspci -Dd {mep_vd}")
+        mep_res = execute_command(f'lspci -Dvvv | grep -B 10 -E "{mep_vd}|SDTECH Device 2006" | grep "^[0-9a-f]"').split()[0]
         if mep_res[5:12] in sw[0]:
             pass  # 第一个switch有mep,无需操作
         else:
@@ -105,8 +105,10 @@ def get_bdf():
     # 'ntb': {'dsp': xxx, 'ep': xxx, 'driver': xxx}, {}]
     all_sudu_sw = []
     mep_ep = mep_res[5:12]
-    dma_ep_list = [dma_ep[5:12] for dma_ep in execute_command(f"lspci -Dd {dma_vd} |awk -F ' ' '{{print $1}}'").split()]
-    ntb_ep_list = [ntb_ep[5:12] for ntb_ep in execute_command(f"lspci -Dd {ntb_vd} |awk -F ' ' '{{print $1}}'").split()]
+    dma_ep_res = execute_command(f'lspci -Dvvv | grep -B 10 -E "{dma_vd}|SDTECH Device 2005" | grep "^[0-9a-f]"').split("\n")
+    dma_ep_list = [dma_ep.split()[0][5:12] for dma_ep in dma_ep_res]
+    ntb_ep_res = execute_command(f'lspci -Dvvv | grep -B 10 -E "{ntb_vd}|SDTECH Device 2004" | grep "^[0-9a-f]"').split("\n")
+    ntb_ep_list = [ntb_ep.split()[0][5:12] for ntb_ep in ntb_ep_res]
 
     for partition in sw:
         mep_dict = {}  # 构建mep字典

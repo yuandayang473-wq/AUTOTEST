@@ -24,10 +24,63 @@ def pytest_addoption(parser):
         default="True",
         help="是否在每个测试用例后检查uart AER状态，默认为True",
     )
+    parser.addoption(
+        "--env-hint-approval",
+        action="store",
+        default="ask",
+        choices=["ask", "yes"],
+        help="环境提示确认策略: ask(人工确认)/yes(自动确认继续)，默认ask",
+    )
 
 
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+
+
+def _collect_item_env_hints(item):
+    hints = []
+    for mark in item.iter_markers(name="env_hint"):
+        if mark.args:
+            hints.append(str(mark.args[0]))
+    if item.get_closest_marker("interaction"):
+        hints.append("交互式半自动化用例，需要人工值守/交互")
+    return hints
+
+
+def pytest_collection_finish(session):
+    records = []
+    for item in session.items:
+        hints = _collect_item_env_hints(item)
+        if hints:
+            records.append((item.nodeid, hints))
+
+    LOGGER.sys("批量执行前环境要求确认".center(100, "-"))
+    if records:
+        LOGGER.info(f"本次存在特殊环境提示的用例数: {len(records)}")
+        for nodeid, hints in records:
+            LOGGER.info(f"测试用例: {nodeid}")
+            for hint in hints:
+                LOGGER.info(f"  环境要求: {hint}")
+    else:
+        LOGGER.info("本次待执行用例无特殊环境提示")
+
+    approval = str(session.config.getoption("--env-hint-approval")).strip().lower()
+    if approval == "yes":
+        LOGGER.info("已通过参数设置为自动确认，继续执行测试")
+        return
+
+    try:
+        if records:
+            confirm = input("请确认以上环境要求已满足，继续执行测试？[y/n]: ").strip().lower()
+        else:
+            return
+    except EOFError:
+        pytest.exit(
+            "无法读取人工确认输入，请显式指定 --env-hint-approval=yes",
+            returncode=2
+        )
+    if confirm not in ("y", "yes"):
+        pytest.exit("用户取消执行：环境要求未确认", returncode=2)
 
 
 def _format_duration(seconds: float) -> str:
@@ -130,11 +183,11 @@ def show_test_case(request):
     time_use = _format_duration(t2 - t1)
     LOGGER.sys(f"用例{request.node.name}测试完成，总用时{time_use}".center(100, "-"))
 
-@pytest.fixture(scope="function", autouse=True)
-def uart_aer_checker(request, show_test_case):
-    LOGGER.info("uart_aer_checker start")
-    yield
-    LOGGER.info("uart_aer_checker end")
+# @pytest.fixture(scope="function", autouse=True)
+# def uart_aer_checker(request, show_test_case):
+#     LOGGER.info("uart_aer_checker start")
+#     yield
+#     LOGGER.info("uart_aer_checker end")
     # if request.config.getoption("--uart-aer-check") == "True":
     #     config = CONFIG
     #     config.config = [

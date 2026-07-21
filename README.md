@@ -21,6 +21,8 @@ for ($i = 1; $i -le 10; $i++) {
     Write-Host "第 $i 次执行"
     pytest '@tests_to_run.txt'
 }
+生成aller报告（为避免之前测试数据影响，需在执行测试用例前删除无关的之前生成的aller文件夹，再生成报告）
+终端执行：allure serve allure-results
 
 ## Environment setup
 

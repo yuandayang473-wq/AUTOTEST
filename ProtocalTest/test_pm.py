@@ -47,9 +47,9 @@ class TestPM:
         # setup
         LOGGER.sys(f"开始执行测试用例组:{request.cls}".center(100, "-"))
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            request.cls.devices = METHOD.get_switch_info()
-            LOGGER.info("设备信息:{}".format(request.cls.devices))
-            METHOD.save_data_file(request.cls.devices, 'pcie_tree_before.json')
+            request.cls.devices_before = METHOD.get_switch_info()
+            LOGGER.info("设备信息:{}".format(request.cls.devices_before))
+            METHOD.save_data_file(request.cls.devices_before, 'pcie_tree_before.json')
             METHOD.upload_file_to_server('pcie_tree_before.json', 'pcie_tree_before.json',
                                      self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
                                      self.config.config["UUT"]["password"])
@@ -112,6 +112,10 @@ class TestPM:
                 BASE.execute_run('lspci -s {} -vvv | grep "PME-Enable+"'.format(dsp_bdf))
                 METHOD.PME_enable(dsp_bdf, PME=False)
 
+    # @pytest.mark.env_hint("需要特定具备ASPM能力的FW版本")
+    # def test_pcie_sys_pm_004(self):
+    #     pass
+
     def test_pcie_sys_pm_012(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             for ep_bdf in self.ep_bdfs:
@@ -119,14 +123,16 @@ class TestPM:
                 SLEEP(2)
                 assert METHOD.get_pm_state(ep_bdf) == "D0", f"EP设备应该处于D0状态: {ep_bdf}"
             self._save_after_and_diff()
-
+    @pytest.mark.env_hint("需要特定具备ASPM能力的FW版本，且环境中只具备WD/三星金手指盘（支持ASPM L1）")
     def test_pcie_sys_pm_014(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            for ep_bdf in self.ep_bdfs:
-                METHOD.set_power_state(ep_bdf, "D3hot")
+            for device in self.devices_before:
+                if device.type == "EP":
+                    METHOD.set_power_state(device.device_bdf, "D3hot")
             BASE.execute_run('python3 serial_check.py check_l1')
-            for ep_bdf in self.ep_bdfs:
-                METHOD.set_power_state(ep_bdf, "D0")
+            for device in self.devices_before:
+                if device.type == "EP":
+                    METHOD.set_power_state(device.device_bdf, "D0")
             self._save_after_and_diff()
 
     def test_pcie_sys_pm_015(self):
@@ -142,12 +148,12 @@ class TestPM:
             self.devices_after = METHOD.get_switch_info()
             for device in self.devices_after:
                 if device.device_bdf in self.ep_bdfs:
-                    aer_status = device.aer_status["DevSta"]
-                    assert "UnsupReq+" in aer_status, f"EP设备在D3hot状态下应该产生Unsupported Request错误: {device.device_bdf}"
+                    error_status = device.error_status["DevSta"]
+                    assert "UnsupReq+" in error_status, f"EP设备在D3hot状态下应该产生Unsupported Request错误: {device.device_bdf}"
 
             METHOD.save_data_file(self.devices_after, 'pcie_tree_after.json')
             for ep_bdf in self.ep_bdfs:
-                METHOD.clear_aer_status(ep_bdf)
+                METHOD.clear_error_status(ep_bdf)
 
     def test_pcie_sys_pm_016(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):

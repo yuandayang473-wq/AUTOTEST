@@ -69,6 +69,7 @@ class TestLoopL1:
             for dsp_bdf in self.dsp_bdfs:
                 METHOD.ASPM_enable(dsp_bdf, L0s=False, L1=False)
     # 需要特定FW版本和支持的设备（金手指WD盘和金手指三星盘）来打开ASPM
+    @pytest.mark.env_hint("需要特定FW版本，且环境中需具备支持ASPM L1的WD/三星金手指盘")
     def test_loop_L1_001(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             LOGGER.info("开始执行ASPM L1 enable循环测试")

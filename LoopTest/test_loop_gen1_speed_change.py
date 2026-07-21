@@ -126,6 +126,6 @@ if __name__ == '__main__':
         {"file": "Device.yaml", "name": "UUT", "key": "UUT_01"},
     ]
     with BASE.ssh_connect(uut=config.config["UUT"]):
-        METHOD.clear_aer_status("7:0.0")
+        METHOD.clear_error_status("7:0.0")
 
     # pytest.main(['-s',"test_link_speed_change_new.py"])

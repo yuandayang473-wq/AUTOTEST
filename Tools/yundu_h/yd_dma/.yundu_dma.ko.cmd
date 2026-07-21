@@ -1,0 +1,1 @@
+savedcmd_/root/yd_dma/yundu_dma.ko := ld -r -m elf_x86_64 -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T scripts/module.lds -o /root/yd_dma/yundu_dma.ko /root/yd_dma/yundu_dma.o /root/yd_dma/yundu_dma.mod.o

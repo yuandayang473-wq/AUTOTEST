@@ -4,6 +4,7 @@ import re
 import time
 import traceback
 from collections import defaultdict, namedtuple
+from concurrent.futures import ProcessPoolExecutor, as_completed, ThreadPoolExecutor
 
 import paramiko
 import yaml
@@ -145,38 +146,63 @@ class Method:
 
 
         devices = []
-        parser = BASE.execute_run(f"lspci -Dvvvnnd 205e:5104| grep 'Upstream Port' -B 30 | egrep '..:..\.0' | cut -d ' ' -f 1", i_record_cmd=True)
+        parser = BASE.execute_run(f"lspci -Dvvvnnd 205e:5144| grep 'Upstream Port' -B 30 | egrep '..:..\.0' | cut -d ' ' -f 1", i_record_cmd=True)
         msg = parser.get_origin_data()
         usplist = msg.strip().split('\n')
 
-        dma_p = []
-        mep_p = []
-        ntb_p = []
         for usp in usplist:
             sw_id = usplist.index(usp)
             uspbdf, dspbdf_list, epbdf_list = self.get_all_device(usp)
             rpbdf = self.get_parent_device(uspbdf)
-            devices.append(self.get_device(rpbdf, 'RP', sw_id))
-            devices.append(self.get_device(usp, 'USP', sw_id))
-            for ep in epbdf_list:
-                device = self.get_device(ep, 'EP', sw_id)
-                if device.type == 'DMA':
-                    dma_p.append(device.parent)
-                elif device.type == 'MEP':
-                    mep_p.append(device.parent)
-                elif device.type == 'NTB':
-                    ntb_p.append(device.parent)
-                devices.append(device)
-            for dsp in dspbdf_list:
-                if dsp in dma_p:
-                    device = self.get_device(dsp, 'DMA_IDSP', sw_id)
-                elif dsp in mep_p:
-                    device = self.get_device(dsp, 'MEP_IDSP', sw_id)
-                elif dsp in ntb_p:
-                    device = self.get_device(dsp, 'NTB_IDSP', sw_id)
-                else:
-                    device = self.get_device(dsp, 'DSP', sw_id)
-                devices.append(device)
+            tasks = [(rpbdf, 'RP'), (usp, 'USP')]
+            tasks.extend((ep, 'EP') for ep in epbdf_list)
+            tasks.extend((dsp, 'DSP') for dsp in dspbdf_list)
+
+            sw_devices = []
+            with ThreadPoolExecutor(max_workers=4) as executor:
+                future_map = {
+                    executor.submit(self.get_device, bdf, dev_type, sw_id): (bdf, dev_type)
+                    for bdf, dev_type in tasks
+                }
+                for future in as_completed(future_map):
+                    sw_devices.append(future.result())
+
+            dma_p = {d.parent for d in sw_devices if d.type == 'DMA'}
+            mep_p = {d.parent for d in sw_devices if d.type == 'MEP'}
+            ntb_p = {d.parent for d in sw_devices if d.type == 'NTB'}
+            for dev in sw_devices:
+                if dev.type == 'DSP':
+                    if dev.device_bdf in dma_p:
+                        dev = dev._replace(type="DMA_IDSP")
+                    elif dev.device_bdf in mep_p:
+                        dev = dev._replace(type="MEP_IDSP")
+                    elif dev.device_bdf in ntb_p:
+                        dev = dev._replace(type="NTB_IDSP")
+                devices.append(dev)
+            # dma_p = []
+            # mep_p = []
+            # ntb_p = []
+            # devices.append(self.get_device(rpbdf, 'RP', sw_id))
+            # devices.append(self.get_device(usp, 'USP', sw_id))
+            # for ep in epbdf_list:
+            #     device = self.get_device(ep, 'EP', sw_id)
+            #     if device.type == 'DMA':
+            #         dma_p.append(device.parent)
+            #     elif device.type == 'MEP':
+            #         mep_p.append(device.parent)
+            #     elif device.type == 'NTB':
+            #         ntb_p.append(device.parent)
+            #     devices.append(device)
+            # for dsp in dspbdf_list:
+            #     if dsp in dma_p:
+            #         device = self.get_device(dsp, 'DMA_IDSP', sw_id)
+            #     elif dsp in mep_p:
+            #         device = self.get_device(dsp, 'MEP_IDSP', sw_id)
+            #     elif dsp in ntb_p:
+            #         device = self.get_device(dsp, 'NTB_IDSP', sw_id)
+            #     else:
+            #         device = self.get_device(dsp, 'DSP', sw_id)
+            #     devices.append(device)
 
         return devices
 
@@ -208,7 +234,7 @@ class Method:
     def get_device(self, bdf, Type, switch_id):
         device = namedtuple('device', ['device_bdf', 'device_id', 'vendor_id', 'type', 'class_code',
                                        'cap_speed', 'cap_width', 'current_speed', 'current_width', 'driver', 'slot',
-                                       'parent', 'children', "aer_status", "switch_id"])
+                                       'parent', 'children', "error_status", "switch_id"])
         bdf_mod = bdf[5:12] if bdf[0:3] == '000' else bdf
         all_info = BASE.execute_run(f'lspci -vvvns {bdf_mod} | grep -E "({bdf_mod}|LnkCap:|LnkSta:|Kernel driver|Physical Slot|Subsystem)"', i_record_cmd=True).get_origin_data()
         class_code, vendor_id, device_id = re.search(f"{bdf_mod}\s+(.+?):\s+(.+?):(\\w+)", all_info).groups()
@@ -230,7 +256,7 @@ class Method:
             slot = "Null"
         parent = self.get_parent_device(bdf)
         children = self.get_children_device(bdf)
-        aer_status = self.get_aer_status_info(bdf)
+        error_status = self.get_error_status_info(bdf)
         if Type == 'EP':
             if f'{sub_id}' == '205e:2005':
                 Type = 'DMA'
@@ -239,7 +265,7 @@ class Method:
             if f'{sub_id}' == '205e:2004':
                 Type = 'NTB'
         return device(bdf, device_id, vendor_id, Type, class_code, cap_speed,
-                      cap_width, current_speed, current_width, driver, slot, parent, children, aer_status, switch_id)
+                      cap_width, current_speed, current_width, driver, slot, parent, children, error_status, switch_id)
 
     def parse_cesta(self, cesta_hex):
         if not cesta_hex or not re.match(r'^[0-9A-Fa-f]+$', cesta_hex):
@@ -299,7 +325,7 @@ class Method:
             parts.append(f"{name}{['-', '+'][(v >> bit) & 1]}")
         return " ".join(parts)
 
-    def get_aer_status_info(self, bdf):
+    def get_error_status_info(self, bdf):
         devsta = BASE.execute_run(f"setpci -s {bdf} CAP_EXP+0x0a.w", i_record_cmd=True).get_origin_data()
         uesta = BASE.execute_run(f"setpci -s {bdf} ECAP_AER+0x04.l", i_exit_code=True, i_record_cmd=True).get_origin_data()
         ret_ue = BASE.ssh.get_exit_code()
@@ -366,6 +392,29 @@ class Method:
 
         return msg.strip()
 
+    def get_special_device(self, devices: namedtuple, name: str):
+        '''
+        获取特定设备
+        '''
+        ret_devices = []
+        vendor_file = os.path.abspath(os.path.join(os.path.abspath(__file__), "../")) + "/vendor.yml"
+        with open(vendor_file, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+            vendor_id = data["EPS"][name].split(":")[0]
+            device_id = data["EPS"][name].split(":")[1]
+        for device in devices:
+            if device.vendor_id == vendor_id and device.device_id == device_id:
+                ret_devices.append(device)
+        return ret_devices
+
+    def get_device_numa_node(self, bdf):
+        '''
+        获取特定BDF设备所属的numa节点
+        '''
+        bdf = f"0000:{bdf}" if bdf[0:3] != "000" else bdf
+        numa_node = BASE.execute_run(f"cat /sys/bus/pci/devices/{bdf}/numa_node").get_origin_data().strip()
+        return numa_node
+
     def sbr_set(self, bdf):
         if BASE.ssh is None:
             raise SSHSessionError("init BASE.ssh")
@@ -390,12 +439,16 @@ class Method:
         with open(filename, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4, sort_keys=True)
 
-    def setpci_bits(self, bdf, offset, bit_start, bit_end, value, width="B"):
+    def setpci_bits(self, bdf, offset, bit_start, bit_end, value, width="B", i_exit_code=False):
         assert width in ("B", "W", "L"), "width must be one of B, W, L"
         bytes_map = {"B": 1, "W": 2, "L": 4}
 
         read_cmd = f"setpci -s {bdf} {offset}.{width}"
-        orig_val = int(BASE.execute_run(read_cmd).get_origin_data(), 16)
+        ret = BASE.execute_run(read_cmd, i_exit_code=i_exit_code).get_origin_data()
+        if BASE.ssh.get_exit_code() != 0:
+            LOGGER.info(f"忽略{read_cmd}执行错误，不再执行setpci写入")
+            return
+        orig_val = int(ret, 16)
         total_bits = bytes_map[width] * 8
 
         # 校验位范围
@@ -516,7 +569,7 @@ class Method:
         if detail["read_value_hex"] is None:
             raise ValueError(f"Failed to read memory address: {addr}")
         return detail["read_value_hex"]
-    def get_bar_address(self, bdf, bar_num=0):
+    def get_bar_address(self, bdf, bar_num=0, i_exit_code=False):
         """
             获取 PCIe 设备的 BAR 地址
             :param bdf: PCI 设备地址，如 "0000:17:00.0"
@@ -526,12 +579,12 @@ class Method:
         if not (0 <= bar_num <= 5):
             raise ValueError("bar_num must be between 0 and 5")
         cmd = f"lspci -s {bdf} -vvv | grep 'Region {bar_num}:'"
-        output = BASE.execute_run(cmd).get_origin_data()
+        output = BASE.execute_run(cmd, i_exit_code=i_exit_code).get_origin_data()
         match = re.search(r"Region {}: Memory at ([0-9a-fA-F]+)".format(bar_num), output)
         if match:
             return match.group(1)
         else:
-            raise ValueError(f"Failed to get BAR{bar_num} address for {bdf}")
+            return None
 
     def set_power_state(self, bdf, state):
         """
@@ -574,18 +627,20 @@ class Method:
         for i in list1:
             BASE.execute_run(f"opensm -g {i} -B -p 14")
 
-    def cx7_start_server(self, rdmalink_devices):
+    def cx7_start_server(self, rdmalink_devices, numa_node):
         """
             启动CX7服务端
             :param rdmalink_device: RDMA名称
+            :param numa_node: NUMA节点
         """
         for i in range(len(rdmalink_devices)):
-            BASE.execute_run(f"ip netns exec ns{i} ib_send_bw --report_gbits --run_infinitely --cpu_util -d mlx5_{i} -FD2 -q 4 -m 4096 -s 512K &>/dev/null &")
+            BASE.execute_run(f"numactl -N {numa_node} -m {numa_node} ip netns exec ns{i} ib_send_bw --report_gbits --run_infinitely --cpu_util -d mlx5_{i} -FD2 -q 4 -m 4096 -s 512K &>/dev/null &")
 
-    def cx7_start_client(self, rdmalink_devices):
+    def cx7_start_client(self, rdmalink_devices, numa_node):
         """
             启动CX7客户端
             :param rdmalink_device: RDMA名称
+            :param numa_node: NUMA节点
         """
         for i in range(len(rdmalink_devices)):
             for j in range(len(rdmalink_devices)):
@@ -594,7 +649,7 @@ class Method:
                     BASE.execute_run(f"ip netns exec ns{i} ping -c 2 -W 1 {remote_ip}", i_exit_code=True)
                     if BASE.ssh.get_exit_code() == 0:
                         LOGGER.info(f"发现可达IP{remote_ip}")
-                        BASE.execute_run(f"ip netns exec ns{i} ib_send_bw --report_gbits --run_infinitely --cpu_util -d mlx5_{i} -FD2 -q 4 -m 4096 -s 512K {remote_ip} &>/dev/null &")
+                        BASE.execute_run(f"numactl -N {numa_node} -m {numa_node} ip netns exec ns{i} ib_send_bw --report_gbits --run_infinitely --cpu_util -d mlx5_{i} -FD2 -q 4 -m 4096 -s 512K {remote_ip} &>/dev/null &")
                         break
             else:
                 LOGGER.info(f"未发现可达IP，无法启动客户端{rdmalink_devices[i]}")
@@ -773,15 +828,16 @@ class Method:
         else:
             self.setpci_bits(dsp, "ECAP_SECPCI+4", 0, 0, 0)
 
-    def clear_aer_status(self, bdf):
+    def clear_error_status(self, bdf):
         """
-            清除PCIe设备的AER状态
+            清除PCIe设备的错误状态
             :param bdf: PCI设备地址，如 "0000:17:00.0"
         """
-        LOGGER.info(f"清除{bdf}对应AER状态")
+        LOGGER.info(f"清除{bdf}对应错误状态")
         self.setpci_bits(bdf, "CAP_EXP+0A", 7, 0, 2**8 - 1, width="B")
-        self.setpci_bits(bdf, "ECAP_AER+04", 31, 0, 2**32 - 1, width="L")
-        self.setpci_bits(bdf, "ECAP_AER+10", 15, 0, 2**16 - 1, width="W")
+        self.setpci_bits(bdf, "ECAP_AER+04", 31, 0, 2**32 - 1, width="L", i_exit_code = True)
+        self.setpci_bits(bdf, "ECAP_AER+10", 15, 0, 2**16 - 1, width="W", i_exit_code = True)
+
 
     def pci_rescan(self):
         """
@@ -846,3 +902,28 @@ class Method:
         nvme_name = f"/dev/{ret}n1"
         LOGGER.info(f"获取到的盘符为：{nvme_name}")
         return nvme_name
+
+    def insmod_dma_driver(self, ip, user, password):
+        BASE.execute_run("lsmod |grep yundu_dma", i_exit_code = True)
+        if BASE.ssh.get_exit_code() != 0:
+            self.upload_file_to_server(r'Tools\yundu_h\yd_dma', 'yd_dma',
+                                         ip, user, password)
+            BASE.execute_run("cd yd_dma; make; insmod yundu_dma.ko")
+        else:
+            LOGGER.info("yundu_dma驱动已加载，无需重复加载")
+    def rmmod_dma_driver(self):
+
+        BASE.execute_run("rmmod yundu_dma")
+
+    def insmod_ntb_driver(self, ip, user, password):
+        BASE.execute_run("lsmod |grep sudu_ntb", i_exit_code = True)
+        if BASE.ssh.get_exit_code() != 0:
+            self.upload_file_to_server(r'Tools\yundu_h\yd_ntb', 'yd_ntb',
+                                         ip, user, password)
+            BASE.execute_run("cd yd_ntb; make; insmod sudu_ntb.ko")
+        else:
+            LOGGER.info("sudu_ntb驱动已加载，无需重复加载")
+
+    def rmmod_ntb_driver(self):
+
+        BASE.execute_run("rmmod sudu_ntb")
