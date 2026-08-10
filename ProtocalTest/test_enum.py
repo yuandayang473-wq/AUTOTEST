@@ -47,18 +47,12 @@ class TestEnum:
         yield
         # teardown
         LOGGER.info(f"结束执行测试用例组:{request.cls}".center(100, "-"))
-        with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            devices_after = METHOD.get_switch_info()
-            METHOD.save_data_file(devices_after, 'pcie_tree_after.json')
-            METHOD.upload_file_to_server('pcie_tree_after.json', 'pcie_tree_after.json',
-                                         self.config.config["UUT"]["ip"], self.config.config["UUT"]["username"],
-                                         self.config.config["UUT"]["password"])
-            BASE.execute_run('diff pcie_tree_before.json pcie_tree_after.json')
+
     @pytest.mark.env_hint("需要环境中有nvme设备")
     def test_pcie_sys_enum_002(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
             for device in self.devices:
-                if device.class_code == "0108":
+                if device.class_code == "0108" and device.type == "EP":
                     self.bdf = device.device_bdf
                     self.driver = device.driver
             assert self.bdf is not None, "未找到class code为0108的设备，请确认测试环境中是有NVME设备"

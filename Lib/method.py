@@ -916,14 +916,14 @@ class Method:
         BASE.execute_run("rmmod yundu_dma")
 
     def insmod_ntb_driver(self, ip, user, password):
-        BASE.execute_run("lsmod |grep sudu_ntb", i_exit_code = True)
+        BASE.execute_run("lsmod |grep sudo_ntb", i_exit_code = True)
         if BASE.ssh.get_exit_code() != 0:
             self.upload_file_to_server(r'Tools\yundu_h\yd_ntb', 'yd_ntb',
                                          ip, user, password)
-            BASE.execute_run("cd yd_ntb; make; insmod sudu_ntb.ko")
+            BASE.execute_run("cd yd_ntb; make; insmod sudo_ntb.ko")
         else:
-            LOGGER.info("sudu_ntb驱动已加载，无需重复加载")
+            LOGGER.info("sudo_ntb驱动已加载，无需重复加载")
 
     def rmmod_ntb_driver(self):
 
-        BASE.execute_run("rmmod sudu_ntb")
+        BASE.execute_run("rmmod sudo_ntb")

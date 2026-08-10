@@ -91,13 +91,16 @@ class TestLoopD3Hot:
                 METHOD.set_power_state(ep_bdf, "D0")
 
 
+    @pytest.mark.env_hint("需要特定具备ASPM能力的FW版本，且环境中只具备WD/三星金手指盘（支持ASPM L1）")
     def test_pcie_sys_pm_014(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            for ep_bdf in self.ep_bdfs:
-                METHOD.set_power_state(ep_bdf, "D3hot")
+            for device in self.devices_before:
+                if device.type == "EP":
+                    METHOD.set_power_state(device.device_bdf, "D3hot")
             BASE.execute_run('python3 serial_check.py check_l1')
-            for ep_bdf in self.ep_bdfs:
-                METHOD.set_power_state(ep_bdf, "D0")
+            for device in self.devices_before:
+                if device.type == "EP":
+                    METHOD.set_power_state(device.device_bdf, "D0")
             self._save_after_and_diff()
 
     def test_pcie_sys_pm_015(self):

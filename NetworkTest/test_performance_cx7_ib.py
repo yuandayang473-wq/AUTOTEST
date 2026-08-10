@@ -36,9 +36,9 @@ class TestPerformanceCx7Ib:
         # setup
         LOGGER.sys(f"开始执行测试用例组:{request.cls}".center(100, "-"))
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
-            all_devices = METHOD.get_switch_info()
-            cx7_list = METHOD.get_special_device(all_devices, "EP_NETWORK_CX7")
-            cx7_bdf_list = [device.device_bdf for device in cx7_list]
+            # all_devices = METHOD.get_switch_info()
+            # cx7_list = METHOD.get_special_device(all_devices, "EP_NETWORK_CX7")
+            # cx7_bdf_list = [device.device_bdf for device in cx7_list]
             # request.cls.numa_node = METHOD.get_device_numa_node(cx7_bdf_list[0])
             request.cls.numa_node = "0"
             devices = METHOD.get_cx7_devices()

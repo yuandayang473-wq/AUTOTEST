@@ -123,6 +123,7 @@ class TestPM:
                 SLEEP(2)
                 assert METHOD.get_pm_state(ep_bdf) == "D0", f"EP设备应该处于D0状态: {ep_bdf}"
             self._save_after_and_diff()
+
     @pytest.mark.env_hint("需要特定具备ASPM能力的FW版本，且环境中只具备WD/三星金手指盘（支持ASPM L1）")
     def test_pcie_sys_pm_014(self):
         with BASE.ssh_connect(uut=self.config.config["UUT"]):
