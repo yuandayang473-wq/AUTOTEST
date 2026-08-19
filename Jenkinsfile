@@ -13,6 +13,7 @@ pipeline {
         }
         stage('Run Test') {
             steps {
+                echo "Running test: ${params.TEST_NAME}"
                 sh '''
                     echo "Running test: ${params.TEST_NAME}"
 
@@ -22,10 +23,6 @@ pipeline {
     }
 
     post {
-        always {
-            cleanWs()
-        }
-
         success {
             echo '构建成功'
         }
