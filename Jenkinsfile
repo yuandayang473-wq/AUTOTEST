@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-    label 'power'     // 指定带 power 标签的节点
-}
+    agent any
 
     parameters {
         string(
