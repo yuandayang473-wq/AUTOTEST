@@ -1,6 +1,6 @@
 pipeline {
     agent {
-    label 'linux'     // 指定带 linux 标签的节点
+    label 'power'     // 指定带 power 标签的节点
 }
 
     parameters {
