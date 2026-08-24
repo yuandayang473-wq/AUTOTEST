@@ -22,9 +22,9 @@ PASSWORD = "1"
 #功耗获取命令
 POWERCOMMAND = "power_read"
 #温度获取命令
-TEMPCOMMAND = "pvt getcali 0 0 0"
-#电压获取命令
-VDDCOMMAND = "pvt getall"
+TEMPCOMMAND = "pvt getcali 0 0 1"
+#PVT获取命令
+PVTCOMMAND = "pvt getall"
 #筛片shell脚本名称,建议脚本放置/root目录下
 SCRIPTNAME = "slt_dpdu_of_nopower_x4_1.sh"
 SERIALPORT = "COM4"
@@ -64,7 +64,7 @@ def sersend(cmd, serialport=SERIALPORT, log_response=True):
     ser = serial.Serial(serialport, BAUDRATE, timeout=10, write_timeout=5)
     ser.write(b"\r")
     ser.write(f"{cmd}\r".encode("utf-8"))
-    time.sleep(1)
+    time.sleep(0.1)
     retcontent = ser.read_all()
     ret = retcontent.decode("utf-8")
     ser.close()
@@ -110,14 +110,14 @@ def portcheck(serialport=SERIALPORT):
                 if "Cur link Status Cap:" in retcontentlist[i]:
                     num += 1
                     if m == 3 and n == 1:
-                        if "GEN5 X8" not in retcontentlist[i]:
+                        if "GEN5 X16" not in retcontentlist[i]:
                             res = retcontentlist[i].split("-")[-1]
                             logger.error("S{}P{}降为{}".format(m, n, res))
                             flag = False
                         else:
                             logger.debug(f"S{m}P{n}" + str(retcontentlist[i]))
                     elif m == 0 and n == 1 or m == 1 and n == 1 or m == 2 and n == 1 or m == 4 and n == 1 or m == 5 and n == 1 or m == 6 and n == 1 or m == 7 and n == 1 or m == 8 and n == 1:
-                        if "GEN5 X4" not in retcontentlist[i]:
+                        if "GEN5 X16" not in retcontentlist[i]:
                             res = retcontentlist[i].split("-")[-1]
                             logger.error("S{}P{}降为{}".format(m, n, res))
                             flag = False
@@ -233,12 +233,12 @@ def fiotest(q, ip, username, password, serialport):
         logger.info("------fio测试前功耗读取------")
         sersend(f"{POWERCOMMAND}", serialport)
         sersend(f"{TEMPCOMMAND}", serialport)
-        sersend(f"{VDDCOMMAND}", serialport)
+        sersend(f"{PVTCOMMAND}", serialport)
         ret = remotecmd(f"cd /home/sd/hyp; bash ./{SCRIPTNAME}", ip, username, password)
         logger.info("+++++fio测试后功耗读取+++++")
         sersend(f"{POWERCOMMAND}", serialport)
         sersend(f"{TEMPCOMMAND}", serialport)
-        sersend(f"{VDDCOMMAND}", serialport)
+        sersend(f"{PVTCOMMAND}", serialport)
         if ret != 0:
             q.put(-1)
         else:
@@ -275,7 +275,7 @@ def test_fiostress(ip=IP, username=USERNAME, password=PASSWORD):
                 logger.info("*******fio测试中功耗读取*******")
                 sersend(f"{POWERCOMMAND}", serialport=SERIALPORT)
                 sersend(f"{TEMPCOMMAND}", serialport=SERIALPORT)
-                sersend(f"{VDDCOMMAND}", serialport=SERIALPORT)
+                sersend(f"{PVTCOMMAND}", serialport=SERIALPORT)
             else:
                 return_sum += q.get()
                 process_copy.remove(p)
@@ -297,14 +297,13 @@ def monitor(q):
             break
         with r:
             try:
-                dfs_ret = sersend("dfs get", SERIALPORT, log_response=False)
+                # dfs_ret = sersend("dfs get", SERIALPORT, log_response=False)
                 # sersend("lt_his all", SERIALPORT)
                 # sersend(f"{TEMPCOMMAND}", SERIALPORT)
                 power_ret = sersend(f"{POWERCOMMAND}", SERIALPORT, log_response=False)
-                vdd_ret = sersend(f"{VDDCOMMAND}", SERIALPORT, log_response=False)
-                # hit = should_log_monitor_cycle(vdd_ret)
-                hit = False
-                log_command_result(dfs_ret, write_file=hit)
+                vdd_ret = sersend(f"{PVTCOMMAND}", SERIALPORT, log_response=False)
+                hit = should_log_monitor_cycle(vdd_ret)
+                # log_command_result(dfs_ret, write_file=hit)
                 log_command_result(power_ret, write_file=hit)
                 log_command_result(vdd_ret, write_file=hit)
             except Exception as e:
@@ -321,7 +320,7 @@ def link_check(q):
             except Exception as e:
                 q.put(e)
                 logger.error("{}".format(traceback.format_exc()))
-        time.sleep(10)
+        time.sleep(120)
 
 ####main####
 if __name__ == '__main__':

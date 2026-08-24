@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+    label 'linux'     // 指定带 linux 标签的节点
+}
 
     parameters {
         string(
