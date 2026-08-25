@@ -45,7 +45,7 @@ pipeline {
                 ]) {
                     sh '''
                         set -eu
-                        ./script_run-test.sh "$TEST_NAME"
+                        ./scripts_run-test.sh "$TEST_NAME"
                     '''
                 }
             }
