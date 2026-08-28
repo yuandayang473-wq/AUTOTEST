@@ -302,7 +302,8 @@ def monitor(q):
                 # sersend(f"{TEMPCOMMAND}", SERIALPORT)
                 power_ret = sersend(f"{POWERCOMMAND}", SERIALPORT, log_response=False)
                 vdd_ret = sersend(f"{PVTCOMMAND}", SERIALPORT, log_response=False)
-                hit = should_log_monitor_cycle(vdd_ret)
+                hit = True
+                # hit = should_log_monitor_cycle(vdd_ret)
                 # log_command_result(dfs_ret, write_file=hit)
                 log_command_result(power_ret, write_file=hit)
                 log_command_result(vdd_ret, write_file=hit)

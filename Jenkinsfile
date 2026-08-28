@@ -60,13 +60,6 @@ pipeline {
                 artifacts: '*_testlog.zip',
                 allowEmptyArchive: true
             )
-
-            emailext(
-                body: '${DEFAULT_CONTENT}',
-                subject: '${DEFAULT_SUBJECT}',
-                to: 'yuandayang@sudoinfotech.com',
-                attachmentsPattern: '*_testlog.zip'
-            )
         }
 
         success {
@@ -74,6 +67,12 @@ pipeline {
         }
 
         failure {
+            emailext(
+                body: '${DEFAULT_CONTENT}',
+                subject: '${DEFAULT_SUBJECT}',
+                to: 'yuandayang@sudoinfotech.com',
+                attachmentsPattern: '*_testlog.zip'
+            )
             echo '构建失败'
         }
 
