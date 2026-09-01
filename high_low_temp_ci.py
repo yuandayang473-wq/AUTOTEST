@@ -242,7 +242,7 @@ def link_check(stop_event):
 ####main####
 if __name__ == '__main__':
     stop_event = threading.Event()
-    SERIALPORT = getcmdserialport()  # 获取命令串口
+    getcmdserialport()  # 获取命令串口
 
     t1 = threading.Thread(target=fio, args=(stop_event,), daemon=True)
     t2 = threading.Thread(target=link_check, args=(stop_event,), daemon=True)

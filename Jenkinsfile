@@ -10,9 +10,15 @@ pipeline {
         stage('Run Test') {
             steps {
                 echo "Running test: ${env.TEST_NAME}"
-                bat '''
-                    py -3 high_low_temp_ci.py
-                '''
+            bat '''
+                whoami
+                echo SESSION=%SESSIONNAME%
+                where py
+                where python
+                where python3
+                py -3 -c "import serial.tools.list_ports; print([p.device for p in serial.tools.list_ports.comports()])"
+                py -3 high_low_temp_ci.py
+            '''
             }
         }
     }
