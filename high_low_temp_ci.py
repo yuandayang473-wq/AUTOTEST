@@ -29,7 +29,7 @@ TEMPCOMMAND = "pvt getcali 0 0 1"
 PVTCOMMAND = "pvt getall"
 # 筛片shell脚本名称,建议脚本放置/root目录下
 SCRIPTNAME = "slt_dpdu_of_nopower_x4_1.sh"
-SERIALPORT = "COM4"
+SERIALPORT = ""
 BAUDRATE = 230400
 LOGFILE = "log_%s.log" % time.strftime("%Y%m%d%H%M%S", time.localtime())
 # 设置日志打印格式

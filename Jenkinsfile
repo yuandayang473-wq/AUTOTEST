@@ -11,7 +11,7 @@ pipeline {
             steps {
                 echo "Running test: ${env.TEST_NAME}"
                 bat '''
-                    py -3 hign_low_temp_ci.py
+                    py -3 high_low_temp_ci.py
                 '''
             }
         }
