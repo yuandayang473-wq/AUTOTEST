@@ -18,7 +18,7 @@ import sys
 import socket
 from multiprocessing import Process, Queue
 
-IP = "192.168.10.62"
+IP = "192.168.10.217"
 USERNAME = "root"
 PASSWORD = "1"
 # 功耗获取命令
@@ -223,21 +223,17 @@ def fio(stop_event):
         remotecmd(
             "cd /root; fio fio_perf.fio", IP, USERNAME, PASSWORD
         )
-    except Exception:
-        logger.error(traceback.format_exc())
     finally:
         stop_event.set()  # fio 正常结束或异常时，结束主线程
 
 
 def link_check(stop_event):
-    while not stop_event.is_set():
-        try:
+    try:
+        while not stop_event.is_set():
             portcheck(serialport=SERIALPORT)
-        except Exception:
-            logger.error(traceback.format_exc())
-            stop_event.set()  # 建链检查失败，通知主线程结束
-            return
-        sleep(120)
+            sleep(120)
+    finally:
+        stop_event.set()
 
 ####main####
 if __name__ == '__main__':

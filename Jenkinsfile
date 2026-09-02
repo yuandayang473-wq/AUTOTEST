@@ -1,18 +1,28 @@
 pipeline {
     agent {label 'windows'}
 
+    options {
+        skipDefaultCheckout(true)
+    }
+
     environment {
         TEST_NAME = 'high_low_temp_test'
     }
 
     stages {
+        stage('Prepare Workspace') {
+            steps {
+                deleteDir()
+                checkout scm
+            }
+        }
 
         stage('Run Test') {
             steps {
                 echo "Running test: ${env.TEST_NAME}"
-            bat '''
-                py -3 high_low_temp_ci.py
-            '''
+                bat '''
+                    py -3 high_low_temp_ci.py
+                '''
             }
         }
     }
@@ -41,6 +51,10 @@ pipeline {
 
         unstable {
             echo '构建不稳定'
+        }
+
+        cleanup {
+            deleteDir()
         }
     }
 }
