@@ -165,18 +165,18 @@ def remotecmd(cmd, ip=IP, username=USERNAME, password=PASSWORD, port=22):
         else:
             logger.info(f"remote command:{cmd} exec success, output is {''.join(output)}")
         return return_code, ''.join(output)
-    except paramiko.AuthenticationException:
-        logger.error("认证失败！")
-        return None, None
-    except paramiko.SSHException as e:
-        logger.error(f"SSH连接错误: {e}")
-        return None, None
-    except paramiko.ssh_exception.NoValidConnectionsError as e:
-        logger.error(f"连接{ip}失败...")
-        return None, None
-    except socket.timeout:
-        logger.error(f"连接超时：无法在10秒内连接到 {ip}")
-        return None, None
+    # except paramiko.AuthenticationException:
+    #     logger.error("认证失败！")
+    #     return None, None
+    # except paramiko.SSHException as e:
+    #     logger.error(f"SSH连接错误: {e}")
+    #     return None, None
+    # except paramiko.ssh_exception.NoValidConnectionsError as e:
+    #     logger.error(f"连接{ip}失败...")
+    #     return None, None
+    # except socket.timeout:
+    #     logger.error(f"连接超时：无法在10秒内连接到 {ip}")
+    #     return None, None
     finally:
         # 关闭连接
         client.close()
@@ -217,23 +217,27 @@ def getcmdserialport():
         logger.error("Cannot find command serial port")
         exit(1)
 
+failures = queue.Queue()
 
 def fio(stop_event):
     try:
-        remotecmd(
-            "cd /root; fio fio_perf.fio", IP, USERNAME, PASSWORD
-        )
-    finally:
-        stop_event.set()  # fio 正常结束或异常时，结束主线程
-
-
-def link_check(stop_event):
-    try:
-        while not stop_event.is_set():
-            portcheck(serialport=SERIALPORT)
-            sleep(120)
+        remotecmd("cd /root; fio fio_perf.fio", IP, USERNAME, PASSWORD)
+    except Exception:
+        failures.put(traceback.format_exc())
+        logger.exception("fio failed")
     finally:
         stop_event.set()
+
+def link_check(stop_event):
+    while not stop_event.is_set():
+        try:
+            portcheck(serialport=SERIALPORT)
+        except Exception:
+            failures.put(traceback.format_exc())
+            logger.exception("link check failed")
+            stop_event.set()
+            return
+        sleep(120)
 
 ####main####
 if __name__ == '__main__':
@@ -247,3 +251,5 @@ if __name__ == '__main__':
     t2.start()
 
     stop_event.wait()
+    if not failures.empty():
+        raise RuntimeError(failures.get())
