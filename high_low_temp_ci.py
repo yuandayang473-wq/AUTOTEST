@@ -143,6 +143,7 @@ def remotecmd(cmd, ip=IP, username=USERNAME, password=PASSWORD, port=22):
         stdin, stdout, stderr = client.exec_command(cmd, get_pty=False)
         channel = stdout.channel
         output = []
+        error_output = []
         # 实时读取输出
         while not channel.exit_status_ready() or channel.recv_ready() or channel.recv_stderr_ready():
             # 读取标准输出
@@ -151,20 +152,33 @@ def remotecmd(cmd, ip=IP, username=USERNAME, password=PASSWORD, port=22):
                 output.append(chunk)
                 sys.stdout.write(chunk)
                 sys.stdout.flush()
+                if chunk.strip():
+                    logger.info(chunk.rstrip())
             # 读取标准错误
             if channel.recv_stderr_ready():
-                sys.stderr.write(channel.recv_stderr(1024).decode('utf-8', errors='ignore'))
+                chunk = channel.recv_stderr(1024).decode('utf-8', errors='ignore')
+                error_output.append(chunk)
+                sys.stderr.write(chunk)
                 sys.stderr.flush()
+                if chunk.strip():
+                    logger.error(chunk.rstrip())
             if not channel.recv_ready() and not channel.recv_stderr_ready():
                 time.sleep(0.01)
         return_code = channel.recv_exit_status()
+        output_text = ''.join(output)
+        error_text = ''.join(error_output)
         if return_code:
             logger.error(f"remote command:{cmd} exec failed, return code is {return_code}")
-            logger.error(f"remote command:{cmd} exec failed, output is {''.join(output)}")
-            raise Exception(f"remote command:{cmd} exec failed, output is {''.join(output)}")
+            logger.error(f"remote command:{cmd} stdout is {output_text}")
+            logger.error(f"remote command:{cmd} stderr is {error_text}")
+            raise Exception(
+                f"remote command:{cmd} exec failed, stdout is {output_text}, stderr is {error_text}"
+            )
         else:
-            logger.info(f"remote command:{cmd} exec success, output is {''.join(output)}")
-        return return_code, ''.join(output)
+            logger.info(f"remote command:{cmd} exec success, stdout is {output_text}")
+            if error_text:
+                logger.warning(f"remote command:{cmd} stderr is {error_text}")
+        return return_code, output_text
     # except paramiko.AuthenticationException:
     #     logger.error("认证失败！")
     #     return None, None
@@ -224,7 +238,6 @@ def fio(stop_event):
         remotecmd("cd /root; fio fio_perf.fio", IP, USERNAME, PASSWORD)
     except Exception:
         failures.put(traceback.format_exc())
-        logger.exception("fio failed")
     finally:
         stop_event.set()
 
@@ -234,7 +247,6 @@ def link_check(stop_event):
             portcheck(serialport=SERIALPORT)
         except Exception:
             failures.put(traceback.format_exc())
-            logger.exception("link check failed")
             stop_event.set()
             return
         sleep(120)
